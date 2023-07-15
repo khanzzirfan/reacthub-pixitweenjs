@@ -7,6 +7,11 @@ const config = {
     "@storybook/addon-essentials",
     "@storybook/addon-interactions",
   ],
+  refs: {
+    "@chakra-ui/react": {
+      disable: true,
+    },
+  },
   framework: {
     name: "@storybook/react-vite",
     options: {},

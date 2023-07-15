@@ -147,6 +147,13 @@ const GsapPixieContextProvider = ({ children }) => {
       value={{
         gsapCtx,
         tl,
+        handlePlay,
+        handlePause,
+        handleReset,
+        handleSeek,
+        handleRestart,
+        handleRepeat,
+        playerTimeRef,
       }}
     >
       {children}
