@@ -27,6 +27,10 @@
     "init-msw": "msw init public/"
   },
   "devDependencies": {
+    "@chakra-ui/icons": "^2.0.15",
+    "@chakra-ui/react": "^2.7.1",
+    "@emotion/react": "^11",
+    "@emotion/styled": "^11",
     "@giphy/js-fetch-api": "^4.1.2",
     "@giphy/js-types": "^4.1.0",
     "@giphy/react-components": "^5.6.1",
@@ -52,8 +56,9 @@
     "@types/react": "^18.0.28",
     "@types/react-dom": "^18.0.11",
     "@vitejs/plugin-react": "^3.1.0",
+    "framer-motion": "^8.4.0",
     "gsap": "3.11.5",
-    "lodash": "4.17.21",
+    "lodash": "4.17.21", 
     "msw": "^1.2.1",
     "msw-storybook-addon": "^1.8.0",
     "pixi-filters": "5.1.1",
