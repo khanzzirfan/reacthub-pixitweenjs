@@ -7,23 +7,42 @@ export const PixiImageSprite = withPixiApp((props) => {
   console.log("allProps", props);
   //// Refs
   const imageRef = React.useRef(null);
-  const groupRef = React.useRef(null);
+  const containerRef = React.useRef(null);
   const imgGroupRef = React.useRef(null);
 
   //// Context
-  const gsapContext = React.useContext(GsapPixieContext);
+  const { tl } = React.useContext(GsapPixieContext);
 
   /// 1001
-  console.log("contxt Values", gsapContext);
-  const { x, y, ...restProps } = props;
+  console.log("contxt Values", tl);
+  const { x, y, startAt, endAt, ...restProps } = props;
 
   const app = useApp();
   const PixiTransformer = React.useRef(null);
 
+  React.useEffect(() => {
+    if (containerRef.current && tl.current) {
+      console.log("adding to timeline animation");
+      tl.current
+        .to(containerRef.current, { opacity: 1, duration: 0.1 }, startAt)
+        .from(
+          containerRef.current,
+          { duration: Number(endAt) - Number(startAt) },
+          startAt,
+        )
+        .to(
+          containerRef.current,
+          { opacity: 0, duration: 0.1 },
+          Number(endAt) - Number(0.2),
+        );
+      console.log("sprite", tl.current.totalDuration());
+    }
+  }, [startAt, endAt]);
+
   console.log("PixiTransformer");
 
   return (
-    <Container ref={groupRef}>
+    <Container ref={containerRef}>
       <Container ref={imgGroupRef}>
         <Sprite
           image="https://assets.codepen.io/693612/surya.svg"

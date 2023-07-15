@@ -25,7 +25,7 @@ const GsapPixieContextProvider = ({ children }) => {
 
   const tl = useRef();
   const gsapCtx = useRef();
-  const playerTimeRef = useRef(0.0);
+  const playerTimeRef = useRef(0.001);
 
   // gsap.ticker.add((time, deltaTime, frame) => {
   //   console.log("timeframe", time, deltaTime, frame);
@@ -46,7 +46,7 @@ const GsapPixieContextProvider = ({ children }) => {
         defaults: { duration: 0 },
       });
     });
-    return () => gsapCtx.revert();
+    return () => gsapCtx.current.revert();
   }, []);
 
   const onUpdate = useCallback(() => {
@@ -74,7 +74,7 @@ const GsapPixieContextProvider = ({ children }) => {
     const timeline = tl.current;
     timeline
       .eventCallback("onUpdate", function () {
-        // console.log(timeline.progress());
+        console.log("onupdate", timeline.progress());
         onUpdate();
       })
       .eventCallback("onComplete", function () {
@@ -106,7 +106,6 @@ const GsapPixieContextProvider = ({ children }) => {
 
   const handleRestart = useCallback(() => {
     const timeline = tl.current;
-
     timeline.restart();
   }, []);
 
@@ -137,7 +136,6 @@ const GsapPixieContextProvider = ({ children }) => {
 
   const handlePlay = () => {
     const timeline = tl.current;
-
     timeline.resume();
     emitCustomEvent(Events.RESUME);
   };

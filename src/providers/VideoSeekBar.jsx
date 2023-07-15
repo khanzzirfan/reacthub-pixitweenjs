@@ -36,10 +36,13 @@ export const VideoSeekBar = () => {
 
   /// state
   const [time, setTime] = React.useState(0);
+  const [duration, setDuration] = React.useState(0);
 
   const totalVideoSeconds = 20;
 
   const animate = (time) => {
+    /// console.log("totalDuration", timeline.current.totalDuration());
+    setDuration(timeline.current.totalDuration());
     if (playerTimeRef && playerTimeRef.current) {
       setTime(playerTimeRef.current);
     }
@@ -123,7 +126,7 @@ export const VideoSeekBar = () => {
           data-testid="sliderthumb"
           value={playerTimeRef.current || 0}
           min={0}
-          max={20}
+          max={duration}
           step={0.1}
           onChange={handleOnSliderChange}
           onChangeStart={handleOnSliderChangeStart}
@@ -134,6 +137,9 @@ export const VideoSeekBar = () => {
           </SliderTrack>
           <SliderThumb data-testid="sliderthumb" />
         </Slider>
+      </Flex>
+      <Flex flexDir={"row"}>
+        <Text>Gsap-CurrentTime: {time}</Text>
       </Flex>
     </Flex>
   );

@@ -15,9 +15,12 @@ import { VideoSeekBar } from "./VideoSeekBar";
 const ContextBridge = ({ children, Context, render }) => {
   return (
     <Context.Consumer>
-      {(value) =>
-        render(<GsapPixieContextProvider>{children}</GsapPixieContextProvider>)
-      }
+      {(value) => {
+        console.log("value", value);
+        return render(
+          <Context.Provider value={value}>{children}</Context.Provider>,
+        );
+      }}
     </Context.Consumer>
   );
 };
@@ -41,23 +44,24 @@ export const App = ({ children, backgroundColor, ...props }) => {
   /// color: 0x1099bb,
   return (
     <div className="App">
-      <ChakraProvider>
-        <Flex flexDir={"column"}>
-          <Stage
-            width={width}
-            height={height}
-            // options={{ background: backgroundColor }}
-            options={{ backgroundColor: backgroundColorx, resolution: 2 }}
-          >
-            {children}
-          </Stage>
-          <GsapPixieContextProvider>
+      <GsapPixieContextProvider>
+        <ChakraProvider>
+          <Flex flexDir={"column"}>
+            <Stage
+              width={width}
+              height={height}
+              // options={{ background: backgroundColor }}
+              options={{ backgroundColor: backgroundColorx, resolution: 2 }}
+            >
+              {children}
+            </Stage>
+
             <Box mt={5} w={600}>
               <VideoSeekBar />
             </Box>
-          </GsapPixieContextProvider>
-        </Flex>
-      </ChakraProvider>
+          </Flex>
+        </ChakraProvider>
+      </GsapPixieContextProvider>
     </div>
   );
 };
