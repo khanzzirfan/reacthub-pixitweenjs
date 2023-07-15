@@ -39,7 +39,7 @@ const GsapPixieContextProvider = ({ children }) => {
   useLayoutEffect(() => {
     gsapCtx.current = gsap.context(() => {
       // add a box and circle animation to our timeline and play on first render
-      console.log("creating timeline");
+      // console.log("creating timeline");
       tl.current && tl.current.progress(0).kill();
       tl.current = gsap.timeline({
         paused: true,
@@ -74,7 +74,7 @@ const GsapPixieContextProvider = ({ children }) => {
     const timeline = tl.current;
     timeline
       .eventCallback("onUpdate", function () {
-        console.log("onupdate", timeline.progress());
+        /// console.log("onupdate", timeline.progress());
         onUpdate();
       })
       .eventCallback("onComplete", function () {
@@ -118,7 +118,7 @@ const GsapPixieContextProvider = ({ children }) => {
 
   const handleSeek = useCallback(() => {
     const timeline = tl.current;
-    timeline.seek(5);
+    timeline.seek(4);
   }, []);
 
   const setDurationTimeline = useCallback(() => {
