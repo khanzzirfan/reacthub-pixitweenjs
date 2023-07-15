@@ -118,7 +118,7 @@ export const VideoSeekBar = () => {
         <Button onClick={handleRestart}>Play</Button>
         <Button onClick={handlePause}>Pause</Button>
         <Button onClick={handlePlay}>Resume</Button>
-        <Button onClick={handleSeek}>Seek (2:00)</Button>
+        <Button onClick={handleSeek}>Seek (4:00)</Button>
       </Box>
       <Flex px={1} mt={2}>
         <Slider
@@ -139,7 +139,10 @@ export const VideoSeekBar = () => {
         </Slider>
       </Flex>
       <Flex flexDir={"row"}>
-        <Text>Gsap-CurrentTime: {time}</Text>
+        <Text>
+          Gsap-CurrentTime: {Math.round((time + Number.EPSILON) * 100) / 100} /{" "}
+          {duration}
+        </Text>
       </Flex>
     </Flex>
   );

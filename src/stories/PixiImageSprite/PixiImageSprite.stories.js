@@ -48,3 +48,22 @@ export const Normal = {
     endAt: 10,
   },
 };
+
+export const FadeIn = {
+  args: {
+    x: 100,
+    y: 100,
+    width: 150,
+    height: 150,
+    anchor: 0.5,
+    rotation: 0,
+    alpha: 1,
+    scale: 1,
+    tint: 0xffffff,
+    blendMode: 0,
+    applyTransformer: false,
+    startAt: 0,
+    endAt: 10,
+    animation: "FADE_IN",
+  },
+};
