@@ -45,6 +45,6 @@ export const Normal = {
     blendMode: 0,
     applyTransformer: false,
     startAt: 0,
-    endAt: 100,
+    endAt: 10,
   },
 };
