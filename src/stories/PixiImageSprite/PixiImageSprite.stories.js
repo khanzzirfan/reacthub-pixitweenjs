@@ -1,7 +1,7 @@
 import { PixiImageSprite } from "./PixiImageSprite";
 // More on how to set up stories at: https://storybook.js.org/docs/react/writing-stories/introduction
 export default {
-  title: "Pixi/ImageSprite",
+  title: "Components/ImageSprite",
   component: PixiImageSprite,
   tags: ["autodocs"],
   argTypes: {
