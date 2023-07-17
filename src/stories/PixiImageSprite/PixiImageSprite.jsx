@@ -63,10 +63,13 @@ export const PixiImageSprite = withPixiApp((props) => {
       colorCorrection,
       effect,
     } = {},
-    onPointerDown,
-    onPointerUp,
-    onMouseDown,
-    onMouseUp,
+    pointerdown,
+    pointerup,
+    mousedown,
+    mouseup,
+    pointerover,
+    mouseover,
+    mouseout,
     ...restProps
   } = props;
 
@@ -186,10 +189,13 @@ export const PixiImageSprite = withPixiApp((props) => {
               x={x}
               y={y}
               interactive={true}
-              pointerdown={onPointerDown}
-              pointerup={onPointerUp}
-              mousedown={onMouseDown}
-              mouseup={onMouseUp}
+              pointerdown={pointerdown}
+              pointerup={pointerup}
+              pointerover={pointerover}
+              mousedown={mousedown}
+              mouseup={mouseup}
+              mouseover={mouseover}
+              mouseout={mouseout}
             />
           </Container>
         </Filters>
@@ -204,10 +210,13 @@ export const PixiImageSprite = withPixiApp((props) => {
             x={x}
             y={y}
             interactive={true}
-            pointerdown={onPointerDown}
-            pointerup={onPointerUp}
-            mousedown={onMouseDown}
-            mouseup={onMouseUp}
+            pointerdown={pointerdown}
+            pointerup={pointerup}
+            pointerover={pointerover}
+            mousedown={mousedown}
+            mouseup={mouseup}
+            mouseover={mouseover}
+            mouseout={mouseout}
           />
         </Container>
       )}
@@ -251,6 +260,13 @@ PixiImageSprite.propTypes = {
       scaleInput: PropTypes.number,
     }),
     effect: PropTypes.string,
+    pointerdown: PropTypes.func,
+    pointerup: PropTypes.func,
+    pointerover: PropTypes.func,
+    mousedown: PropTypes.func,
+    mouseup: PropTypes.func,
+    mouseover: PropTypes.func,
+    mouseout: PropTypes.func,
   }).isRequired,
   // sprite initial alpha property (opacity)
   initialAlpha: PropTypes.number,
@@ -263,10 +279,13 @@ PixiImageSprite.propTypes = {
 };
 
 PixiImageSprite.defaultProps = {
-  onPointerDown: () => {},
-  onPointerUp: () => {},
-  onMouseDown: () => {},
-  onMouseUp: () => {},
+  pointerdown: () => {},
+  pointerup: () => {},
+  mousedown: () => {},
+  mouseup: () => {},
+  pointerover: () => {},
+  mouseover: () => {},
+  mouseout: () => {},
   backgroundColor: "0x000000",
   transformation: {
     x: 0,
