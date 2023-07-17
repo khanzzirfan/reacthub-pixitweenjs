@@ -9,6 +9,10 @@ export default {
       control: "color",
       description: "background color for the application stage",
     },
+    src: {
+      control: "text",
+      description: "source of the image",
+    },
     transformation: {
       control: "object",
       description: "transformation of the sprite",
@@ -27,16 +31,37 @@ export default {
       scale: { control: "number", description: "scale of the sprite" },
       tint: { control: "number", description: "tint of the sprite" },
       blendMode: { control: "number", description: "blendMode of the sprite" },
+      colorCorrection: {
+        control: "object",
+        description: "colorCorrection of the sprite",
+        brightness: {
+          control: "number",
+          description: "brightness of the sprite",
+        },
+        contrast: { control: "number", description: "contrast of the sprite" },
+        saturation: {
+          control: "number",
+          description: "saturation of the sprite",
+        },
+        alpha: { control: "number", description: "alpha of the sprite" },
+      },
     },
     applyTransformer: { control: "boolean", description: "applyTransformer" },
     startAt: { control: "number", description: "startAt" },
     endAt: { control: "number", description: "endAt" },
+    initialAlpha: {
+      control: "number",
+      min: 0,
+      max: 1,
+      description: "sprite initial alpha value (default  1)",
+    },
   },
 };
 
 // More on writing stories with args: https://storybook.js.org/docs/react/writing-stories/args
 export const Normal = {
   args: {
+    src: "https://assets.codepen.io/693612/surya.svg",
     transformation: {
       x: 100,
       y: 100,
@@ -48,15 +73,18 @@ export const Normal = {
       scale: 1,
       tint: 0xffffff,
       blendMode: 0,
+      colorCorrection: {},
     },
     applyTransformer: false,
     startAt: 0,
     endAt: 10,
+    initialAlpha: 1,
   },
 };
 
 export const FadeIn = {
   args: {
+    src: "https://assets.codepen.io/693612/surya.svg",
     transformation: {
       x: 100,
       y: 100,
@@ -69,9 +97,11 @@ export const FadeIn = {
       tint: 0xffffff,
       blendMode: 0,
       animation: "FADE_IN",
+      colorCorrection: {},
     },
     applyTransformer: false,
     startAt: 0,
     endAt: 10,
+    initialAlpha: 0,
   },
 };
