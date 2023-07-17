@@ -18,7 +18,12 @@ export const PixiImageSprite = withPixiApp((props) => {
 
   /// 1001
   console.log("contxt Values", tl);
-  const { x, y, startAt, endAt, animation, ...restProps } = props;
+  const {
+    startAt,
+    endAt,
+    transformation: { x, y, animation } = {},
+    ...restProps
+  } = props;
 
   const app = useApp();
   const PixiTransformer = React.useRef(null);
