@@ -1,14 +1,7 @@
 import React, { Context } from "react";
 import PropTypes from "prop-types";
 import { GsapPixieContext } from "../../providers/GsapPixieContextProvider";
-import {
-  Stage,
-  Sprite,
-  Container,
-  useApp,
-  withPixiApp,
-  withFilters,
-} from "@pixi/react";
+import { Sprite, Container, useApp, withFilters } from "@pixi/react";
 import { AdjustmentFilter } from "@pixi/filter-adjustment";
 import * as PIXI from "pixi.js";
 import gsap from "gsap";
@@ -36,7 +29,7 @@ const config = {
 /** CYAN Filters */
 const CYAN = [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0];
 
-export const PixiImageSprite = withPixiApp((props) => {
+export const PixiImageSprite = (props) => {
   /// console.log("allProps", props);
   //// Refs
   const imageRef = React.useRef(null);
@@ -222,7 +215,7 @@ export const PixiImageSprite = withPixiApp((props) => {
       )}
     </Container>
   );
-});
+};
 
 PixiImageSprite.propTypes = {
   // app background color property
