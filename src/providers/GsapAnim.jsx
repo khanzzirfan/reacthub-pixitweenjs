@@ -1,4 +1,4 @@
-import { Elastic } from "gsap";
+/// import { Elastic } from "gsap";
 // import BezierEasing from 'bezier-easing';
 
 export const getAnimByName = (animate, stageWidth, stageHeight, x, y) => {

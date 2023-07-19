@@ -1,8 +1,8 @@
 {
-  "name": "reacthub-gsap-pixie",
+  "name": "reacthub-pixitweenjs",
   "version": "0.2.0",
-  "description": "Starter template to get up and running quickly with React and Storybook",
-  "author": "Chromatic <https://chromatic.com/>",
+  "description": "reacthub-pixitweenjs is a library that provides a powerful combination of React, PixiJS, GSAP, and image manipulation capabilities in a timeline sequence. With this library, you can easily create stunning animations and interactive graphics for your React applications",
+  "author": "khanzzirfan",
   "type": "module",
   "repository": {
     "type": "git",
@@ -58,7 +58,7 @@
     "@vitejs/plugin-react": "^3.1.0",
     "framer-motion": "^8.4.0",
     "gsap": "3.11.5",
-    "lodash": "4.17.21", 
+    "lodash": "4.17.21",
     "msw": "^1.2.1",
     "msw-storybook-addon": "^1.8.0",
     "pixi-filters": "5.1.1",
