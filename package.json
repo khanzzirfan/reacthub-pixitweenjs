@@ -6,10 +6,10 @@
   "type": "module",
   "repository": {
     "type": "git",
-    "url": "https://github.com/chromaui/intro-storybook-react-template"
+    "url": "https://github.com/khanzzirfan/reacthub-gsap-pixiez"
   },
   "bugs": {
-    "url": "https://github.com/chromaui/intro-storybook-react-template/issues"
+    "url": "https://github.com/khanzzirfan/reacthub-gsap-pixiez/issues"
   },
   "license": "MIT",
   "private": true,
