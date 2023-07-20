@@ -9,6 +9,10 @@ export default {
       control: "color",
       description: "background color for the application stage",
     },
+    uniqueId: {
+      control: "text",
+      description: "uniqueId of the sprite",
+    },
     src: {
       control: "text",
       description: "source of the image",
@@ -61,6 +65,7 @@ export default {
 // More on writing stories with args: https://storybook.js.org/docs/react/writing-stories/args
 export const Normal = {
   args: {
+    uniqueId: "surya001", // uniqueId of the sprite
     src: "https://assets.codepen.io/693612/surya.svg",
     transformation: {
       x: 100,
@@ -84,6 +89,7 @@ export const Normal = {
 
 export const FadeIn = {
   args: {
+    uniqueId: 'surya002', // uniqueId of the sprite  
     src: "https://assets.codepen.io/693612/surya.svg",
     transformation: {
       x: 100,

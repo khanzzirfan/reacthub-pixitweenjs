@@ -7,6 +7,7 @@ import * as PIXI from "pixi.js";
 import gsap from "gsap";
 import isEmpty from "lodash/isEmpty";
 import { getAnimByName } from "../../providers/GsapAnim";
+import { usePixiTransformer } from "../../hooks/usePixiTransformer";
 
 const Filters = withFilters(Container, {
   blur: PIXI.filters.BlurFilter,
@@ -30,10 +31,21 @@ const config = {
 const CYAN = [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0];
 
 export const PixiImageSprite = (props) => {
+  //// State
+  const [transform, setTransform] = React.useState({
+    x: 0,
+    y: 0,
+    width: 80,
+    height: 80,
+    rotate: 0
+  });
+  const [isTransformerDragging, setIsTransformerDragging] = React.useState(false);
+  const [isMouseOverTransformer, setIsMouseOverTransformer] = React.useState(false);
   /// console.log("allProps", props);
   //// Refs
   const imageRef = React.useRef(null);
   const containerRef = React.useRef(null);
+  const parentNode = React.useRef(null);
   const imgGroupRef = React.useRef(null);
 
   //// Context
@@ -42,6 +54,7 @@ export const PixiImageSprite = (props) => {
   /// 1001
   console.log("contxt Values", tl);
   const {
+    uniqueId,
     src,
     startAt,
     endAt,
@@ -63,9 +76,11 @@ export const PixiImageSprite = (props) => {
     pointerover,
     mouseover,
     mouseout,
+    applyTransformer,
     ...restProps
   } = props;
 
+  // color corrections
   const {
     enabled = false,
     temperature = 1,
@@ -97,6 +112,22 @@ export const PixiImageSprite = (props) => {
     saturation,
     alpha,
   };
+
+  // transformer to handle sprite transformation
+  const handleOnTransformEnd = React.useCallback((endData) => {
+    console.log("changeEnd", endData);
+    const transformation = endData.transformation;
+    setTransform(transformation);
+  }, []);
+
+
+  // initialize usePixiTransformer hook
+  const {
+    handleTransformer,
+    removeTransformer,
+    isDragging
+  } = usePixiTransformer(uniqueId, handleOnTransformEnd, {}, setIsMouseOverTransformer, setIsTransformerDragging);
+
 
   React.useEffect(() => {
     let ctx = gsap.context(() => {});
@@ -147,7 +178,22 @@ export const PixiImageSprite = (props) => {
     return () => ctx.revert(); // cleanup!
   }, [animation, startAt, endAt]);
 
+  React.useEffect(() => {
+    setIsTransformerDragging(isDragging);
+  }, [isDragging]);
+
+  // apply transformer in use effect hook based on prop applyTransformer
+  React.useEffect(() => {
+    if (applyTransformer && containerRef.current) {
+      handleTransformer(containerRef.current, parentNode.current);
+    }
+    return () => {
+      removeTransformer();
+    };
+  }, [removeTransformer, handleTransformer, applyTransformer]);
+
   return (
+    <Container ref={parentNode} alpha={initialAlpha}>
     <Container ref={containerRef} alpha={initialAlpha}>
       {colorCorrection && colorCorrection.enabled ? (
         <Filters
@@ -214,6 +260,7 @@ export const PixiImageSprite = (props) => {
         </Container>
       )}
     </Container>
+    </Container>
   );
 };
 
@@ -269,6 +316,8 @@ PixiImageSprite.propTypes = {
   startAt: PropTypes.number.isRequired,
   // sprite startAt and endAt properties
   endAt: PropTypes.number.isRequired,
+  // sprite uniqueId
+  uniqueId: PropTypes.string.isRequired,
 };
 
 PixiImageSprite.defaultProps = {
