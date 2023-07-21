@@ -25,3 +25,8 @@ yarn-error.log*
 
 ##dist
 dist
+
+## env
+.env
+.env.local
+.env.dev

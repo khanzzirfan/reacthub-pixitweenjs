@@ -37,10 +37,12 @@ export const PixiImageSprite = (props) => {
     y: 0,
     width: 80,
     height: 80,
-    rotate: 0
+    rotate: 0,
   });
-  const [isTransformerDragging, setIsTransformerDragging] = React.useState(false);
-  const [isMouseOverTransformer, setIsMouseOverTransformer] = React.useState(false);
+  const [isTransformerDragging, setIsTransformerDragging] =
+    React.useState(false);
+  const [isMouseOverTransformer, setIsMouseOverTransformer] =
+    React.useState(false);
   /// console.log("allProps", props);
   //// Refs
   const imageRef = React.useRef(null);
@@ -120,14 +122,15 @@ export const PixiImageSprite = (props) => {
     setTransform(transformation);
   }, []);
 
-
   // initialize usePixiTransformer hook
-  const {
-    handleTransformer,
-    removeTransformer,
-    isDragging
-  } = usePixiTransformer(uniqueId, handleOnTransformEnd, {}, setIsMouseOverTransformer, setIsTransformerDragging);
-
+  const { handleTransformer, removeTransformer, isDragging } =
+    usePixiTransformer(
+      uniqueId,
+      handleOnTransformEnd,
+      {},
+      setIsMouseOverTransformer,
+      setIsTransformerDragging,
+    );
 
   React.useEffect(() => {
     let ctx = gsap.context(() => {});
@@ -193,31 +196,52 @@ export const PixiImageSprite = (props) => {
   }, [removeTransformer, handleTransformer, applyTransformer]);
 
   return (
-    <Container ref={parentNode} alpha={initialAlpha}>
-    <Container ref={containerRef} alpha={initialAlpha}>
-      {colorCorrection && colorCorrection.enabled ? (
-        <Filters
-          scale={1}
-          blur={{ blur: blurRadius, quality: 4 }}
-          adjust={adjustments}
-          apply={({ matrix }) => {
-            if (effect === "BlackAndWhite") {
-              matrix.desaturate();
-            } else if (effect === "Sepia") {
-              matrix.sepia();
-            } else if (effect === "RetroVintage") {
-              matrix.negative();
-            } else if (effect === "NightVision") {
-              matrix.negative();
-            } else if (effect === "Normal") {
-              matrix.reset();
-            }
-          }}
-          matrix={{
-            enabled: true,
-            matrix: CYAN,
-          }}
-        >
+    <Container ref={parentNode}>
+      <Container ref={containerRef} alpha={initialAlpha}>
+        {colorCorrection && colorCorrection.enabled ? (
+          <Filters
+            scale={1}
+            blur={{ blur: blurRadius, quality: 4 }}
+            adjust={adjustments}
+            apply={({ matrix }) => {
+              if (effect === "BlackAndWhite") {
+                matrix.desaturate();
+              } else if (effect === "Sepia") {
+                matrix.sepia();
+              } else if (effect === "RetroVintage") {
+                matrix.negative();
+              } else if (effect === "NightVision") {
+                matrix.negative();
+              } else if (effect === "Normal") {
+                matrix.reset();
+              }
+            }}
+            matrix={{
+              enabled: true,
+              matrix: CYAN,
+            }}
+          >
+            <Container ref={imgGroupRef}>
+              <Sprite
+                image={src}
+                width={width}
+                height={height}
+                anchor={anchor}
+                ref={imageRef}
+                x={x}
+                y={y}
+                interactive={true}
+                pointerdown={pointerdown}
+                pointerup={pointerup}
+                pointerover={pointerover}
+                mousedown={mousedown}
+                mouseup={mouseup}
+                mouseover={mouseover}
+                mouseout={mouseout}
+              />
+            </Container>
+          </Filters>
+        ) : (
           <Container ref={imgGroupRef}>
             <Sprite
               image={src}
@@ -237,29 +261,8 @@ export const PixiImageSprite = (props) => {
               mouseout={mouseout}
             />
           </Container>
-        </Filters>
-      ) : (
-        <Container ref={imgGroupRef}>
-          <Sprite
-            image={src}
-            width={width}
-            height={height}
-            anchor={anchor}
-            ref={imageRef}
-            x={x}
-            y={y}
-            interactive={true}
-            pointerdown={pointerdown}
-            pointerup={pointerup}
-            pointerover={pointerover}
-            mousedown={mousedown}
-            mouseup={mouseup}
-            mouseover={mouseover}
-            mouseout={mouseout}
-          />
-        </Container>
-      )}
-    </Container>
+        )}
+      </Container>
     </Container>
   );
 };
