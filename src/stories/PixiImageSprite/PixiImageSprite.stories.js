@@ -1,11 +1,10 @@
 import { PixiImageSprite } from "./PixiImageSprite";
-import { Stage as PixiStage, Container as PixiContainer } from "@pixi/react";
 
 // More on how to set up stories at: https://storybook.js.org/docs/react/writing-stories/introduction
 export default {
   title: "Components/ImageSprite",
   component: PixiImageSprite,
-  
+
   tags: ["autodocs"],
   argTypes: {
     backgroundColor: {
@@ -62,9 +61,16 @@ export default {
       max: 1,
       description: "sprite initial alpha value (default  1)",
     },
+    onAnchorTransformationEnd: {
+      action: "onAnchorTransformationEnd",
+      description:
+        "on transforamtion end the event is fire callback with latest sprite transformation properties.",
+    },
+    pointerdown: {
+      action: "pointerdown",
+      description: "pointerdown event",
+    },
   },
-  
-
 };
 
 // More on writing stories with args: https://storybook.js.org/docs/react/writing-stories/args
@@ -90,12 +96,11 @@ export const Normal = {
     endAt: 10,
     initialAlpha: 1,
   },
-  
 };
 
 export const FadeIn = {
   args: {
-    uniqueId: 'surya002', // uniqueId of the sprite  
+    uniqueId: "surya002", // uniqueId of the sprite
     src: "https://assets.codepen.io/693612/surya.svg",
     transformation: {
       x: 100,
