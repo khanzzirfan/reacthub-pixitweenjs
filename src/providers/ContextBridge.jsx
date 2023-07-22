@@ -1,5 +1,5 @@
 // your Stage:
-import { Stage as PixiStage } from "@pixi/react";
+import { Stage as PixiStage, Container as PixiContainer } from "@pixi/react";
 import React from "react";
 import { Flex, Icon, Text, Box, Button } from "@chakra-ui/react";
 import * as PIXI from "pixi.js";
@@ -8,6 +8,7 @@ import {
   GsapPixieContext,
   GsapPixieContextProvider,
 } from "./GsapPixieContextProvider";
+import { AppStateContext, AppStateContextProvider } from "./AppStateProvider";
 
 import { VideoSeekBar } from "./VideoSeekBar";
 
@@ -16,7 +17,6 @@ const ContextBridge = ({ children, Context, render }) => {
   return (
     <Context.Consumer>
       {(value) => {
-        console.log("value", value);
         return render(
           <Context.Provider value={value}>{children}</Context.Provider>,
         );
@@ -25,11 +25,30 @@ const ContextBridge = ({ children, Context, render }) => {
   );
 };
 
+const AppStateStage = ({ children, ...props }) => {
+  return (
+    <ContextBridge
+      Context={AppStateContext}
+      render={(children) => (
+        <PixiContainer {...props}>{children}</PixiContainer>
+      )}
+    >
+      {children}
+    </ContextBridge>
+  );
+};
+
 const Stage = ({ children, ...props }) => {
   return (
     <ContextBridge
       Context={GsapPixieContext}
-      render={(children) => <PixiStage {...props}>{children}</PixiStage>}
+      render={(children) => (
+        <PixiStage {...props}>
+          <AppStateContextProvider {...props}>
+            {children}
+          </AppStateContextProvider>
+        </PixiStage>
+      )}
     >
       {children}
     </ContextBridge>
@@ -40,7 +59,6 @@ export const App = ({ children, backgroundColor, ...props }) => {
   const backgroundColorx = PIXI.utils.string2hex(backgroundColor || "#2D2E3C");
   const width = 600;
   const height = 500;
-
   /// color: 0x1099bb,
   return (
     <div className="App">
@@ -55,7 +73,6 @@ export const App = ({ children, backgroundColor, ...props }) => {
             >
               {children}
             </Stage>
-
             <Box mt={5} w={600}>
               <VideoSeekBar />
             </Box>

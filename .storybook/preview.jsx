@@ -16,7 +16,7 @@ const preview = {
 export const decorators = [
   (Story) => (
     <App>
-      <Story />
+      {Story({appState:'x'})}
     </App>
   ),
 ];

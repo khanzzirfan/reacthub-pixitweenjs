@@ -1,8 +1,11 @@
 import { PixiImageSprite } from "./PixiImageSprite";
+import { Stage as PixiStage, Container as PixiContainer } from "@pixi/react";
+
 // More on how to set up stories at: https://storybook.js.org/docs/react/writing-stories/introduction
 export default {
   title: "Components/ImageSprite",
   component: PixiImageSprite,
+  
   tags: ["autodocs"],
   argTypes: {
     backgroundColor: {
@@ -60,6 +63,8 @@ export default {
       description: "sprite initial alpha value (default  1)",
     },
   },
+  
+
 };
 
 // More on writing stories with args: https://storybook.js.org/docs/react/writing-stories/args
@@ -85,6 +90,7 @@ export const Normal = {
     endAt: 10,
     initialAlpha: 1,
   },
+  
 };
 
 export const FadeIn = {

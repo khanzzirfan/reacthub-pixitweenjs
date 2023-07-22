@@ -43,7 +43,8 @@ export const PixiImageSprite = (props) => {
     React.useState(false);
   const [isMouseOverTransformer, setIsMouseOverTransformer] =
     React.useState(false);
-  /// console.log("allProps", props);
+ 
+  console.log("allProps", props);
   //// Refs
   const imageRef = React.useRef(null);
   const containerRef = React.useRef(null);
@@ -79,6 +80,7 @@ export const PixiImageSprite = (props) => {
     mouseover,
     mouseout,
     applyTransformer,
+    onAnchorTransformationEnd,
     ...restProps
   } = props;
 
@@ -118,8 +120,9 @@ export const PixiImageSprite = (props) => {
   // transformer to handle sprite transformation
   const handleOnTransformEnd = React.useCallback((endData) => {
     console.log("changeEnd", endData);
-    const transformation = endData.transformation;
-    setTransform(transformation);
+    if(onAnchorTransformationEnd){
+      onAnchorTransformationEnd(endData);
+    }
   }, []);
 
   // initialize usePixiTransformer hook
@@ -197,7 +200,14 @@ export const PixiImageSprite = (props) => {
 
   return (
     <Container ref={parentNode}>
-      <Container ref={containerRef} alpha={initialAlpha}>
+      <Container
+        ref={containerRef}
+        alpha={initialAlpha}
+        position={[x, y]}
+        pivot={[x, y]}
+        width={width}
+        height={height}
+      >
         {colorCorrection && colorCorrection.enabled ? (
           <Filters
             scale={1}
@@ -303,13 +313,6 @@ PixiImageSprite.propTypes = {
       scaleInput: PropTypes.number,
     }),
     effect: PropTypes.string,
-    pointerdown: PropTypes.func,
-    pointerup: PropTypes.func,
-    pointerover: PropTypes.func,
-    mousedown: PropTypes.func,
-    mouseup: PropTypes.func,
-    mouseover: PropTypes.func,
-    mouseout: PropTypes.func,
   }).isRequired,
   // sprite initial alpha property (opacity)
   initialAlpha: PropTypes.number,
@@ -321,6 +324,17 @@ PixiImageSprite.propTypes = {
   endAt: PropTypes.number.isRequired,
   // sprite uniqueId
   uniqueId: PropTypes.string.isRequired,
+  // sprite on anchor transformation end
+  onAnchorTransformationEnd: PropTypes.func,
+  // sprite on click
+  onClickSprite: PropTypes.func,
+  pointerdown: PropTypes.func,
+  pointerup: PropTypes.func,
+  pointerover: PropTypes.func,
+  mousedown: PropTypes.func,
+  mouseup: PropTypes.func,
+  mouseover: PropTypes.func,
+  mouseout: PropTypes.func,
 };
 
 PixiImageSprite.defaultProps = {
