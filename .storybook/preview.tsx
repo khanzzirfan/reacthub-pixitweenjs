@@ -1,5 +1,5 @@
-// import { GsapPixieContextProvider } from "../src/providers/GsapPixieContextProvider";
-import { App } from "../src/providers/ContextBridge";
+import React from "react";
+import { AppWrapper } from "../src/utils/AppWrapper";
 /** @type { import('@storybook/react').Preview } */
 const preview = {
   parameters: {
@@ -14,11 +14,7 @@ const preview = {
 };
 
 export const decorators = [
-  (Story) => (
-    <App>
-      {Story({appState:'x'})}
-    </App>
-  ),
+  (Story) => <AppWrapper>{Story({ appState: "x" })}</AppWrapper>,
 ];
 
 export default preview;

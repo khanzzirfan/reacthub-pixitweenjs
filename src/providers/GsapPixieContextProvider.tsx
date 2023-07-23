@@ -1,4 +1,5 @@
-import React, {
+import * as React from "react";
+import {
   useState,
   useEffect,
   useCallback,
@@ -7,10 +8,22 @@ import React, {
 } from "react";
 import gsap from "gsap";
 import { emitCustomEvent } from "react-custom-events";
-// import { Power4 } from "gsap";
+
+interface GsapPixieContextProps {
+  gsapCtx: React.MutableRefObject<any>;
+  tl: React.MutableRefObject<any>;
+  handlePlay: () => void;
+  handlePause: () => void;
+  handleReset: () => void;
+  handleSeek: () => void;
+  handleRestart: () => void;
+  handleRepeat: () => void;
+  playerTimeRef: React.MutableRefObject<number>;
+}
 
 // Context has been created
-const GsapPixieContext = React.createContext({});
+// @ts-ignore
+const GsapPixieContext = React.createContext<GsapPixieContextProps>({});
 
 const Events = {
   STOP: "GSAP_STOP",
@@ -18,21 +31,19 @@ const Events = {
   PLAY: "GSAP_PLAY",
   RESUME: "GSAP_RESUME",
 };
+
 // Provider
-const GsapPixieContextProvider = ({ children }) => {
-  const [play, setPlay] = useState(false);
-  const [frameNumber, setFrameNumber] = useState(0);
+const GsapPixieContextProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  const [play, setPlay] = useState<boolean>(false);
+  const [frameNumber, setFrameNumber] = useState<number>(0);
 
-  const tl = useRef();
-  const gsapCtx = useRef();
-  const playerTimeRef = useRef(0.001);
+  const tl = useRef<any>();
+  const gsapCtx = useRef<any>();
+  const playerTimeRef = useRef<number>(0.001);
 
-  // gsap.ticker.add((time, deltaTime, frame) => {
-  //   console.log("timeframe", time, deltaTime, frame);
-  //   setFrameNumber(frame);
-  // });
-
-  const parentElementRef = useRef();
+  const parentElementRef = useRef<any>();
   // передаем предка анимируемых элементов
   const q = gsap.utils.selector(parentElementRef);
 
@@ -62,14 +73,6 @@ const GsapPixieContextProvider = ({ children }) => {
     playerTimeRef.current = now;
   }, []);
 
-  // const timeline = React.useCallback(
-  //   gsap.timeline({
-  //     paused: true,
-  //     defaults: { duration: 0, onUpdate: onUpdate },
-  //   }),
-  //   [],
-  // );
-
   useEffect(() => {
     const timeline = tl.current;
     timeline
@@ -93,7 +96,7 @@ const GsapPixieContextProvider = ({ children }) => {
     }
   }, [play]);
 
-  const addTotalDuration = (duration) => {
+  const addTotalDuration = (duration: number) => {
     const timeline = tl.current;
     timeline.totalDuration(duration);
   };

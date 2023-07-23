@@ -1,8 +1,39 @@
-/// import { Elastic } from "gsap";
-// import BezierEasing from 'bezier-easing';
+interface Ease {
+  from?: {
+    duration: number;
+    ease: string;
+    y?: number;
+    x?: number;
+  };
+  fromTo?: {
+    from: {
+      y?: number;
+      x?: number;
+      alpha?: number;
+    };
+    to: {
+      ease: string;
+      y?: number;
+      x?: number;
+      alpha?: number;
+      duration: number;
+    };
+  };
+  to?: {
+    ease: string;
+    alpha: number;
+    duration: number;
+  };
+}
 
-export const getAnimByName = (animate, stageWidth, stageHeight, x, y) => {
-  let ease = {};
+export const getAnimByName = (
+  animate: string,
+  stageWidth?: number,
+  stageHeight?: number,
+  x?: number,
+  y?: number,
+): Ease => {
+  let ease: Ease = {};
   switch (animate) {
     case "NONE":
     case "none":

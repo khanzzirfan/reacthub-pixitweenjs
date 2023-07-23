@@ -1,16 +1,13 @@
-import { PixiImageSprite } from "./PixiImageSprite";
+import type { Meta, StoryObj } from "@storybook/react";
+import { PixiImageSprite } from ".";
 
 // More on how to set up stories at: https://storybook.js.org/docs/react/writing-stories/introduction
-export default {
+const meta = {
   title: "Components/ImageSprite",
   component: PixiImageSprite,
 
   tags: ["autodocs"],
   argTypes: {
-    backgroundColor: {
-      control: "color",
-      description: "background color for the application stage",
-    },
     uniqueId: {
       control: "text",
       description: "uniqueId of the sprite",
@@ -71,10 +68,13 @@ export default {
       description: "pointerdown event",
     },
   },
-};
+} satisfies Meta<typeof PixiImageSprite>;
+
+export default meta;
+type Story = StoryObj<typeof meta>;
 
 // More on writing stories with args: https://storybook.js.org/docs/react/writing-stories/args
-export const Normal = {
+export const Normal: Story = {
   args: {
     uniqueId: "surya001", // uniqueId of the sprite
     src: "https://assets.codepen.io/693612/surya.svg",
@@ -98,7 +98,7 @@ export const Normal = {
   },
 };
 
-export const FadeIn = {
+export const FadeIn: Story = {
   args: {
     uniqueId: "surya002", // uniqueId of the sprite
     src: "https://assets.codepen.io/693612/surya.svg",
