@@ -12,6 +12,7 @@ import { emitCustomEvent } from "react-custom-events";
 interface GsapPixieContextProps {
   gsapCtx: React.MutableRefObject<any>;
   tl: React.MutableRefObject<any>;
+  play: boolean;
   handlePlay: () => void;
   handlePause: () => void;
   handleReset: () => void;
@@ -76,13 +77,24 @@ const GsapPixieContextProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     const timeline = tl.current;
     timeline
+      .eventCallback("onStart", function () {
+        /// console.log("onstart", timeline.progress());
+        setPlay(true);
+        onUpdate();
+      })
+      .eventCallback("onInterrupt", function () {
+        /// console.log("onInterrupt", timeline.progress());
+        setPlay(false);
+        onUpdate();
+      })
       .eventCallback("onUpdate", function () {
         /// console.log("onupdate", timeline.progress());
         onUpdate();
       })
       .eventCallback("onComplete", function () {
-        timeline.seek(0.01);
+        timeline.seek(0);
         timeline.pause();
+        setPlay(false);
         onUpdate();
       });
   }, []);
@@ -110,6 +122,7 @@ const GsapPixieContextProvider: React.FC<{ children: React.ReactNode }> = ({
   const handleRestart = useCallback(() => {
     const timeline = tl.current;
     timeline.restart();
+    setPlay(true);
   }, []);
 
   const handleRepeat = useCallback(() => {
@@ -117,6 +130,7 @@ const GsapPixieContextProvider: React.FC<{ children: React.ReactNode }> = ({
 
     timeline.repeat(1);
     timeline.restart();
+    setPlay(true);
   }, []);
 
   const handleSeek = useCallback(() => {
@@ -132,13 +146,14 @@ const GsapPixieContextProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const handlePause = () => {
     const timeline = tl.current;
-
     timeline.pause();
     emitCustomEvent(Events.PAUSE);
+    setPlay(false);
   };
 
   const handlePlay = () => {
     const timeline = tl.current;
+    setPlay(true);
     timeline.resume();
     emitCustomEvent(Events.RESUME);
   };
@@ -155,6 +170,7 @@ const GsapPixieContextProvider: React.FC<{ children: React.ReactNode }> = ({
         handleRestart,
         handleRepeat,
         playerTimeRef,
+        play,
       }}
     >
       {children}
