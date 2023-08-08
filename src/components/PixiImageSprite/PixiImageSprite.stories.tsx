@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { PixiImageSprite } from ".";
+import { AppStateContextProvider } from "../../utils/AppStateProvider";
 
 // More on how to set up stories at: https://storybook.js.org/docs/react/writing-stories/introduction
 const meta = {
@@ -75,6 +76,11 @@ type Story = StoryObj<typeof meta>;
 
 // More on writing stories with args: https://storybook.js.org/docs/react/writing-stories/args
 export const Normal: Story = {
+  render: (args: any) => (
+    <AppStateContextProvider {...args}>
+      <PixiImageSprite {...args} />
+    </AppStateContextProvider>
+  ),
   args: {
     uniqueId: "surya001", // uniqueId of the sprite
     src: "https://assets.codepen.io/693612/surya.svg",
@@ -99,6 +105,11 @@ export const Normal: Story = {
 };
 
 export const FadeIn: Story = {
+  render: (args: any) => (
+    <AppStateContextProvider {...args}>
+      <PixiImageSprite {...args} />
+    </AppStateContextProvider>
+  ),
   args: {
     uniqueId: "surya002", // uniqueId of the sprite
     src: "https://assets.codepen.io/693612/surya.svg",

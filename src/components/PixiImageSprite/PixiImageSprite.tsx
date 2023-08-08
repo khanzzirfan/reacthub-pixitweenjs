@@ -7,10 +7,11 @@ import { Sprite, Container, useApp, withFilters } from "@pixi/react";
 import { AdjustmentFilter } from "@pixi/filter-adjustment";
 import * as PIXI from "pixi.js";
 import gsap from "gsap";
+import PixiTransformer from "../../utils/PixiTransformer";
+
 // @ts-ignore
 import isEmpty from "lodash/isEmpty";
 import { getAnimByName } from "../../utils/GsapAnim";
-import { usePixiTransformer } from "../../hooks/usePixiTransformer";
 import { TransformationEnd } from "../../types/transformation";
 
 type PixiImageSpriteProps = {
@@ -90,6 +91,7 @@ const CYAN = [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0];
 
 const PixiImageSprite: React.FC<PixiImageSpriteProps> = (props) => {
   //// State
+  const [isMounted, setIsMounted] = React.useState(false);
   const [transform, setTransform] = useState({
     x: 0,
     y: 0,
@@ -106,12 +108,13 @@ const PixiImageSprite: React.FC<PixiImageSpriteProps> = (props) => {
   const containerRef = useRef<PIXI.Container>(null);
   const parentNode = useRef<PIXI.Container>(null);
   const imgGroupRef = useRef<PIXI.Container>(null);
+  const transformerRef = useRef<PIXI.Container>(null);
 
   //// Context
   const { tl } = useContext(GsapPixieContext);
 
   /// 1001
-  console.log("contxt Values", tl);
+  // console.log("contxt Values", tl);
   const {
     uniqueId,
     src,
@@ -163,7 +166,6 @@ const PixiImageSprite: React.FC<PixiImageSpriteProps> = (props) => {
   } = colorCorrection || {};
 
   const app = useApp();
-  const PixiTransformer = useRef<any>(null);
 
   /** adjustment filter */
   const adjustments = {
@@ -173,26 +175,22 @@ const PixiImageSprite: React.FC<PixiImageSpriteProps> = (props) => {
     alpha,
   };
 
+  /** handle on tranformer onchange */
+  const handleOnTransformChange = React.useCallback(() => {
+    setIsTransformerDragging(true);
+  }, []);
+
   // transformer to handle sprite transformation
   const handleOnTransformEnd = React.useCallback(
     (endData: TransformationEnd) => {
       console.log("changeEnd", endData);
       if (onAnchorTransformationEnd) {
+        console.log("running onAnchorTransformationEnd");
         onAnchorTransformationEnd(endData);
       }
     },
-    [],
+    []
   );
-
-  // initialize usePixiTransformer hook
-  const { handleTransformer, removeTransformer, isDragging } =
-    usePixiTransformer({
-      uniqueId,
-      onTransformEnd: handleOnTransformEnd,
-      events: {},
-      mouseoverEvent: setIsMouseOverTransformer,
-      setDragging: setIsTransformerDragging,
-    });
 
   useEffect(() => {
     let ctx = gsap.context(() => {});
@@ -214,7 +212,7 @@ const PixiImageSprite: React.FC<PixiImageSpriteProps> = (props) => {
             .to(
               containerRef.current,
               { alpha: 1, duration: 0.2, ...ease.to },
-              startAt,
+              startAt
             )
             .from(imgGroupRef.current, { ...data }, startAt)
             .to(containerRef.current, { alpha: 0, duration: 0.2 }, endAt - 0.2);
@@ -224,7 +222,7 @@ const PixiImageSprite: React.FC<PixiImageSpriteProps> = (props) => {
               containerRef.current,
               ease.fromTo?.from,
               ease.fromTo?.to,
-              startAt,
+              startAt
             )
             .from(imgGroupRef.current, { ...data }, startAt)
             .to(containerRef.current, { alpha: 0, duration: 0.2 }, endAt - 0.2);
@@ -235,7 +233,7 @@ const PixiImageSprite: React.FC<PixiImageSpriteProps> = (props) => {
             .to(
               containerRef.current,
               { alpha: 0, duration: 0.1 },
-              Number(endAt) - Number(0.1),
+              Number(endAt) - Number(0.1)
             );
         }
       });
@@ -243,19 +241,11 @@ const PixiImageSprite: React.FC<PixiImageSpriteProps> = (props) => {
     return () => ctx.revert(); // cleanup!
   }, [animation, startAt, endAt]);
 
-  useEffect(() => {
-    setIsTransformerDragging(isDragging);
-  }, [isDragging]);
-
-  // apply transformer in use effect hook based on prop applyTransformer
-  useEffect(() => {
-    if (applyTransformer && containerRef.current && parentNode.current) {
-      handleTransformer(containerRef.current, parentNode.current);
+  React.useEffect(() => {
+    if (containerRef.current) {
+      setIsMounted(true);
     }
-    return () => {
-      removeTransformer();
-    };
-  }, [removeTransformer, handleTransformer, applyTransformer]);
+  }, []);
 
   return (
     // @ts-ignore
@@ -339,6 +329,17 @@ const PixiImageSprite: React.FC<PixiImageSpriteProps> = (props) => {
           </Container>
         )}
       </Container>
+      {applyTransformer && (
+        <PixiTransformer
+          pixiTransformerRef={transformerRef}
+          imageRef={containerRef}
+          isMounted={isMounted}
+          transformCommit={handleOnTransformEnd}
+          transformChange={handleOnTransformChange}
+          mouseoverEvent={setIsMouseOverTransformer}
+          uniqueId={uniqueId}
+        />
+      )}
     </Container>
   );
 };

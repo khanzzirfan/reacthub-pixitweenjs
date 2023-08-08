@@ -1,6 +1,6 @@
 import * as React from "react";
 import ContextBridge from "./ContextBridge";
-import { AppStateContext } from "../providers/AppStateProvider";
+import { AppStateContext } from "./AppStateProvider";
 import { Container as PixiContainer } from "@pixi/react";
 
 interface AppStateStageProps {

@@ -8,19 +8,6 @@ interface AppState {
   };
 }
 
-interface AppStateContextProps extends AppState {
-  onAnchorTransformationEnd: (data: TransformationEnd) => void;
-  onMouseOverSprite: (data: unknown) => void;
-  onClickSprite: (data: unknown) => void;
-}
-
-export const AppStateContext = React.createContext<AppStateContextProps>({
-  transformation: {},
-  onAnchorTransformationEnd: () => {},
-  onMouseOverSprite: () => {},
-  onClickSprite: () => {},
-});
-
 interface AppStateContextProviderProps extends AppState {
   children: React.ReactNode;
 }
@@ -28,27 +15,30 @@ interface AppStateContextProviderProps extends AppState {
 export const AppStateContextProvider: React.FC<
   AppStateContextProviderProps
 > = ({ children, ...props }) => {
+  console.log("AppStateContextProvider", props);
   const [appState, setAppState] = React.useState<AppState>(props);
+  const appStateRef = React.useRef<AppState>(appState);
+
   useDeepEffect(() => {
     setAppState(props);
+    appStateRef.current = props;
   }, [props]);
 
   const onAnchorTransformationEnd = React.useCallback(
-    (data: {
-      uniqueId: string;
-      transformation: { [key: string]: unknown };
-    }) => {
+    (data: TransformationEnd) => {
+      console.log("onAnchorTransformationEnd", data);
       const { uniqueId, transformation } = data;
       const newAppState = {
-        ...props,
+        ...appStateRef.current,
         transformation: {
-          ...props.transformation,
+          ...appStateRef.current?.transformation,
           ...transformation,
         },
       };
+      console.log("saving state", newAppState);
       setAppState(newAppState);
     },
-    [props],
+    []
   );
 
   const onMouseOverSprite = React.useCallback((data: unknown) => {}, []);
@@ -56,15 +46,14 @@ export const AppStateContextProvider: React.FC<
   const onClickSprite = React.useCallback((data: unknown) => {}, []);
 
   return (
-    <AppStateContext.Provider
-      value={{
+    <>
+      {/*@ts-ignore */}
+      {React.cloneElement(children, {
         ...appState,
         onAnchorTransformationEnd,
         onMouseOverSprite,
         onClickSprite,
-      }}
-    >
-      {children}
-    </AppStateContext.Provider>
+      })}
+    </>
   );
 };

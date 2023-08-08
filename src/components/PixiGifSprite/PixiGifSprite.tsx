@@ -10,10 +10,11 @@ import { AdjustmentFilter } from "@pixi/filter-adjustment";
 import * as PIXI from "pixi.js";
 import gsap from "gsap";
 import { useWorkerParser, usePlayerState } from "@react-gifs/tools";
+import PixiTransformer from "../../utils/PixiTransformer";
+
 // @ts-ignore
 import isEmpty from "lodash/isEmpty";
 import { getAnimByName } from "../../utils/GsapAnim";
-import { usePixiTransformer } from "../../hooks/usePixiTransformer";
 import { TransformationEnd } from "../../types/transformation";
 import { PixiAnimatedSprite } from "../PixiAnimatedSprite";
 
@@ -122,7 +123,7 @@ const PixiGifSprite: React.FC<PixiGifSpriteProps> = (props) => {
   const [currentFrame, setCurrentFrame] = useState<number>(0);
   const [isComplete, setIsComplete] = useState<boolean>(false);
 
-  const [isTransformerDragging, setIsTransformerDragging] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   const [isMouseOverTransformer, setIsMouseOverTransformer] = useState(false);
 
   const [gifState, update] = usePlayerState({ autoPlay: false });
@@ -135,14 +136,7 @@ const PixiGifSprite: React.FC<PixiGifSpriteProps> = (props) => {
   const containerRef = useRef<PIXI.Container>(null);
   const parentNode = useRef<PIXI.Container>(null);
   const imgGroupRef = useRef<PIXI.Container>(null);
-
-  /// Reducers state
-  //   const [playerState, dispatchState] = React.useReducer((state, data) => {
-  //     return {
-  //       ...state,
-  //       ...data,
-  //     };
-  //   }, initialState);
+  const transformerRef = useRef<PIXI.Container>(null);
 
   //// Context
   const { tl, play: tlPlay } = useContext(GsapPixieContext);
@@ -237,18 +231,8 @@ const PixiGifSprite: React.FC<PixiGifSpriteProps> = (props) => {
         onAnchorTransformationEnd(endData);
       }
     },
-    [],
+    []
   );
-
-  // initialize usePixiTransformer hook
-  const { handleTransformer, removeTransformer, isDragging } =
-    usePixiTransformer({
-      uniqueId,
-      onTransformEnd: handleOnTransformEnd,
-      events: {},
-      mouseoverEvent: setIsMouseOverTransformer,
-      setDragging: setIsTransformerDragging,
-    });
 
   React.useEffect(() => {
     if (!isEmpty(gifFrames)) {
@@ -266,7 +250,7 @@ const PixiGifSprite: React.FC<PixiGifSpriteProps> = (props) => {
             texture: eachFrame,
             time: gifDelays[index],
           };
-        },
+        }
       );
 
       setGifFrame(texturedFrames);
@@ -349,7 +333,7 @@ const PixiGifSprite: React.FC<PixiGifSpriteProps> = (props) => {
             .to(
               containerRef.current,
               { alpha: 1, duration: 0.2, ...ease.to },
-              startAt,
+              startAt
             )
             .from(imgGroupRef.current, { ...data }, startAt)
             .to(containerRef.current, { alpha: 0, duration: 0.2 }, endAt - 0.2);
@@ -359,7 +343,7 @@ const PixiGifSprite: React.FC<PixiGifSpriteProps> = (props) => {
               containerRef.current,
               ease.fromTo?.from,
               ease.fromTo?.to,
-              startAt,
+              startAt
             )
             .from(imgGroupRef.current, { ...data }, startAt)
             .to(containerRef.current, { alpha: 0, duration: 0.2 }, endAt - 0.2);
@@ -370,7 +354,7 @@ const PixiGifSprite: React.FC<PixiGifSpriteProps> = (props) => {
             .to(
               containerRef.current,
               { alpha: 0, duration: 0.1 },
-              Number(endAt) - Number(0.1),
+              Number(endAt) - Number(0.1)
             );
         }
       });
@@ -378,19 +362,10 @@ const PixiGifSprite: React.FC<PixiGifSpriteProps> = (props) => {
     return () => ctx.revert(); // cleanup!
   }, [animation, startAt, endAt]);
 
-  useEffect(() => {
-    setIsTransformerDragging(isDragging);
-  }, [isDragging]);
-
-  // apply transformer in use effect hook based on prop applyTransformer
-  useEffect(() => {
-    if (applyTransformer && containerRef.current && parentNode.current) {
-      handleTransformer(containerRef.current, parentNode.current);
-    }
-    return () => {
-      removeTransformer();
-    };
-  }, [removeTransformer, handleTransformer, applyTransformer]);
+  /** handle on tranformer onchange */
+  const handleOnTransformChange = React.useCallback(() => {
+    setIsDragging(true);
+  }, []);
 
   app.ticker.add((delta) => {
     if (graphicRef.current) {
@@ -458,6 +433,17 @@ const PixiGifSprite: React.FC<PixiGifSpriteProps> = (props) => {
           )}
         </Container>
       </Container>
+      {applyTransformer && (
+        <PixiTransformer
+          pixiTransformerRef={transformerRef}
+          imageRef={containerRef}
+          isMounted={loaded}
+          transformCommit={handleOnTransformEnd}
+          transformChange={handleOnTransformChange}
+          mouseoverEvent={setIsMouseOverTransformer}
+          uniqueId={uniqueId}
+        />
+      )}
     </Container>
   );
 };
