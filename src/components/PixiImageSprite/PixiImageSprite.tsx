@@ -92,13 +92,6 @@ const CYAN = [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0];
 const PixiImageSprite: React.FC<PixiImageSpriteProps> = (props) => {
   //// State
   const [isMounted, setIsMounted] = React.useState(false);
-  const [transform, setTransform] = useState({
-    x: 0,
-    y: 0,
-    width: 80,
-    height: 80,
-    rotate: 0,
-  });
   const [isTransformerDragging, setIsTransformerDragging] = useState(false);
   const [isMouseOverTransformer, setIsMouseOverTransformer] = useState(false);
 
