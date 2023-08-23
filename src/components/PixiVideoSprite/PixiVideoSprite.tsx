@@ -2,7 +2,11 @@ import * as React from "react";
 import { useContext, useEffect, useRef, useState } from "react";
 // @ts-ignore
 import PropTypes from "prop-types";
-import { GsapPixieContext } from "../../providers/GsapPixieContextProvider";
+import { useCustomEventListener } from "react-custom-events";
+import {
+  GsapPixieContext,
+  Events,
+} from "../../providers/GsapPixieContextProvider";
 import { Sprite, Container, useApp, withFilters } from "@pixi/react";
 import { AdjustmentFilter } from "@pixi/filter-adjustment";
 import * as PIXI from "pixi.js";
@@ -138,7 +142,6 @@ const PixiVideoSprite: React.FC<PixiVideoSpriteProps> = (props) => {
   const transformerRef = useRef<PIXI.Container>(null);
   const videoElement = useRef<HTMLVideoElement>(null);
   const videoStateRef = useRef<VideoState>(initialState);
-  const videoTimelineRef = useRef<gsap.core.Timeline>(null);
 
   //// Context
   const {
@@ -248,6 +251,22 @@ const PixiVideoSprite: React.FC<PixiVideoSpriteProps> = (props) => {
     return element;
   }, [src]);
 
+  /** Adding custom event listners */
+  /** Event Listeneres */
+  useCustomEventListener(Events.PAUSE, (data) => {
+    console.log("pause event", data);
+    if (videoElement.current) {
+      const vid = videoElement.current;
+      const isVidPlaying =
+        vid.currentTime > 0 &&
+        !vid.paused &&
+        !vid.ended &&
+        vid.readyState > vid.HAVE_CURRENT_DATA;
+      if (isVidPlaying) videoElement.current.pause();
+      videoStateRef.current.isPlaying = false;
+    }
+  });
+
   // /** stop video playing when gsapDragging is true */
   React.useEffect(() => {
     console.log("current", videoElement.current, gsapDragging);
@@ -273,14 +292,10 @@ const PixiVideoSprite: React.FC<PixiVideoSpriteProps> = (props) => {
         playerTimeRef.current <= endAt &&
         !gsapDragging
       ) {
-        setVidPlay(true);
-        videoElement.current.currentTime = playerTimeRef.current;
+        videoElement.current.currentTime =
+          Number(frameStartAt) || Number(startAt);
         videoElement.current.play();
         videoStateRef.current.isPlaying = true;
-      } else {
-        setVidPlay(false);
-        videoElement.current.pause();
-        videoStateRef.current.isPlaying = false;
       }
     }
   };
@@ -321,13 +336,13 @@ const PixiVideoSprite: React.FC<PixiVideoSpriteProps> = (props) => {
     // console.log('interrupting', refId);
   };
 
-  const onUpdate = (time: number) => {
+  const onUpdate = () => {
     if (videoElement.current) {
-      console.log(
-        "currenttime vs player reftime",
-        videoElement.current.currentTime,
-        playerTimeRef.current
-      );
+      // console.log(
+      //   "currenttime vs player reftime",
+      //   videoElement.current.currentTime,
+      //   playerTimeRef.current
+      // );
       const absDiff = Math.abs(
         videoElement.current.currentTime - playerTimeRef.current
       );
@@ -344,7 +359,7 @@ const PixiVideoSprite: React.FC<PixiVideoSpriteProps> = (props) => {
         videoElement.current.currentTime = playerTimeRef.current;
         videoElement.current.play();
         setTimeout(() => {
-          setVidPlay(false);
+          videoStateRef.current.isPlaying = false;
           if (videoElement.current) videoElement.current.pause();
         }, 55);
         videoStateRef.current.isPlaying = false;
@@ -352,14 +367,13 @@ const PixiVideoSprite: React.FC<PixiVideoSpriteProps> = (props) => {
         // if (!isVidPlaying) videoElement.current.play();
         // videoStateRef.current.isPlaying = true;
         // let the video play and update current time
-        videoElement.current.currentTime = playerTimeRef.current;
+        // videoElement.current.currentTime = playerTimeRef.current;
         if (!isVidPlaying) videoElement.current.play();
-        videoStateRef.current.isPlaying = true;
         videoStateRef.current.isPlaying = true;
       } else if (absDiff > 0.3) {
-        videoElement.current.currentTime = playerTimeRef.current;
-        if (!isVidPlaying) videoElement.current.play();
-        videoStateRef.current.isPlaying = true;
+        // videoElement.current.currentTime = playerTimeRef.current;
+        // if (!isVidPlaying) videoElement.current.play();
+        // videoStateRef.current.isPlaying = true;
       }
     }
   };
@@ -388,11 +402,6 @@ const PixiVideoSprite: React.FC<PixiVideoSpriteProps> = (props) => {
       const ease = getAnimByName(animation || "None");
       ctx = gsap.context(() => {
         if (!isEmpty(ease.from)) {
-          videoTimelineRef.current = gsap.timeline({
-            paused: true,
-            defaults: { duration: 0 },
-          });
-
           tl.current
             .from(containerRef.current, { ...ease.from }, startAt)
             .to(imgGroupRef.current, { alpha: 1, duration: 0.2 }, startAt)
@@ -459,69 +468,6 @@ const PixiVideoSprite: React.FC<PixiVideoSpriteProps> = (props) => {
       }
     }
   }, [isDragging, gsapDragging]);
-
-  // play video when vidPlay is true else stop
-  // React.useEffect(() => {
-  //   let timeout: any;
-  //   if (videoElement.current) {
-  //     const vid = videoElement.current;
-  //     const isVidPlaying =
-  //       vid.currentTime > 0 &&
-  //       !vid.paused &&
-  //       !vid.ended &&
-  //       vid.readyState > vid.HAVE_CURRENT_DATA;
-  //     if (gsapDragging) {
-  //       videoElement.current.play();
-  //       timeout = setTimeout(() => {
-  //         setVidPlay(false);
-  //         if (videoElement.current) videoElement.current.pause();
-  //       }, 55);
-  //       videoStateRef.current.isPlaying = false;
-  //     } else if (vidPlay && !isVidPlaying && !gsapDragging) {
-  //       videoElement.current.play();
-  //       videoStateRef.current.isPlaying = true;
-  //     } else if (!vidPlay && isVidPlaying) {
-  //       videoElement.current.pause();
-  //       videoStateRef.current.isPlaying = false;
-  //     }
-  //   }
-  //   return () => clearTimeout(timeout);
-  // }, [vidPlay, gsapDragging]);
-
-  React.useEffect(() => {
-    if (videoElement.current) {
-      console.log("play updated", play);
-      videoElement.current.currentTime = playerTimeRef.current;
-      // play the video if the start and end times are between the playerTimeRef.current
-      if (
-        playerTimeRef.current >= startAt &&
-        playerTimeRef.current <= endAt &&
-        play
-      ) {
-        // set current time of video using playerTimeRef.current
-        videoElement.current.currentTime = playerTimeRef.current;
-        const vid = videoElement.current;
-        const isVidPlaying =
-          vid.currentTime > 0 &&
-          !vid.paused &&
-          !vid.ended &&
-          vid.readyState > vid.HAVE_CURRENT_DATA;
-        if (play && !isVidPlaying) videoElement.current.play();
-        // videoElement.current.play();
-        setVidPlay(true);
-        videoStateRef.current.isPlaying = true;
-      } else {
-        setVidPlay(false);
-        videoElement.current.pause();
-        videoStateRef.current.isPlaying = false;
-      }
-
-      if (!play) {
-        videoElement.current.pause();
-        videoStateRef.current.isPlaying = false;
-      }
-    }
-  }, [play]);
 
   // load // load meta // load seek through
   React.useEffect(() => {

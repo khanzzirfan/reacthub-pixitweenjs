@@ -91,15 +91,6 @@ export const VideoSeekBar: React.FC = () => {
   };
 
   /** Create Draggable for the Gsap Player */
-  const updateDrag = React.useCallback(
-    (x: number, maxX: number) => {
-      console.log("updatgeDrag running", x, maxX);
-      const currentTime = (x / maxX) * totalVideoSeconds;
-      const prog = x / sliderRef.current!.offsetWidth;
-      console.log("drage update", currentTime, prog);
-    },
-    [totalVideoSeconds]
-  );
 
   return (
     <Flex flexDir={"column"}>
