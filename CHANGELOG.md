@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.5](https://github.com/khanzzirfan/reacthub-pixitweenjs/compare/v0.2.4...v0.2.5) (2023-08-23)
+
+
+### Features
+
+* audio sprite instance added ([be6333e](https://github.com/khanzzirfan/reacthub-pixitweenjs/commit/be6333e640b9449f3efa9afdb182aaa399344a65))
+* Gif animation added to the library ([c4c5914](https://github.com/khanzzirfan/reacthub-pixitweenjs/commit/c4c5914069d5f1699d17a40167e3e928ccfd48bf))
+
+
+### Bug Fixes
+
+* updated pixi svg sprite ([d462599](https://github.com/khanzzirfan/reacthub-pixitweenjs/commit/d462599b88f6151df32d9d4036d31bbb82236383))
+* updated pixijs bindings and updated pixi libraries dependencies ([2d39ac7](https://github.com/khanzzirfan/reacthub-pixitweenjs/commit/2d39ac795a5a7d355d75642aa778b22c9a2ad2ce))
+
 ### [0.2.4](https://github.com/khanzzirfan/reacthub-gsap-pixiez/compare/v0.2.3...v0.2.4) (2023-07-23)
 
 
