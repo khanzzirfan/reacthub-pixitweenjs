@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { PixiGifSprite } from ".";
+import { PixiSvgPathSprite } from ".";
 import { AppStateContextProvider } from "../../utils/AppStateProvider";
 
 // More on how to set up stories at: https://storybook.js.org/docs/react/writing-stories/introduction
 const meta = {
-  title: "Components/GifSprite",
-  component: PixiGifSprite,
+  title: "Components/SvgSprite",
+  component: PixiSvgPathSprite,
 
   tags: ["autodocs"],
   argTypes: {
@@ -68,36 +68,8 @@ const meta = {
       action: "pointerdown",
       description: "pointerdown event",
     },
-    pointerup: {
-      action: "pointerup",
-      description: "pointerup event",
-    },
-    mousedown: {
-      action: "mousedown",
-      description: "mousedown event",
-    },
-    mouseup: {
-      action: "mouseup",
-      description: "mouseup event",
-    },
-    pointerover: {
-      action: "pointerover",
-      description: "pointerover event",
-    },
-    mouseover: {
-      action: "mouseover",
-      description: "mouseover event",
-    },
-    mouseout: {
-      action: "mouseout",
-      description: "mouseout event",
-    },
-    pointerout: {
-      action: "pointerout",
-      description: "pointerout event",
-    },
   },
-} satisfies Meta<typeof PixiGifSprite>;
+} satisfies Meta<typeof PixiSvgPathSprite>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -106,14 +78,12 @@ type Story = StoryObj<typeof meta>;
 export const Normal: Story = {
   render: (args: any) => (
     <AppStateContextProvider {...args}>
-      <PixiGifSprite {...args} />
+      <PixiSvgPathSprite {...args} />
     </AppStateContextProvider>
   ),
   args: {
-    uniqueId: "suryaGify001", // uniqueId of the sprite
-    src: "https://media.giphy.com/media/5VKbvrjxpVJCM/giphy.gif",
-    locked: false,
-    loop: false,
+    uniqueId: "svg001", // uniqueId of the sprite
+    path: "M 100 100 L 300 100 L 200 300 z",
     transformation: {
       x: 100,
       y: 100,
@@ -126,10 +96,42 @@ export const Normal: Story = {
       tint: 0xffffff,
       blendMode: 0,
       colorCorrection: {},
+      fill: "#FFC0CB",
     },
     applyTransformer: false,
     startAt: 0,
-    endAt: 4,
+    endAt: 10,
     initialAlpha: 1,
+  },
+};
+
+export const FadeIn: Story = {
+  render: (args: any) => (
+    <AppStateContextProvider {...args}>
+      <PixiSvgPathSprite {...args} />
+    </AppStateContextProvider>
+  ),
+  args: {
+    uniqueId: "surya002", // uniqueId of the sprite
+    path: "M 100, 100 m -75, 0 a 75,75 0 1,0 150,0 a 75,75 0 1,0 -150,0",
+    transformation: {
+      x: 100,
+      y: 100,
+      width: 150,
+      height: 150,
+      anchor: 0.5,
+      rotation: 0,
+      alpha: 1,
+      scale: 1,
+      tint: 0xffffff,
+      blendMode: 0,
+      animation: "FADE_IN",
+      colorCorrection: {},
+      fill: "#fe2c54",
+    },
+    applyTransformer: false,
+    startAt: 0,
+    endAt: 10,
+    initialAlpha: 0,
   },
 };

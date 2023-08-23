@@ -1,7 +1,6 @@
 import * as React from "react";
 import ContextBridge from "./ContextBridge";
 import { Stage as PixiStage } from "@pixi/react";
-import { AppStateContextProvider } from "./AppStateProvider";
 import { GsapPixieContext } from "../providers/GsapPixieContextProvider";
 
 interface StageProps {
@@ -18,10 +17,7 @@ const Stage: React.FC<StageProps> = ({ children, ...props }) => {
       render={(children: React.ReactNode | React.ReactElement) => (
         <PixiStage {...props}>
           {/* @ts-ignore */}
-          <AppStateContextProvider {...props}>
-            {/* @ts-ignore */}
-            {children}
-          </AppStateContextProvider>
+          {children}
         </PixiStage>
       )}
     >

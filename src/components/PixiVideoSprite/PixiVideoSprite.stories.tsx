@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { PixiGifSprite } from ".";
+import { PixiVideoSprite } from ".";
 import { AppStateContextProvider } from "../../utils/AppStateProvider";
 
 // More on how to set up stories at: https://storybook.js.org/docs/react/writing-stories/introduction
 const meta = {
-  title: "Components/GifSprite",
-  component: PixiGifSprite,
+  title: "Components/VideoSprite",
+  component: PixiVideoSprite,
 
   tags: ["autodocs"],
   argTypes: {
@@ -53,6 +53,10 @@ const meta = {
     applyTransformer: { control: "boolean", description: "applyTransformer" },
     startAt: { control: "number", description: "startAt" },
     endAt: { control: "number", description: "endAt" },
+    frameStartAt: { control: "number", description: "frameStartAt" },
+    frameEndAt: { control: "number", description: "frameEndAt" },
+    mute: { control: "boolean", description: "mute" },
+    locked: { control: "boolean", description: "locked" },
     initialAlpha: {
       control: "number",
       min: 0,
@@ -68,36 +72,8 @@ const meta = {
       action: "pointerdown",
       description: "pointerdown event",
     },
-    pointerup: {
-      action: "pointerup",
-      description: "pointerup event",
-    },
-    mousedown: {
-      action: "mousedown",
-      description: "mousedown event",
-    },
-    mouseup: {
-      action: "mouseup",
-      description: "mouseup event",
-    },
-    pointerover: {
-      action: "pointerover",
-      description: "pointerover event",
-    },
-    mouseover: {
-      action: "mouseover",
-      description: "mouseover event",
-    },
-    mouseout: {
-      action: "mouseout",
-      description: "mouseout event",
-    },
-    pointerout: {
-      action: "pointerout",
-      description: "pointerout event",
-    },
   },
-} satisfies Meta<typeof PixiGifSprite>;
+} satisfies Meta<typeof PixiVideoSprite>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -106,14 +82,45 @@ type Story = StoryObj<typeof meta>;
 export const Normal: Story = {
   render: (args: any) => (
     <AppStateContextProvider {...args}>
-      <PixiGifSprite {...args} />
+      <PixiVideoSprite {...args} />
     </AppStateContextProvider>
   ),
   args: {
-    uniqueId: "suryaGify001", // uniqueId of the sprite
-    src: "https://media.giphy.com/media/5VKbvrjxpVJCM/giphy.gif",
+    uniqueId: "oceanv1", // uniqueId of the sprite
+    src: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+    transformation: {
+      x: 290,
+      y: 250,
+      width: 550,
+      height: 400,
+      anchor: 0.5,
+      rotation: 0,
+      alpha: 1,
+      scale: 1,
+      tint: 0xffffff,
+      blendMode: 0,
+      colorCorrection: {},
+    },
+    applyTransformer: false,
+    startAt: 0,
+    endAt: 10,
+    frameStartAt: 0,
+    frameEndAt: 10,
+    initialAlpha: 1,
+    mute: false,
     locked: false,
-    loop: false,
+  },
+};
+
+export const FadeIn: Story = {
+  render: (args: any) => (
+    <AppStateContextProvider {...args}>
+      <PixiVideoSprite {...args} />
+    </AppStateContextProvider>
+  ),
+  args: {
+    uniqueId: "ForBiggerBlazes002", // uniqueId of the sprite
+    src: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
     transformation: {
       x: 100,
       y: 100,
@@ -125,11 +132,16 @@ export const Normal: Story = {
       scale: 1,
       tint: 0xffffff,
       blendMode: 0,
+      animation: "FADE_IN",
       colorCorrection: {},
     },
     applyTransformer: false,
     startAt: 0,
-    endAt: 4,
-    initialAlpha: 1,
+    endAt: 10,
+    frameStartAt: 0,
+    frameEndAt: 10,
+    initialAlpha: 0,
+    mute: false,
+    locked: false,
   },
 };

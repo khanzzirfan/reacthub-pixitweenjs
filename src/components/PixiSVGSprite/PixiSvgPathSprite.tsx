@@ -1,31 +1,27 @@
 import * as React from "react";
 import { useContext, useEffect, useRef, useState } from "react";
 // @ts-ignore
-import map from "lodash/map";
-// @ts-ignore
 import PropTypes from "prop-types";
 import { GsapPixieContext } from "../../providers/GsapPixieContextProvider";
-import { Container, useApp, withFilters, Graphics } from "@pixi/react";
+import { Sprite, Container, useApp, withFilters } from "@pixi/react";
 import { AdjustmentFilter } from "@pixi/filter-adjustment";
 import * as PIXI from "pixi.js";
 import gsap from "gsap";
-import { useWorkerParser, usePlayerState } from "@react-gifs/tools";
+import { SVG } from "pixi-svg";
 import PixiTransformer from "../../utils/PixiTransformer";
-
+// @ts-ignore
+import svgpath from "svgpath";
 // @ts-ignore
 import isEmpty from "lodash/isEmpty";
 import { getAnimByName } from "../../utils/GsapAnim";
 import { TransformationEnd } from "../../types/transformation";
-import { PixiAnimatedSprite } from "../PixiAnimatedSprite";
 
-type PixiGifSpriteProps = {
+type PixiSvgPathSpriteProps = {
   uniqueId: string;
-  src: string;
+  path: string;
   startAt: number;
   endAt: number;
   initialAlpha: number;
-  locked: boolean;
-  loop: boolean;
   transformation: {
     x: number;
     y: number;
@@ -38,6 +34,12 @@ type PixiGifSpriteProps = {
     tint?: number;
     blendMode?: number;
     animation?: string;
+    fill?: string;
+    fontWeight?: string;
+    fontStyle?: string;
+    stroke?: string;
+    strokeWidth?: number;
+    blurRadius?: number;
     colorCorrection?: {
       enabled?: boolean;
       temperature?: number;
@@ -67,7 +69,6 @@ type PixiGifSpriteProps = {
   pointerover?: () => void;
   mouseover?: () => void;
   mouseout?: () => void;
-  pointerout?: () => void;
   applyTransformer?: boolean;
   onAnchorTransformationEnd?: (endData: any) => void;
 };
@@ -96,81 +97,47 @@ const config = {
 /** CYAN Filters */
 const CYAN = [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0];
 
-const initialState = {
-  isPlaying: false,
-  progress: 0,
-  speed: 1,
-  isMuted: false,
-  isWaiting: false,
-  loaded: false,
-  size: { width: 50, height: 50 },
-  play: false,
-  current: false,
-};
-
-/**
- * PixiGifSprite Component is used to render gif image
- * @param props Gif Sprite props
- * @returns
- */
-const PixiGifSprite: React.FC<PixiGifSpriteProps> = (props) => {
+const PixiSvgPathSprite: React.FC<PixiSvgPathSpriteProps> = (props) => {
   //// State
-  const [gifFrame, setGifFrame] = React.useState<PIXI.Texture[]>([]);
-  const [gifDuration, setGifDuration] = React.useState<number>(0);
-  const [gifFrameObject, setGifFrameObject] = React.useState<
-    PIXI.FrameObject[]
-  >([]);
-  const [currentFrame, setCurrentFrame] = useState<number>(0);
-  const [isComplete, setIsComplete] = useState<boolean>(false);
-
-  const [isDragging, setIsDragging] = useState(false);
+  const [isMounted, setIsMounted] = React.useState(false);
+  const [isTransformerDragging, setIsTransformerDragging] = useState(false);
   const [isMouseOverTransformer, setIsMouseOverTransformer] = useState(false);
-
-  const [gifState, update] = usePlayerState({ autoPlay: false });
-  const graphicRef = React.useRef<PIXI.Graphics>(null);
-  const gifStatusRef = React.useRef(false);
+  const [texture, setTexture] = React.useState<any>(null);
 
   console.log("allProps", props);
   //// Refs
-  const animatedSpriteRef = useRef<PIXI.AnimatedSprite>(null);
+  const imageRef = useRef<PIXI.Sprite>(null);
   const containerRef = useRef<PIXI.Container>(null);
   const parentNode = useRef<PIXI.Container>(null);
   const imgGroupRef = useRef<PIXI.Container>(null);
   const transformerRef = useRef<PIXI.Container>(null);
 
   //// Context
-  const { tl, play: tlPlay } = useContext(GsapPixieContext);
+  const { tl } = useContext(GsapPixieContext);
 
   /// 1001
-  console.log("contxt Values", tl);
-  console.log("gifState", gifState, gifDuration);
-  const {
-    index,
-    frames: gifFrames,
-    delays: gifDelays,
-    length,
-    loaded,
-  } = gifState;
-
+  // console.log("contxt Values", tl);
   const {
     uniqueId,
-    src,
+    path,
     startAt,
     endAt,
     initialAlpha,
-    locked,
-    loop,
     transformation: {
-      width = 0,
-      height = 0,
       x,
       y,
-      rotation = 0,
-      scale,
+      width,
+      height,
       anchor,
       animation,
       colorCorrection,
       effect,
+      fill,
+      fontWeight,
+      fontStyle,
+      stroke = "none",
+      strokeWidth = 0,
+      blurRadius = 0,
     },
     pointerdown,
     pointerup,
@@ -179,7 +146,6 @@ const PixiGifSprite: React.FC<PixiGifSpriteProps> = (props) => {
     pointerover,
     mouseover,
     mouseout,
-    pointerout,
     applyTransformer,
     onAnchorTransformationEnd,
     ...restProps
@@ -199,7 +165,6 @@ const PixiGifSprite: React.FC<PixiGifSpriteProps> = (props) => {
     levels = 1,
     luminance = 0,
     enhance = 0,
-    blurRadius = 0,
     red = 150,
     green = 150,
     blue = 150,
@@ -217,107 +182,30 @@ const PixiGifSprite: React.FC<PixiGifSpriteProps> = (props) => {
     alpha,
   };
 
-  //  load and parse gif
-  useWorkerParser(src, update);
+  const fillColor = PIXI.utils.string2hex(fill || "#262730");
 
-  // updates current index
-  // usePlayback(gifState, () => update(({ index }) => ({ index: index + 1 })));
+  /** handle on tranformer onchange */
+  const handleOnTransformChange = React.useCallback(() => {
+    setIsTransformerDragging(true);
+  }, []);
 
   // transformer to handle sprite transformation
   const handleOnTransformEnd = React.useCallback(
     (endData: TransformationEnd) => {
       console.log("changeEnd", endData);
       if (onAnchorTransformationEnd) {
+        console.log("running onAnchorTransformationEnd");
         onAnchorTransformationEnd(endData);
       }
     },
     []
   );
 
-  React.useEffect(() => {
-    if (!isEmpty(gifFrames)) {
-      // app.stage.addChild(frames);
-      /// load textues
-      const texturedFrames = map(gifFrames, (eachFrame: ImageData) => {
-        const { data, width, height } = eachFrame;
-        const dataEx = new Uint8Array(data);
-        return PIXI.Texture.fromBuffer(dataEx, width, height);
-      });
-
-      const frameObj = texturedFrames.map(
-        (eachFrame: PIXI.Texture, index: number) => {
-          return {
-            texture: eachFrame,
-            time: gifDelays[index],
-          };
-        }
-      );
-
-      setGifFrame(texturedFrames);
-      setGifFrameObject(frameObj);
-      let duration = 0;
-      gifDelays.forEach((delay) => {
-        duration += delay * 10;
-      });
-      setGifDuration(duration);
-    }
-  }, [gifFrames, gifDelays]);
-
-  /** Gsap Start and Stop Events */
-  const gsapOnStart = (startAt: number) => {
-    if (animatedSpriteRef.current) {
-      animatedSpriteRef.current.gotoAndPlay(startAt || 0);
-    }
-  };
-
-  const gsapOnPause = (startAt: number) => {
-    // console.log(`gsap onStart ${droptype} id`, refId);
-    // console.log(elementRefs.current[refId]);
-    if (animatedSpriteRef.current) {
-      animatedSpriteRef.current.stop();
-    }
-  };
-
-  const gsapOnComplete = () => {
-    if (animatedSpriteRef.current) {
-      animatedSpriteRef.current.stop();
-      // animatedSpriteRef.current.gotoAndStop(0);
-    }
-  };
-
-  const onInterrupt = () => {
-    // console.log('interrupting', refId);
-  };
-
-  const onUpdate = () => {
-    // console.log('timeline paused', ctxTimeLine.paused());
-    // if (animatedSpriteRef.current) {
-    //   animatedSpriteRef.current.play();
-    //   dispatchState({
-    //     play: play,
-    //   });
-    // }
-  };
-
-  const handleComplete = () => {
-    setIsComplete(true);
-    // if (onComplete) {
-    //   onComplete();
-    // }
-  };
-
   useEffect(() => {
     let ctx = gsap.context(() => {});
     if (containerRef.current && tl.current) {
       const data = {
         duration: Number(endAt) - Number(startAt),
-        onStart: gsapOnStart,
-        onComplete: gsapOnComplete,
-        onStartParams: [startAt],
-        onCompleteParams: [],
-        onInterrupt: onInterrupt,
-        onUpdate: onUpdate,
-        onUpdateParams: [],
       };
 
       const ease = getAnimByName(animation || "None");
@@ -362,25 +250,28 @@ const PixiGifSprite: React.FC<PixiGifSpriteProps> = (props) => {
     return () => ctx.revert(); // cleanup!
   }, [animation, startAt, endAt]);
 
-  /** handle on tranformer onchange */
-  const handleOnTransformChange = React.useCallback(() => {
-    setIsDragging(true);
-  }, []);
-
-  app.ticker.add((delta) => {
-    if (graphicRef.current) {
-      graphicRef.current.rotation += 0.01 * delta;
-      graphicRef.current
-        .clear()
-        .lineStyle(4, 0xffffff, 1)
-        .moveTo(40, 0)
-        .arc(0, 0, 40, 0, Math.PI * 2 * 0.6, false);
+  React.useEffect(() => {
+    if (containerRef.current) {
+      setIsMounted(true);
     }
-  });
-
-  const draw = React.useCallback((g: PIXI.Graphics) => {
-    g.clear();
   }, []);
+
+  React.useEffect(() => {
+    const transformedPath = svgpath(path).scale(5).translate(0, 0).toString();
+    // console.log('path', path);
+    // console.log('transformedPath', transformedPath);
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}"> 
+        <path stroke="${stroke}" stroke-width="${strokeWidth}" fill="${fill}" d="${transformedPath}">
+        </path>
+      </svg>`;
+
+    const svgObject = new SVG(svg);
+    const tex = app.renderer.generateTexture(svgObject);
+    setTexture(tex);
+    return () => {
+      // removeTransformer();
+    };
+  }, [app, path, stroke, strokeWidth, fill]);
 
   return (
     // @ts-ignore
@@ -394,50 +285,86 @@ const PixiGifSprite: React.FC<PixiGifSpriteProps> = (props) => {
         width={width}
         height={height}
       >
-        {/* @ts-ignore */}
-        <Container ref={imgGroupRef}>
-          {!loaded && (
-            // @ts-ignore
-            <Container anchor={0.5} position={[width / 2, height / 2]}>
-              <Graphics x={x} y={y} ref={graphicRef} draw={draw} />
-            </Container>
-          )}
-          {gifFrame && gifFrame.length > 0 && (
-            <PixiAnimatedSprite
-              x={x}
-              y={y}
-              width={width}
-              height={height}
-              rotation={rotation}
-              animationSpeed={1}
-              loop={loop}
-              isPlaying={!!tlPlay}
-              // @ts-ignore
-              textures={gifFrameObject}
-              onComplete={handleComplete}
-              onFrameChange={(currentFrame: number) =>
-                setCurrentFrame(currentFrame)
+        {colorCorrection && colorCorrection.enabled ? (
+          <Filters
+            scale={1}
+            blur={{ blur: blurRadius, quality: 4 }}
+            adjust={adjustments}
+            apply={({ matrix }: { matrix: any }) => {
+              if (effect === "BlackAndWhite") {
+                matrix.desaturate();
+              } else if (effect === "Sepia") {
+                matrix.sepia();
+              } else if (effect === "RetroVintage") {
+                matrix.negative();
+              } else if (effect === "NightVision") {
+                matrix.negative();
+              } else if (effect === "Normal") {
+                matrix.reset();
               }
-              anchor={0.5}
-              {...(!locked &&
-                !isDragging && {
-                  interactive: true,
-                  buttonMode: true,
-                  pointerdown: pointerdown,
-                  pointerover: pointerover,
-                  pointerout: pointerout,
-                })}
-              forwardRef={animatedSpriteRef}
-              scale={scale}
-            />
-          )}
-        </Container>
+            }}
+            matrix={{
+              enabled: true,
+              // @ts-ignore
+              matrix: CYAN,
+            }}
+          >
+            {/* @ts-ignore */}
+
+            <Container ref={imgGroupRef}>
+              {texture && (
+                <Sprite
+                  texture={texture}
+                  width={width}
+                  height={height}
+                  anchor={anchor}
+                  ref={imageRef}
+                  x={x}
+                  y={y}
+                  // @ts-ignore
+                  interactive={true}
+                  pointerdown={pointerdown}
+                  pointerup={pointerup}
+                  pointerover={pointerover}
+                  mousedown={mousedown}
+                  mouseup={mouseup}
+                  mouseover={mouseover}
+                  mouseout={mouseout}
+                />
+              )}
+            </Container>
+          </Filters>
+        ) : (
+          // @ts-ignore
+          <Container ref={imgGroupRef}>
+            {texture && (
+              <Sprite
+                texture={texture}
+                width={width}
+                height={height}
+                anchor={anchor}
+                ref={imageRef}
+                x={x}
+                y={y}
+                // @ts-ignore
+                interactive={true}
+                pointerdown={pointerdown}
+                pointerup={pointerup}
+                pointerover={pointerover}
+                mousedown={mousedown}
+                mouseup={mouseup}
+                mouseover={mouseover}
+                mouseout={mouseout}
+              />
+            )}
+          </Container>
+        )}
       </Container>
       {applyTransformer && (
         <PixiTransformer
           pixiTransformerRef={transformerRef}
           imageRef={containerRef}
-          isMounted={loaded}
+          isMounted={isMounted}
           transformCommit={handleOnTransformEnd}
           transformChange={handleOnTransformChange}
           mouseoverEvent={setIsMouseOverTransformer}
@@ -448,4 +375,4 @@ const PixiGifSprite: React.FC<PixiGifSpriteProps> = (props) => {
   );
 };
 
-export default PixiGifSprite;
+export default PixiSvgPathSprite;
