@@ -6,10 +6,10 @@
   "type": "module",
   "repository": {
     "type": "git",
-    "url": "https://github.com/khanzzirfan/reacthub-gsap-pixiez"
+    "url": "https://github.com/khanzzirfan/reacthub-pixitweenjs"
   },
   "bugs": {
-    "url": "https://github.com/khanzzirfan/reacthub-gsap-pixiez/issues"
+    "url": "https://github.com/khanzzirfan/reacthub-pixitweenjs"
   },
   "license": "MIT",
   "scripts": {
