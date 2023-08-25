@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.6](https://github.com/khanzzirfan/reacthub-pixitweenjs/compare/v0.2.5...v0.2.6) (2023-08-25)
+
+
+### Features
+
+* added text , gif and svg sprites ([290e6fd](https://github.com/khanzzirfan/reacthub-pixitweenjs/commit/290e6fda45ad4954c9ca767945c0863362326af4))
+
+
+### Bug Fixes
+
+* updated pixi svg sprite ([6fe3619](https://github.com/khanzzirfan/reacthub-pixitweenjs/commit/6fe3619e0eb9faf0a46d10de7154ad428a21e188))
+* updated pixi text editor ([d4cd8d9](https://github.com/khanzzirfan/reacthub-pixitweenjs/commit/d4cd8d97b53fa6210919cd641bfa74d4f7d93f84))
+
 ### [0.2.5](https://github.com/khanzzirfan/reacthub-pixitweenjs/compare/v0.2.4...v0.2.5) (2023-08-23)
 
 
