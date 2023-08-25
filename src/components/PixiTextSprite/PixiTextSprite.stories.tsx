@@ -94,6 +94,7 @@ export const Normal: Story = {
     uniqueId: "TextSpritexx001", // uniqueId of the sprite
     text: "Hello Welcome to PixiJS",
     locked: false,
+    applyTransformer: false,
     transformation: {
       x: 100,
       y: 100,
@@ -122,7 +123,6 @@ export const Normal: Story = {
       textBaseline: "alphabetic",
       trim: false,
     },
-    applyTransformer: false,
     startAt: 0,
     endAt: 10,
     initialAlpha: 1,
@@ -139,6 +139,7 @@ export const FadeIn: Story = {
     uniqueId: "TextSprite001", // uniqueId of the sprite
     text: "Hello Welcome to PixiJS",
     locked: false,
+    applyTransformer: false,
     transformation: {
       x: 100,
       y: 100,
@@ -163,12 +164,11 @@ export const FadeIn: Story = {
       dropShadowColor: 0x000000,
       dropShadowBlur: 0,
       wordWrap: false,
-      wordWrapWidth: 5000000,
+      wordWrapWidth: 100,
       padding: 0,
       textBaseline: "alphabetic",
       trim: false,
     },
-    applyTransformer: false,
     startAt: 0,
     endAt: 10,
     initialAlpha: 0,

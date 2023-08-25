@@ -4,6 +4,7 @@ import { Container, useApp, withFilters, Text } from "@pixi/react";
 import { AdjustmentFilter } from "@pixi/filter-adjustment";
 import * as PIXI from "pixi.js";
 import gsap from "gsap";
+import Quill from "quill";
 import "quill/dist/quill.snow.css";
 // @ts-ignore
 import PropTypes from "prop-types";
@@ -387,8 +388,8 @@ const PixiTextSprite: React.FC<PixiTextSpriteProps> = (props) => {
   }, [transformation]);
 
   const handleOnDoubleClickEditText = () => {
+    console.log("double click triggered");
     setIsEditing(true);
-    // onDoubleClick();
   };
 
   const handleTextChange = (e: string) => {
@@ -404,147 +405,14 @@ const PixiTextSprite: React.FC<PixiTextSpriteProps> = (props) => {
   const handleOnTransformEnd = React.useCallback(
     (endData: TransformationEnd) => {
       if (!textRef.current) return;
-
-      const { transformation: transEnd } = endData;
-      const currentTransformation = textTransformDetailRef.current;
-      const currentX = currentTransformation.x;
-      const currentY = currentTransformation.y;
-      console.log("transend", transEnd);
-      const { scale: transScale } = transEnd;
-      console.log("originalWidth", width);
-
-      const x = textRef.current.x;
-      const y = textRef.current.y;
-      const nwidth = Math.round(textRef.current.width);
-      const nheight = Math.round(textRef.current.height);
-      const rotate = Math.round(textRef.current.rotation);
-      const scale = [textRef.current.scale._x, textRef.current.scale._y];
-      const textMetrix = PIXI.TextMetrics.measureText(
-        textRef.current.text,
-        // @ts-ignore
-        textRef.current._style
-      );
-
-      // @ts-ignore
-      const currentFontSize = textRef.current._style.fontSize;
-      const isResized = transScale[0] !== 1;
-      const isHeightResized = transScale[1] !== 1;
-      const noOfLines = textMetrix.lines.length;
-      const fontSizeUpdate = Math.max(
-        10,
-        Math.round(Number(currentFontSize) * scale[0])
-      );
-      let expectedFontSize = fontSizeUpdate; ///* noOfLines;
-      let operator = "+";
-      let iterator = 0;
-
-      if (!isResized && onAnchorTransformationEnd) {
-        onAnchorTransformationEnd({
-          uniqueId,
-          transformation: {
-            x: Math.round(x),
-            y: Math.round(y),
-            position: [Math.round(x), Math.round(y)],
-            pivot: [Math.round(x), Math.round(y)],
-            width: Math.round(Math.max(5, nwidth)),
-            height: Math.round(Math.max(5, nheight)),
-            rotate: Math.round(rotate),
-            scale: [1, 1],
-            // fontSize: expectedFontSize,
-            /// wordWrapWidth: Math.max(minWrapWidth, Math.round(width)),
-            // lineHeight: expectedLH,
-          },
-        });
-      } else if (isHeightResized && isResized) {
-        do {
-          if (operator === "+") {
-            expectedFontSize = expectedFontSize + 1;
-          } else if (operator === "-") {
-            expectedFontSize = expectedFontSize - 1;
-          }
-
-          const newPixiStyle = new PIXI.TextStyle({
-            fontFamily: "Arial",
-            fontSize: expectedFontSize,
-            fontStyle: "italic",
-            fontWeight: "bold",
-            fill: ["#ffffff", "#00ff99"], // gradient
-            stroke: "#4a1850",
-            strokeThickness: 5,
-            dropShadow: true,
-            dropShadowColor: "#000000",
-            dropShadowBlur: 4,
-            dropShadowAngle: Math.PI / 6,
-            dropShadowDistance: 6,
-            wordWrap: true,
-            wordWrapWidth: nwidth,
-          });
-          const newMetrix = PIXI.TextMetrics.measureText(
-            textRef.current.text,
-            newPixiStyle
-          );
-          console.log("newMetrix", newMetrix);
-          if (newMetrix.lines.length === noOfLines) {
-            break;
-          } else if (newMetrix.lines.length > noOfLines) {
-            operator = "-";
-          } else if (newMetrix.lines.length < noOfLines) {
-            operator = "+";
-          }
-          iterator++;
-          if (iterator > 30) {
-            break;
-          }
-        } while (true);
-
-        if (onAnchorTransformationEnd) {
-          onAnchorTransformationEnd({
-            uniqueId,
-            transformation: {
-              x: Math.round(x),
-              y: Math.round(y),
-              position: [Math.round(x), Math.round(y)],
-              pivot: [Math.round(x), Math.round(y)],
-              width: Math.round(Math.max(5, nwidth)),
-              height: Math.round(Math.max(5, nheight)),
-              rotate: Math.round(rotate),
-              scale: [1, 1],
-              fontSize: expectedFontSize,
-              wordWrapWidth: Math.max(minWrapWidth, Math.round(nwidth)),
-              // lineHeight: expectedLH,
-            },
-          });
-        }
-      } else if (isResized && onAnchorTransformationEnd) {
-        // only width resized
-        onAnchorTransformationEnd({
-          uniqueId,
-          transformation: {
-            x: Math.round(x),
-            y: Math.round(y),
-            position: [Math.round(x), Math.round(y)],
-            pivot: [Math.round(x), Math.round(y)],
-            width: Math.round(Math.max(5, nwidth)),
-            height: Math.round(Math.max(5, nheight)),
-            rotate: Math.round(rotate),
-            scale: [1, 1],
-            wordWrapWidth: Math.max(minWrapWidth, Math.round(nwidth)),
-          },
-        });
+      console.log("enddata", endData);
+      if (onAnchorTransformationEnd) {
+        console.log("running onAnchorTransformationEnd");
+        onAnchorTransformationEnd(endData);
       }
     },
     [onAnchorTransformationEnd, uniqueId, width]
   );
-
-  const handleOnClick = (e: any) => {
-    if (e) {
-      e.stopPropagation();
-    }
-    // onClick(uniqueId);
-    if (pointerdown) {
-      pointerdown();
-    }
-  };
 
   // const handleOnMoveOver = (interactionData) => {
   //   if (!isDragging) {
@@ -557,6 +425,69 @@ const PixiTextSprite: React.FC<PixiTextSpriteProps> = (props) => {
   //     setMouseOverSprite(false);
   //   }
   // };
+
+  React.useEffect(() => {
+    if (isEditing && textInputGroupRef.current) {
+      let el = document.getElementById("note-editor");
+      if (el) {
+        el.style.position = "absolute";
+        el.style.zIndex = "10";
+        el.style.left = x + "px";
+        el.style.top = y + "px";
+        el.style.backgroundColor = "var(--chakra-color-darkShark)";
+        el.style.transform = "scale(1.5)";
+        el.style.width = 300 + "px";
+        el.style.height = 100 + "px";
+        el.style.color = "#fff";
+        el.style.fontSize = "20px";
+        el.style.border = "1px solid #CBCEE0";
+
+        const keyboardbindings = {
+          // This will overwrite the default binding also named 'tab'
+          esc: {
+            key: 27,
+            handler: function () {
+              setIsEditing(false);
+              /// onUnSelectKeyFrame();
+            },
+          },
+          enter: {
+            key: 13,
+            handler: function () {
+              setIsEditing(false);
+              /// onUnSelectKeyFrame();
+            },
+          },
+        };
+
+        var quill = new Quill("#note-editor", {
+          modules: {
+            toolbar: false,
+            keyboard: {
+              bindings: {
+                ...keyboardbindings,
+              },
+            },
+          },
+          placeholder: "Compose your text here...",
+          theme: "snow", // or 'bubble'
+        });
+
+        quill.on("text-change", function () {
+          handleTextChange(quill.root.innerText);
+        });
+
+        quill.setText(text);
+        quill.focus();
+        quill.off("text-change", () => {
+          console.log("removed");
+        });
+        if (!quill.hasFocus()) {
+          el.style.display = "none";
+        }
+      }
+    }
+  }, [x, y, isEditing]);
 
   return (
     // @ts-ignore
@@ -608,8 +539,7 @@ const PixiTextSprite: React.FC<PixiTextSpriteProps> = (props) => {
                   !locked && {
                     interactive: true,
                     buttonMode: true,
-                    pointerdown: handleOnClick,
-                    pointerover: pointerover,
+                    pointerdown: pointerdown,
                     pointerout: mouseout,
                   })}
                 ref={textRef}
@@ -631,8 +561,7 @@ const PixiTextSprite: React.FC<PixiTextSpriteProps> = (props) => {
                 !locked && {
                   interactive: true,
                   buttonMode: true,
-                  pointerdown: handleOnClick,
-                  pointerover: pointerover,
+                  pointerdown: pointerdown,
                   pointerout: mouseout,
                 })}
               ref={textRef}
@@ -650,6 +579,7 @@ const PixiTextSprite: React.FC<PixiTextSpriteProps> = (props) => {
           transformChange={handleOnTransformChange}
           mouseoverEvent={setIsMouseOverTransformer}
           uniqueId={uniqueId}
+          onDoubleClick={handleOnDoubleClickEditText}
         />
       )}
     </Container>
@@ -657,3 +587,9 @@ const PixiTextSprite: React.FC<PixiTextSpriteProps> = (props) => {
 };
 
 export default PixiTextSprite;
+
+// @ts-ignore
+// PixiTextSprite.whyDidYouRender = {
+//   logOnDifferentValues: true,
+//   customName: "PixiTextSprite",
+// };
