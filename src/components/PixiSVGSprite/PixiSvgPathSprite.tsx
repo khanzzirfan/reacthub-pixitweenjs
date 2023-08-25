@@ -73,26 +73,11 @@ type PixiSvgPathSpriteProps = {
   onAnchorTransformationEnd?: (endData: any) => void;
 };
 
-type EffectFunc = () => void;
-type Deps = ReadonlyArray<unknown>;
-
 const Filters = withFilters(Container, {
   blur: PIXI.filters.BlurFilter,
   adjust: AdjustmentFilter,
   matrix: PIXI.filters.ColorMatrixFilter,
 });
-
-/** filter config */
-const config = {
-  dot: {
-    scale: 1,
-    angle: 5,
-  },
-  blur: {
-    blur: 0,
-    quality: 4,
-  },
-};
 
 /** CYAN Filters */
 const CYAN = [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0];
@@ -100,11 +85,10 @@ const CYAN = [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0];
 const PixiSvgPathSprite: React.FC<PixiSvgPathSpriteProps> = (props) => {
   //// State
   const [isMounted, setIsMounted] = React.useState(false);
-  const [isTransformerDragging, setIsTransformerDragging] = useState(false);
-  const [isMouseOverTransformer, setIsMouseOverTransformer] = useState(false);
+  const [, setIsTransformerDragging] = useState(false);
+  const [, setIsMouseOverTransformer] = useState(false);
   const [texture, setTexture] = React.useState<any>(null);
 
-  console.log("allProps", props);
   //// Refs
   const imageRef = useRef<PIXI.Sprite>(null);
   const containerRef = useRef<PIXI.Container>(null);
@@ -133,8 +117,6 @@ const PixiSvgPathSprite: React.FC<PixiSvgPathSpriteProps> = (props) => {
       colorCorrection,
       effect,
       fill,
-      fontWeight,
-      fontStyle,
       stroke = "none",
       strokeWidth = 0,
       blurRadius = 0,
@@ -148,28 +130,14 @@ const PixiSvgPathSprite: React.FC<PixiSvgPathSpriteProps> = (props) => {
     mouseout,
     applyTransformer,
     onAnchorTransformationEnd,
-    ...restProps
   } = props;
 
   // color corrections
   const {
-    enabled = false,
-    temperature = 1,
-    hue = 1,
     contrast = 1,
     saturation = 1,
     exposure = 1,
-    reset,
-    sharpness = 1,
-    value = 0,
-    levels = 1,
-    luminance = 0,
-    enhance = 0,
-    red = 150,
-    green = 150,
-    blue = 150,
     alpha = 1,
-    scaleInput = 1,
   } = colorCorrection || {};
 
   const app = useApp();
@@ -182,7 +150,7 @@ const PixiSvgPathSprite: React.FC<PixiSvgPathSpriteProps> = (props) => {
     alpha,
   };
 
-  const fillColor = PIXI.utils.string2hex(fill || "#262730");
+  // const fillColor = PIXI.utils.string2hex(fill || "#262730");
 
   /** handle on tranformer onchange */
   const handleOnTransformChange = React.useCallback(() => {

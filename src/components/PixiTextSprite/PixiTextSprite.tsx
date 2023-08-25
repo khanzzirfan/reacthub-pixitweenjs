@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useContext, useEffect, useRef, useState } from "react";
-import { Container, useApp, withFilters, Text } from "@pixi/react";
+import { Container, withFilters, Text } from "@pixi/react";
 import { AdjustmentFilter } from "@pixi/filter-adjustment";
 import * as PIXI from "pixi.js";
 import gsap from "gsap";
@@ -101,46 +101,25 @@ type PixiTextSpriteProps = {
   onAnchorTransformationEnd?: (endData: any) => void;
 };
 
-type EffectFunc = () => void;
-type Deps = ReadonlyArray<unknown>;
-
 const Filters = withFilters(Container, {
   blur: PIXI.filters.BlurFilter,
   adjust: AdjustmentFilter,
   matrix: PIXI.filters.ColorMatrixFilter,
 });
 
-/** filter config */
-const config = {
-  dot: {
-    scale: 1,
-    angle: 5,
-  },
-  blur: {
-    blur: 0,
-    quality: 4,
-  },
-};
-
 /** CYAN Filters */
 const CYAN = [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0];
-const RETURN_KEY = 13;
-const ESCAPE_KEY = 27;
 // change these to control the text size
-const BaseFontSize = 64; // font size for 1400 x 700 window
-const MinFontSize = 16; // minimum allowable font size
-const minWrapWidth = 500;
 
 const PixiTextSprite: React.FC<PixiTextSpriteProps> = (props) => {
   //// State
   const [isMounted, setIsMounted] = React.useState(false);
-  const [isTransformerDragging, setIsTransformerDragging] = useState(false);
-  const [isMouseOverTransformer, setIsMouseOverTransformer] = useState(false);
+  const [, setIsTransformerDragging] = useState(false);
+  const [, setIsMouseOverTransformer] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
   console.log("allProps", props);
   //// Refs
-  const imageRef = useRef<PIXI.Sprite>(null);
   const containerRef = useRef<PIXI.Container>(null);
   const parentNode = useRef<PIXI.Container>(null);
   const imgGroupRef = useRef<PIXI.Container>(null);
@@ -148,10 +127,8 @@ const PixiTextSprite: React.FC<PixiTextSpriteProps> = (props) => {
 
   /// refs
   const textRef = useRef<PIXI.Text>(null);
-  const textGroupRef = useRef(null);
   const textInputGroupRef = useRef(null);
   const textInnerGroupRef = useRef(null);
-  const textContainerRef = useRef(null);
   const textFontSize = useRef<number>(16);
   const textTransformDetailRef = useRef<any>(null);
 
@@ -169,16 +146,10 @@ const PixiTextSprite: React.FC<PixiTextSpriteProps> = (props) => {
     locked,
     transformation,
     pointerdown,
-    pointerup,
-    mousedown,
-    mouseup,
-    pointerover,
-    mouseover,
     mouseout,
     applyTransformer,
     onAnchorTransformationEnd,
     onTextUpdate,
-    ...restProps
   } = props;
 
   const {
@@ -188,12 +159,10 @@ const PixiTextSprite: React.FC<PixiTextSpriteProps> = (props) => {
     x,
     y,
     rotation = 1,
-    lineHeight = 1,
     /// font
     fontFamily = "Arial",
     fontWeight = "normal",
     fontStyle = "normal",
-    fontVariant = "normal",
     fontSize = 16,
 
     // fill
@@ -204,49 +173,25 @@ const PixiTextSprite: React.FC<PixiTextSpriteProps> = (props) => {
     strokeThickness: strokeWidth,
     // drop shadow
     blurRadius = 0,
-    dropShadow: shadowEnabled = false,
     blurEnabled = false,
     dropShadowColor: shadowColor = null,
-    shadowOffsetX = 0,
-    shadowOffsetY = 0,
-    dropShadowBlur: shadowBlur = 0,
 
     // multiline
     wordWrapWidth = 50000000,
     leading = 0,
-    textDecoration,
     letterSpacing,
-    zIndex = 0,
-    padding = 0,
-    border,
     colorCorrection = {},
     animation,
     effect,
-    ...restTransProps
   } = transformation;
 
   // color corrections
   const {
-    enabled = false,
-    temperature = 1,
-    hue = 1,
     contrast = 1,
     saturation = 1,
     exposure = 1,
-    reset,
-    sharpness = 1,
-    value = 0,
-    levels = 1,
-    luminance = 0,
-    enhance = 0,
-    red = 150,
-    green = 150,
-    blue = 150,
     alpha = 1,
-    scaleInput = 1,
   } = colorCorrection || {};
-
-  const app = useApp();
 
   /** adjustment filter */
   const adjustments = {
@@ -375,10 +320,10 @@ const PixiTextSprite: React.FC<PixiTextSpriteProps> = (props) => {
     wordWrapWidth,
   ]);
 
-  let textMetrics = {};
-  if (!isEmpty(text) && !isEmpty(pixiStyles)) {
-    textMetrics = PIXI.TextMetrics.measureText(text, pixiStyles);
-  }
+  // let textMetrics = {};
+  // if (!isEmpty(text) && !isEmpty(pixiStyles)) {
+  //   textMetrics = PIXI.TextMetrics.measureText(text, pixiStyles);
+  // }
 
   // On transformation change, update the textTransformDetailRef
   React.useEffect(() => {

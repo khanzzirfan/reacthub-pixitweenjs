@@ -7,7 +7,7 @@ import {
   GsapPixieContext,
   Events,
 } from "../../providers/GsapPixieContextProvider";
-import { Sprite, Container, useApp, withFilters } from "@pixi/react";
+import { Sprite, Container, withFilters } from "@pixi/react";
 import { AdjustmentFilter } from "@pixi/filter-adjustment";
 import * as PIXI from "pixi.js";
 import gsap from "gsap";
@@ -73,9 +73,6 @@ type PixiVideoSpriteProps = {
   onAnchorTransformationEnd?: (endData: any) => void;
 };
 
-type EffectFunc = () => void;
-type Deps = ReadonlyArray<unknown>;
-
 interface VideoState {
   isPlaying: boolean;
   progress: number;
@@ -92,18 +89,6 @@ const Filters = withFilters(Container, {
   adjust: AdjustmentFilter,
   matrix: PIXI.filters.ColorMatrixFilter,
 });
-
-/** filter config */
-const config = {
-  dot: {
-    scale: 1,
-    angle: 5,
-  },
-  blur: {
-    blur: 0,
-    quality: 4,
-  },
-};
 
 /** CYAN Filters */
 const CYAN = [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0];
@@ -122,10 +107,9 @@ const initialState: VideoState = {
 const PixiVideoSprite: React.FC<PixiVideoSpriteProps> = (props) => {
   //// State
   const [isMounted, setIsMounted] = React.useState(false);
-  const [vidPlay, setVidPlay] = React.useState(false);
-  const [isTransformerDragging, setIsTransformerDragging] = useState(false);
-  const [isMouseOverTransformer, setIsMouseOverTransformer] = useState(false);
-  const [{ isWaiting, isStalled }, setVideoState] = React.useState({
+  /// const [isTransformerDragging, setIsTransformerDragging] = useState(false);
+  const [, setIsMouseOverTransformer] = useState(false);
+  const [, setVideoState] = React.useState({
     isWaiting: false,
     isStalled: false,
   });
@@ -173,7 +157,6 @@ const PixiVideoSprite: React.FC<PixiVideoSpriteProps> = (props) => {
       height,
       scale,
       rotation,
-      anchor,
       animation,
       colorCorrection,
       effect,
@@ -187,34 +170,18 @@ const PixiVideoSprite: React.FC<PixiVideoSpriteProps> = (props) => {
     mouseout,
     applyTransformer,
     onAnchorTransformationEnd,
-    ...restProps
   } = props;
 
   const videoUrl = src || "";
 
   // color corrections
   const {
-    enabled = false,
-    temperature = 1,
-    hue = 1,
     contrast = 1,
     saturation = 1,
     exposure = 1,
-    reset,
-    sharpness = 1,
-    value = 0,
-    levels = 1,
-    luminance = 0,
-    enhance = 0,
     blurRadius = 0,
-    red = 150,
-    green = 150,
-    blue = 150,
     alpha = 1,
-    scaleInput = 1,
   } = colorCorrection || {};
-
-  const app = useApp();
 
   /** adjustment filter */
   const adjustments = {
@@ -300,26 +267,9 @@ const PixiVideoSprite: React.FC<PixiVideoSpriteProps> = (props) => {
     }
   };
 
-  const gsapOnPause = (startAt: number) => {
-    if (videoElement.current) {
-      setVidPlay(false);
-
-      const vid = videoElement.current;
-      const isVidPlaying =
-        vid.currentTime > 0 &&
-        !vid.paused &&
-        !vid.ended &&
-        vid.readyState > vid.HAVE_CURRENT_DATA;
-      ///if (!isVidPlaying) videoElement.current.play();
-      if (isVidPlaying) videoElement.current.pause();
-      videoStateRef.current.isPlaying = false;
-    }
-  };
-
   const gsapOnComplete = () => {
     console.log("onComplete triggered");
     if (videoElement.current) {
-      setVidPlay(false);
       const vid = videoElement.current;
       const isVidPlaying =
         vid.currentTime > 0 &&
@@ -376,13 +326,6 @@ const PixiVideoSprite: React.FC<PixiVideoSpriteProps> = (props) => {
         // videoStateRef.current.isPlaying = true;
       }
     }
-  };
-
-  const handleComplete = () => {
-    // if (onComplete) {
-    //   onComplete();
-    // }
-    videoStateRef.current.isPlaying = false;
   };
 
   useEffect(() => {
@@ -519,7 +462,7 @@ const PixiVideoSprite: React.FC<PixiVideoSpriteProps> = (props) => {
       Math.round((Number(frameStartAt) + Number.EPSILON) * 100) / 100;
     const endAt = Math.round((Number(frameEndAt) + Number.EPSILON) * 100) / 100;
     const urlWithTimestamp = `${videoUrl}#t=${stAt},${endAt}`;
-    const urlWithQuery = `${videoUrl}?t=${stAt},${endAt}`;
+    /// const urlWithQuery = `${videoUrl}?t=${stAt},${endAt}`;
 
     console.log("urlTimestap", urlWithTimestamp);
     /// const texture =
@@ -628,6 +571,8 @@ const PixiVideoSprite: React.FC<PixiVideoSpriteProps> = (props) => {
                       mousedown: mousedown,
                       mouseover: mouseover,
                       mouseout: mouseout,
+                      mouseup: mouseup,
+                      pointerup: pointerup,
                     })}
                   ref={imageRef}
                   scale={scale}
@@ -657,6 +602,8 @@ const PixiVideoSprite: React.FC<PixiVideoSpriteProps> = (props) => {
                     mousedown: mousedown,
                     mouseover: mouseover,
                     mouseout: mouseout,
+                    mouseup: mouseup,
+                    pointerup: pointerup,
                   })}
                 ref={imageRef}
                 scale={scale}

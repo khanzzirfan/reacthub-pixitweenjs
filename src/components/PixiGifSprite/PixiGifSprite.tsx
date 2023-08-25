@@ -5,8 +5,7 @@ import map from "lodash/map";
 // @ts-ignore
 import PropTypes from "prop-types";
 import { GsapPixieContext } from "../../providers/GsapPixieContextProvider";
-import { Container, useApp, withFilters, Graphics } from "@pixi/react";
-import { AdjustmentFilter } from "@pixi/filter-adjustment";
+import { Container, useApp, Graphics } from "@pixi/react";
 import * as PIXI from "pixi.js";
 import gsap from "gsap";
 import { useWorkerParser, usePlayerState } from "@react-gifs/tools";
@@ -72,42 +71,6 @@ type PixiGifSpriteProps = {
   onAnchorTransformationEnd?: (endData: any) => void;
 };
 
-type EffectFunc = () => void;
-type Deps = ReadonlyArray<unknown>;
-
-const Filters = withFilters(Container, {
-  blur: PIXI.filters.BlurFilter,
-  adjust: AdjustmentFilter,
-  matrix: PIXI.filters.ColorMatrixFilter,
-});
-
-/** filter config */
-const config = {
-  dot: {
-    scale: 1,
-    angle: 5,
-  },
-  blur: {
-    blur: 0,
-    quality: 4,
-  },
-};
-
-/** CYAN Filters */
-const CYAN = [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0];
-
-const initialState = {
-  isPlaying: false,
-  progress: 0,
-  speed: 1,
-  isMuted: false,
-  isWaiting: false,
-  loaded: false,
-  size: { width: 50, height: 50 },
-  play: false,
-  current: false,
-};
-
 /**
  * PixiGifSprite Component is used to render gif image
  * @param props Gif Sprite props
@@ -120,15 +83,14 @@ const PixiGifSprite: React.FC<PixiGifSpriteProps> = (props) => {
   const [gifFrameObject, setGifFrameObject] = React.useState<
     PIXI.FrameObject[]
   >([]);
-  const [currentFrame, setCurrentFrame] = useState<number>(0);
-  const [isComplete, setIsComplete] = useState<boolean>(false);
+  const [, setCurrentFrame] = useState<number>(0);
+  const [, setIsComplete] = useState<boolean>(false);
 
   const [isDragging, setIsDragging] = useState(false);
-  const [isMouseOverTransformer, setIsMouseOverTransformer] = useState(false);
+  const [, setIsMouseOverTransformer] = useState(false);
 
   const [gifState, update] = usePlayerState({ autoPlay: false });
   const graphicRef = React.useRef<PIXI.Graphics>(null);
-  const gifStatusRef = React.useRef(false);
 
   console.log("allProps", props);
   //// Refs
@@ -144,13 +106,7 @@ const PixiGifSprite: React.FC<PixiGifSpriteProps> = (props) => {
   /// 1001
   console.log("contxt Values", tl);
   console.log("gifState", gifState, gifDuration);
-  const {
-    index,
-    frames: gifFrames,
-    delays: gifDelays,
-    length,
-    loaded,
-  } = gifState;
+  const { frames: gifFrames, delays: gifDelays, loaded } = gifState;
 
   const {
     uniqueId,
@@ -167,10 +123,7 @@ const PixiGifSprite: React.FC<PixiGifSpriteProps> = (props) => {
       y,
       rotation = 0,
       scale,
-      anchor,
       animation,
-      colorCorrection,
-      effect,
     },
     pointerdown,
     pointerup,
@@ -182,40 +135,11 @@ const PixiGifSprite: React.FC<PixiGifSpriteProps> = (props) => {
     pointerout,
     applyTransformer,
     onAnchorTransformationEnd,
-    ...restProps
   } = props;
 
   // color corrections
-  const {
-    enabled = false,
-    temperature = 1,
-    hue = 1,
-    contrast = 1,
-    saturation = 1,
-    exposure = 1,
-    reset,
-    sharpness = 1,
-    value = 0,
-    levels = 1,
-    luminance = 0,
-    enhance = 0,
-    blurRadius = 0,
-    red = 150,
-    green = 150,
-    blue = 150,
-    alpha = 1,
-    scaleInput = 1,
-  } = colorCorrection || {};
 
   const app = useApp();
-
-  /** adjustment filter */
-  const adjustments = {
-    brightness: exposure,
-    contrast,
-    saturation,
-    alpha,
-  };
 
   //  load and parse gif
   useWorkerParser(src, update);
@@ -267,14 +191,6 @@ const PixiGifSprite: React.FC<PixiGifSpriteProps> = (props) => {
   const gsapOnStart = (startAt: number) => {
     if (animatedSpriteRef.current) {
       animatedSpriteRef.current.gotoAndPlay(startAt || 0);
-    }
-  };
-
-  const gsapOnPause = (startAt: number) => {
-    // console.log(`gsap onStart ${droptype} id`, refId);
-    // console.log(elementRefs.current[refId]);
-    if (animatedSpriteRef.current) {
-      animatedSpriteRef.current.stop();
     }
   };
 
@@ -426,6 +342,11 @@ const PixiGifSprite: React.FC<PixiGifSpriteProps> = (props) => {
                   pointerdown: pointerdown,
                   pointerover: pointerover,
                   pointerout: pointerout,
+                  pointerup: pointerup,
+                  mousedown: mousedown,
+                  mouseup: mouseup,
+                  mouseover: mouseover,
+                  mouseout: mouseout,
                 })}
               forwardRef={animatedSpriteRef}
               scale={scale}

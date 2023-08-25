@@ -48,7 +48,6 @@ const GsapPixieContextProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [play, setPlay] = useState<boolean>(false);
-  const [frameNumber, setFrameNumber] = useState<number>(0);
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [internalDuration, setInternalDuration] = useState<number>(0);
   const [totalDuration, setTotalDuration] = useState<number>(0);
@@ -58,9 +57,9 @@ const GsapPixieContextProvider: React.FC<{ children: React.ReactNode }> = ({
   const gsapCtx = useRef<any>();
   const playerTimeRef = useRef<number>(0.001);
 
-  const parentElementRef = useRef<any>();
+  // const parentElementRef = useRef<any>();
   // передаем предка анимируемых элементов
-  const q = gsap.utils.selector(parentElementRef);
+  // const q = gsap.utils.selector(parentElementRef);
 
   useLayoutEffect(() => {
     gsapCtx.current = gsap.context(() => {
@@ -75,7 +74,7 @@ const GsapPixieContextProvider: React.FC<{ children: React.ReactNode }> = ({
     return () => gsapCtx.current.revert();
   }, []);
 
-  gsap.ticker.add((time, deltaTime, frame) => {
+  gsap.ticker.add(() => {
     // console.log("timeframe", time, deltaTime, frame);
     // setFrameNumber(frame);
     if (tl.current && getTimelineDuration) {
@@ -86,11 +85,11 @@ const GsapPixieContextProvider: React.FC<{ children: React.ReactNode }> = ({
   const onUpdate = useCallback(() => {
     /// console.log("update event callback");
     const timeline = tl.current;
-    var now = timeline.time();
-    var elapsedTime;
-    if (playerTimeRef.current) {
-      elapsedTime = now - playerTimeRef.current;
-    }
+    let now = timeline.time();
+    // let elapsedTime;
+    // if (playerTimeRef.current) {
+    //   elapsedTime = now - playerTimeRef.current;
+    // }
     //  console.log(`elapseTime :${elapsedTime} and frame: ${frameNumber}`);
     //time = now;
     playerTimeRef.current = now;
@@ -154,11 +153,6 @@ const GsapPixieContextProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, [play]);
 
-  const addTotalDuration = (duration: number) => {
-    const timeline = tl.current;
-    timeline.totalDuration(duration);
-  };
-
   const handleReset = useCallback(() => {
     const timeline = tl.current;
 
@@ -188,10 +182,10 @@ const GsapPixieContextProvider: React.FC<{ children: React.ReactNode }> = ({
     timeline.seek(4);
   }, []);
 
-  const setTimelineDuration = useCallback(() => {
-    const timeline = tl.current;
-    timeline.totalDuration(3);
-  }, []);
+  // const setTimelineDuration = useCallback(() => {
+  //   const timeline = tl.current;
+  //   timeline.totalDuration(3);
+  // }, []);
 
   const getTimelineDuration = useCallback(() => {
     const timeline = tl.current;
@@ -214,12 +208,12 @@ const GsapPixieContextProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   /** Event listener dragging */
-  useCustomEventListener(Events.DRAGGING_START, (time) => {
+  useCustomEventListener(Events.DRAGGING_START, () => {
     console.log("dragging start");
     setIsDragging(true);
   });
 
-  useCustomEventListener(Events.DRAGGING_END, (time) => {
+  useCustomEventListener(Events.DRAGGING_END, () => {
     setIsDragging(false);
     console.log("dragging end");
   });

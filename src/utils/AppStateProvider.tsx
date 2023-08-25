@@ -27,7 +27,7 @@ export const AppStateContextProvider: React.FC<
   const onAnchorTransformationEnd = React.useCallback(
     (data: TransformationEnd) => {
       console.log("onAnchorTransformationEnd", data);
-      const { uniqueId, transformation } = data;
+      const { transformation } = data;
       const newAppState = {
         ...appStateRef.current,
         transformation: {
@@ -41,9 +41,9 @@ export const AppStateContextProvider: React.FC<
     []
   );
 
-  const onMouseOverSprite = React.useCallback((data: unknown) => {}, []);
+  const onMouseOverSprite = React.useCallback(() => {}, []);
 
-  const onClickSprite = React.useCallback((data: unknown) => {}, []);
+  const onClickSprite = React.useCallback(() => {}, []);
 
   return (
     <>

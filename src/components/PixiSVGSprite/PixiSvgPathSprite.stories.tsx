@@ -13,9 +13,9 @@ const meta = {
       control: "text",
       description: "uniqueId of the sprite",
     },
-    src: {
+    path: {
       control: "text",
-      description: "source of the image",
+      description: "source of the svg path",
     },
     transformation: {
       control: "object",

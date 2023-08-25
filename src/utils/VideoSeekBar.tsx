@@ -4,9 +4,7 @@ import {
   SliderTrack,
   SliderFilledTrack,
   SliderThumb,
-  SliderMark,
   Flex,
-  Icon,
   Text,
   Box,
   Button,
@@ -15,7 +13,7 @@ import {
   GsapPixieContext,
   Events,
 } from "../providers/GsapPixieContextProvider";
-import { useCustomEventListener, emitCustomEvent } from "react-custom-events";
+import { emitCustomEvent } from "react-custom-events";
 
 import { gsap } from "gsap";
 import { Draggable } from "gsap/Draggable";
@@ -24,19 +22,14 @@ gsap.registerPlugin(Draggable);
 
 export const VideoSeekBar: React.FC = () => {
   const rafRef = React.useRef<number>();
-  const sliderRef = React.useRef<HTMLDivElement>(null);
   const sliderThumbRef = React.useRef<HTMLDivElement>(null);
-  const sliderProgressRef = React.useRef<HTMLDivElement>(null);
   const {
     tl: timeline,
     playerTimeRef,
     handlePlay,
     handlePause,
-    handleReset,
-    handleSeek,
     handleSeekTest,
     handleRestart,
-    handleRepeat,
     totalDuration: duration,
   } = React.useContext(GsapPixieContext);
 
@@ -44,7 +37,7 @@ export const VideoSeekBar: React.FC = () => {
   const [time, setTime] = React.useState<number>(0);
   const totalVideoSeconds = 20;
 
-  const animate = (time: number) => {
+  const animate = () => {
     /// console.log("totalDuration", timeline.current.totalDuration());
     if (playerTimeRef && playerTimeRef.current) {
       setTime(playerTimeRef.current);
@@ -78,13 +71,13 @@ export const VideoSeekBar: React.FC = () => {
    * 1. pause the timeline
    * 2. trigger custom event isDraggingStart
    */
-  const handleOnSliderChangeStart = (value: number) => {
+  const handleOnSliderChangeStart = () => {
     // trigger custom event and pause the timeline
     emitCustomEvent(Events.DRAGGING_START);
     timeline && timeline.current.pause();
   };
 
-  const handleOnSliderChangeEnd = (value: number) => {
+  const handleOnSliderChangeEnd = () => {
     // trigger custom event and pause the timeline
     emitCustomEvent(Events.DRAGGING_END);
     timeline && timeline.current.pause();

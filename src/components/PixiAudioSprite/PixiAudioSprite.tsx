@@ -6,7 +6,7 @@ import {
   GsapPixieContext,
   Events,
 } from "../../providers/GsapPixieContextProvider";
-import { Container, useApp } from "@pixi/react";
+import { Container } from "@pixi/react";
 import { useCustomEventListener } from "react-custom-events";
 import gsap from "gsap";
 import { Sound } from "@pixi/sound";
@@ -46,7 +46,7 @@ const PixiAudioSprite: React.FC<PixiAudioSpriteProps> = (props) => {
     isDragging: false,
   };
   //// State
-  const [isMounted, setIsMounted] = React.useState(false);
+  const [, setIsMounted] = React.useState(false);
 
   const audioStateRef = useRef<AudioState>(initialState);
 
@@ -61,9 +61,8 @@ const PixiAudioSprite: React.FC<PixiAudioSpriteProps> = (props) => {
 
   /// 1001
   // console.log("contxt Values", tl);
-  const { uniqueId, src, startAt, endAt, mute, speed, ...restProps } = props;
+  const { uniqueId, src, startAt, endAt, mute, speed } = props;
 
-  const app = useApp();
   const audioContainerRef = React.useRef<Sound>(null);
 
   /** Adding custom event listners */
@@ -91,15 +90,6 @@ const PixiAudioSprite: React.FC<PixiAudioSpriteProps> = (props) => {
         audioStateRef.current.isPlaying = true;
         audioStateRef.current.completed = false;
       }
-    }
-  };
-
-  const gsapOnPause = (startAt: number) => {
-    if (containerRef.current) {
-      console.log("audio gsapOnStart", startAt);
-      // @ts-ignore
-      audioContainerRef.current?.pause();
-      audioStateRef.current.isPlaying = false;
     }
   };
 
@@ -131,7 +121,7 @@ const PixiAudioSprite: React.FC<PixiAudioSpriteProps> = (props) => {
     }
   };
 
-  const onInterrupt = (startAt: number) => {};
+  const onInterrupt = () => {};
 
   useEffect(() => {
     let ctx = gsap.context(() => {});
@@ -178,7 +168,7 @@ const PixiAudioSprite: React.FC<PixiAudioSpriteProps> = (props) => {
   }, [mute, speed]);
 
   const onSoundLoaded = React.useCallback(
-    (err: any, sound: Sound | undefined) => {
+    (_: any, sound: Sound | undefined) => {
       //@ts-ignore
       audioContainerRef.current = sound;
       audioStateRef.current.loaded = true;

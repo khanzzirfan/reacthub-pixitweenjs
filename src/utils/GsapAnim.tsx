@@ -26,13 +26,7 @@ interface Ease {
   };
 }
 
-export const getAnimByName = (
-  animate: string,
-  stageWidth?: number,
-  stageHeight?: number,
-  x?: number,
-  y?: number,
-): Ease => {
+export const getAnimByName = (animate: string): Ease => {
   let ease: Ease = {};
   switch (animate) {
     case "NONE":

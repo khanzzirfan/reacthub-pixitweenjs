@@ -3,7 +3,7 @@ import { useContext, useEffect, useRef, useState } from "react";
 // @ts-ignore
 import PropTypes from "prop-types";
 import { GsapPixieContext } from "../../providers/GsapPixieContextProvider";
-import { Sprite, Container, useApp, withFilters } from "@pixi/react";
+import { Sprite, Container, withFilters } from "@pixi/react";
 import { AdjustmentFilter } from "@pixi/filter-adjustment";
 import * as PIXI from "pixi.js";
 import gsap from "gsap";
@@ -65,26 +65,11 @@ type PixiImageSpriteProps = {
   onAnchorTransformationEnd?: (endData: any) => void;
 };
 
-type EffectFunc = () => void;
-type Deps = ReadonlyArray<unknown>;
-
 const Filters = withFilters(Container, {
   blur: PIXI.filters.BlurFilter,
   adjust: AdjustmentFilter,
   matrix: PIXI.filters.ColorMatrixFilter,
 });
-
-/** filter config */
-const config = {
-  dot: {
-    scale: 1,
-    angle: 5,
-  },
-  blur: {
-    blur: 0,
-    quality: 4,
-  },
-};
 
 /** CYAN Filters */
 const CYAN = [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0];
@@ -92,8 +77,8 @@ const CYAN = [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0];
 const PixiImageSprite: React.FC<PixiImageSpriteProps> = (props) => {
   //// State
   const [isMounted, setIsMounted] = React.useState(false);
-  const [isTransformerDragging, setIsTransformerDragging] = useState(false);
-  const [isMouseOverTransformer, setIsMouseOverTransformer] = useState(false);
+  const [, setIsTransformerDragging] = useState(false);
+  const [, setIsMouseOverTransformer] = useState(false);
 
   console.log("allProps", props);
   //// Refs
@@ -133,32 +118,16 @@ const PixiImageSprite: React.FC<PixiImageSpriteProps> = (props) => {
     mouseout,
     applyTransformer,
     onAnchorTransformationEnd,
-    ...restProps
   } = props;
 
   // color corrections
   const {
-    enabled = false,
-    temperature = 1,
-    hue = 1,
     contrast = 1,
     saturation = 1,
     exposure = 1,
-    reset,
-    sharpness = 1,
-    value = 0,
-    levels = 1,
-    luminance = 0,
-    enhance = 0,
     blurRadius = 0,
-    red = 150,
-    green = 150,
-    blue = 150,
     alpha = 1,
-    scaleInput = 1,
   } = colorCorrection || {};
-
-  const app = useApp();
 
   /** adjustment filter */
   const adjustments = {
