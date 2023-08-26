@@ -145,11 +145,16 @@ const PixiTextSprite: React.FC<PixiTextSpriteProps> = (props) => {
     initialAlpha,
     locked,
     transformation,
-    pointerdown,
-    mouseout,
     applyTransformer,
     onAnchorTransformationEnd,
     onTextUpdate,
+    pointerdown,
+    pointerup,
+    mousedown,
+    mouseup,
+    pointerover,
+    mouseover,
+    mouseout,
   } = props;
 
   const {
@@ -447,53 +452,30 @@ const PixiTextSprite: React.FC<PixiTextSpriteProps> = (props) => {
         height={height}
       >
         {isEditing && <Container ref={textInputGroupRef}></Container>}
-        {colorCorrection && colorCorrection.enabled ? (
-          <Filters
-            scale={1}
-            blur={{ blur: blurRadius, quality: 4 }}
-            adjust={adjustments}
-            apply={({ matrix }: { matrix: any }) => {
-              if (effect === "BlackAndWhite") {
-                matrix.desaturate();
-              } else if (effect === "Sepia") {
-                matrix.sepia();
-              } else if (effect === "RetroVintage") {
-                matrix.negative();
-              } else if (effect === "NightVision") {
-                matrix.negative();
-              } else if (effect === "Normal") {
-                matrix.reset();
-              }
-            }}
-            matrix={{
-              enabled: true,
-              // @ts-ignore
-              matrix: CYAN,
-            }}
-          >
-            {/* @ts-ignore */}
-            <Container alpha={isEditing ? 0 : 1} ref={textInnerGroupRef}>
-              <Text
-                style={pixiStyles}
-                x={x}
-                y={y}
-                rotation={rotation}
-                anchor={0.5}
-                text={text}
-                {...(!isEditing &&
-                  !locked && {
-                    interactive: true,
-                    buttonMode: true,
-                    pointerdown: pointerdown,
-                    pointerout: mouseout,
-                  })}
-                ref={textRef}
-                scale={scale}
-              />
-            </Container>
-          </Filters>
-        ) : (
-          // @ts-ignore
+        <Filters
+          scale={1}
+          blur={{ blur: blurRadius, quality: 4 }}
+          adjust={adjustments}
+          apply={({ matrix }: { matrix: any }) => {
+            if (effect === "BlackAndWhite") {
+              matrix.desaturate();
+            } else if (effect === "Sepia") {
+              matrix.sepia();
+            } else if (effect === "RetroVintage") {
+              matrix.negative();
+            } else if (effect === "NightVision") {
+              matrix.negative();
+            } else if (effect === "Normal") {
+              matrix.reset();
+            }
+          }}
+          matrix={{
+            enabled: true,
+            // @ts-ignore
+            matrix: CYAN,
+          }}
+        >
+          {/* @ts-ignore */}
           <Container alpha={isEditing ? 0 : 1} ref={textInnerGroupRef}>
             <Text
               style={pixiStyles}
@@ -508,12 +490,17 @@ const PixiTextSprite: React.FC<PixiTextSpriteProps> = (props) => {
                   buttonMode: true,
                   pointerdown: pointerdown,
                   pointerout: mouseout,
+                  pointerover: pointerover,
+                  pointerup: pointerup,
+                  mousedown: mousedown,
+                  mouseup: mouseup,
+                  mouseover: mouseover,
                 })}
               ref={textRef}
               scale={scale}
             />
           </Container>
-        )}
+        </Filters>
       </Container>
       {applyTransformer && (
         <PixiTransformer

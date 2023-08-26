@@ -143,3 +143,39 @@ export const FadeIn: Story = {
     initialAlpha: 0,
   },
 };
+
+// More on writing stories with args: https://storybook.js.org/docs/react/writing-stories/args
+export const Filters: Story = {
+  render: (args: any) => (
+    <AppStateContextProvider {...args}>
+      <PixiImageSprite {...args} />
+    </AppStateContextProvider>
+  ),
+  args: {
+    uniqueId: "image-filters001", // uniqueId of the sprite
+    src: "https://assets.codepen.io/693612/surya.svg",
+    applyTransformer: false,
+    startAt: 0,
+    endAt: 10,
+    transformation: {
+      x: 200,
+      y: 200,
+      width: 150,
+      height: 150,
+      anchor: 0.5,
+      rotation: 0,
+      alpha: 1,
+      scale: 1,
+      tint: 0xffffff,
+      blendMode: 0,
+      colorCorrection: {
+        enabled: true,
+        contrast: 1,
+        saturation: 2,
+        exposure: 1,
+        blurRadius: 0,
+      },
+    },
+    initialAlpha: 1,
+  },
+};

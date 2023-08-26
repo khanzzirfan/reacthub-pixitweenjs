@@ -117,7 +117,6 @@ const PixiVideoSprite: React.FC<PixiVideoSpriteProps> = (props) => {
     React.useState<PIXI.Texture<PIXI.Resource>>();
   const [isDragging, setIsDragging] = useState(false);
 
-  console.log("PixiVideoSpriteProps", props);
   //// Refs
   const imageRef = useRef<PIXI.Sprite>(null);
   const containerRef = useRef<PIXI.Container>(null);
@@ -132,12 +131,9 @@ const PixiVideoSprite: React.FC<PixiVideoSpriteProps> = (props) => {
     tl,
     playerTimeRef,
     isDragging: gsapDragging,
-    play,
   } = useContext(GsapPixieContext);
 
   // console log draggging
-  console.log("isGsapDragging", gsapDragging);
-  console.log("play", play);
   /// 1001
   // console.log("contxt Values", tl);
   const {
@@ -527,62 +523,30 @@ const PixiVideoSprite: React.FC<PixiVideoSpriteProps> = (props) => {
         width={width}
         height={height}
       >
-        {colorCorrection && colorCorrection.enabled ? (
-          <Filters
-            scale={1}
-            blur={{ blur: blurRadius, quality: 4 }}
-            adjust={adjustments}
-            apply={({ matrix }: { matrix: any }) => {
-              if (effect === "BlackAndWhite") {
-                matrix.desaturate();
-              } else if (effect === "Sepia") {
-                matrix.sepia();
-              } else if (effect === "RetroVintage") {
-                matrix.negative();
-              } else if (effect === "NightVision") {
-                matrix.negative();
-              } else if (effect === "Normal") {
-                matrix.reset();
-              }
-            }}
-            matrix={{
-              enabled: true,
-              // @ts-ignore
-              matrix: CYAN,
-            }}
-          >
-            {/* @ts-ignore */}
-            <Container ref={imgGroupRef}>
-              {videoTexture && (
-                <Sprite
-                  texture={videoTexture}
-                  width={width}
-                  height={height}
-                  anchor={0.5}
-                  x={x}
-                  y={y}
-                  {...(!locked &&
-                    !isDragging && {
-                      interactive: true,
-                      buttonMode: true,
-                      pointerdown: pointerdown,
-                      pointerover: pointerover,
-                      pointerout: mouseout,
-                      mousedown: mousedown,
-                      mouseover: mouseover,
-                      mouseout: mouseout,
-                      mouseup: mouseup,
-                      pointerup: pointerup,
-                    })}
-                  ref={imageRef}
-                  scale={scale}
-                  rotation={rotation}
-                />
-              )}
-            </Container>
-          </Filters>
-        ) : (
-          // @ts-ignore
+        <Filters
+          scale={1}
+          blur={{ blur: blurRadius, quality: 4 }}
+          adjust={adjustments}
+          apply={({ matrix }: { matrix: any }) => {
+            if (effect === "BlackAndWhite") {
+              matrix.desaturate();
+            } else if (effect === "Sepia") {
+              matrix.sepia();
+            } else if (effect === "RetroVintage") {
+              matrix.negative();
+            } else if (effect === "NightVision") {
+              matrix.negative();
+            } else if (effect === "Normal") {
+              matrix.reset();
+            }
+          }}
+          matrix={{
+            enabled: true,
+            // @ts-ignore
+            matrix: CYAN,
+          }}
+        >
+          {/* @ts-ignore */}
           <Container ref={imgGroupRef}>
             {videoTexture && (
               <Sprite
@@ -611,7 +575,7 @@ const PixiVideoSprite: React.FC<PixiVideoSpriteProps> = (props) => {
               />
             )}
           </Container>
-        )}
+        </Filters>
       </Container>
       {applyTransformer && (
         <PixiTransformer

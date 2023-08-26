@@ -174,3 +174,55 @@ export const FadeIn: Story = {
     initialAlpha: 0,
   },
 };
+
+// More on writing stories with args: https://storybook.js.org/docs/react/writing-stories/args
+export const Filters: Story = {
+  render: (args: any) => (
+    <AppStateContextProvider {...args}>
+      <PixiTextSprite {...args} />
+    </AppStateContextProvider>
+  ),
+  args: {
+    uniqueId: "TextSpritexx001", // uniqueId of the sprite
+    text: "Hello Welcome to PixiJS",
+    locked: false,
+    applyTransformer: false,
+    transformation: {
+      x: 200,
+      y: 200,
+      width: 200,
+      height: 200,
+      anchor: 0.5,
+      rotation: 0,
+      alpha: 1,
+      scale: 1,
+      blendMode: 0,
+      colorCorrection: {
+        enabled: true,
+        contrast: 2,
+        saturation: 2,
+        exposure: 2,
+        blurRadius: 1,
+      },
+      fill: "#00ff99",
+      fontSize: 80,
+      fontFamily: "Arial",
+      align: "center",
+      stroke: "#522d2d",
+      strokeThickness: 0,
+      letterSpacing: 0,
+      lineHeight: 0,
+      dropShadow: false,
+      dropShadowColor: "#522d2d",
+      dropShadowBlur: 0,
+      wordWrap: false,
+      wordWrapWidth: 5000000,
+      padding: 10,
+      textBaseline: "alphabetic",
+      trim: false,
+    },
+    startAt: 0,
+    endAt: 10,
+    initialAlpha: 1,
+  },
+};

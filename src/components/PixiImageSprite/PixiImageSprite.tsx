@@ -220,54 +220,30 @@ const PixiImageSprite: React.FC<PixiImageSpriteProps> = (props) => {
         width={width}
         height={height}
       >
-        {colorCorrection && colorCorrection.enabled ? (
-          <Filters
-            scale={1}
-            blur={{ blur: blurRadius, quality: 4 }}
-            adjust={adjustments}
-            apply={({ matrix }: { matrix: any }) => {
-              if (effect === "BlackAndWhite") {
-                matrix.desaturate();
-              } else if (effect === "Sepia") {
-                matrix.sepia();
-              } else if (effect === "RetroVintage") {
-                matrix.negative();
-              } else if (effect === "NightVision") {
-                matrix.negative();
-              } else if (effect === "Normal") {
-                matrix.reset();
-              }
-            }}
-            matrix={{
-              enabled: true,
-              // @ts-ignore
-              matrix: CYAN,
-            }}
-          >
-            {/* @ts-ignore */}
-            <Container ref={imgGroupRef}>
-              <Sprite
-                image={src}
-                width={width}
-                height={height}
-                anchor={anchor}
-                ref={imageRef}
-                x={x}
-                y={y}
-                // @ts-ignore
-                interactive={true}
-                pointerdown={pointerdown}
-                pointerup={pointerup}
-                pointerover={pointerover}
-                mousedown={mousedown}
-                mouseup={mouseup}
-                mouseover={mouseover}
-                mouseout={mouseout}
-              />
-            </Container>
-          </Filters>
-        ) : (
-          // @ts-ignore
+        <Filters
+          scale={1}
+          blur={{ blur: blurRadius, quality: 4 }}
+          adjust={adjustments}
+          apply={({ matrix }: { matrix: any }) => {
+            if (effect === "BlackAndWhite") {
+              matrix.desaturate();
+            } else if (effect === "Sepia") {
+              matrix.sepia();
+            } else if (effect === "RetroVintage") {
+              matrix.negative();
+            } else if (effect === "NightVision") {
+              matrix.negative();
+            } else if (effect === "Normal") {
+              matrix.reset();
+            }
+          }}
+          matrix={{
+            enabled: true,
+            // @ts-ignore
+            matrix: CYAN,
+          }}
+        >
+          {/* @ts-ignore */}
           <Container ref={imgGroupRef}>
             <Sprite
               image={src}
@@ -288,7 +264,7 @@ const PixiImageSprite: React.FC<PixiImageSpriteProps> = (props) => {
               mouseout={mouseout}
             />
           </Container>
-        )}
+        </Filters>
       </Container>
       {applyTransformer && (
         <PixiTransformer
