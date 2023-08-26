@@ -84,11 +84,14 @@ export const Normal: Story = {
   args: {
     uniqueId: "svg001", // uniqueId of the sprite
     path: "M 100 100 L 300 100 L 200 300 z",
+    applyTransformer: false,
+    startAt: 0,
+    endAt: 10,
     transformation: {
-      x: 100,
-      y: 100,
-      width: 150,
-      height: 150,
+      x: 200,
+      y: 200,
+      width: 200,
+      height: 200,
       anchor: 0.5,
       rotation: 0,
       alpha: 1,
@@ -98,9 +101,7 @@ export const Normal: Story = {
       colorCorrection: {},
       fill: "#FFC0CB",
     },
-    applyTransformer: false,
-    startAt: 0,
-    endAt: 10,
+
     initialAlpha: 1,
   },
 };
@@ -114,11 +115,14 @@ export const FadeIn: Story = {
   args: {
     uniqueId: "surya002", // uniqueId of the sprite
     path: "M 100, 100 m -75, 0 a 75,75 0 1,0 150,0 a 75,75 0 1,0 -150,0",
+    applyTransformer: false,
+    startAt: 0,
+    endAt: 10,
     transformation: {
-      x: 100,
-      y: 100,
-      width: 150,
-      height: 150,
+      x: 200,
+      y: 200,
+      width: 200,
+      height: 200,
       anchor: 0.5,
       rotation: 0,
       alpha: 1,
@@ -129,9 +133,6 @@ export const FadeIn: Story = {
       colorCorrection: {},
       fill: "#fe2c54",
     },
-    applyTransformer: false,
-    startAt: 0,
-    endAt: 10,
     initialAlpha: 0,
   },
 };

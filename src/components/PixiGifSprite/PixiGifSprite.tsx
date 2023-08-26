@@ -5,7 +5,8 @@ import map from "lodash/map";
 // @ts-ignore
 import PropTypes from "prop-types";
 import { GsapPixieContext } from "../../providers/GsapPixieContextProvider";
-import { Container, useApp, Graphics } from "@pixi/react";
+import { Container, useApp, Graphics, withFilters } from "@pixi/react";
+import { AdjustmentFilter } from "@pixi/filter-adjustment";
 import * as PIXI from "pixi.js";
 import gsap from "gsap";
 import { useWorkerParser, usePlayerState } from "@react-gifs/tools";
@@ -71,6 +72,15 @@ type PixiGifSpriteProps = {
   onAnchorTransformationEnd?: (endData: any) => void;
 };
 
+const Filters = withFilters(Container, {
+  blur: PIXI.filters.BlurFilter,
+  adjust: AdjustmentFilter,
+  matrix: PIXI.filters.ColorMatrixFilter,
+});
+
+/** CYAN Filters */
+const CYAN = [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0];
+
 /**
  * PixiGifSprite Component is used to render gif image
  * @param props Gif Sprite props
@@ -92,7 +102,6 @@ const PixiGifSprite: React.FC<PixiGifSpriteProps> = (props) => {
   const [gifState, update] = usePlayerState({ autoPlay: false });
   const graphicRef = React.useRef<PIXI.Graphics>(null);
 
-  console.log("allProps", props);
   //// Refs
   const animatedSpriteRef = useRef<PIXI.AnimatedSprite>(null);
   const containerRef = useRef<PIXI.Container>(null);
@@ -104,8 +113,6 @@ const PixiGifSprite: React.FC<PixiGifSpriteProps> = (props) => {
   const { tl, play: tlPlay } = useContext(GsapPixieContext);
 
   /// 1001
-  console.log("contxt Values", tl);
-  console.log("gifState", gifState, gifDuration);
   const { frames: gifFrames, delays: gifDelays, loaded } = gifState;
 
   const {
@@ -124,6 +131,8 @@ const PixiGifSprite: React.FC<PixiGifSpriteProps> = (props) => {
       rotation = 0,
       scale,
       animation,
+      colorCorrection,
+      effect,
     },
     pointerdown,
     pointerup,
@@ -138,6 +147,21 @@ const PixiGifSprite: React.FC<PixiGifSpriteProps> = (props) => {
   } = props;
 
   // color corrections
+  const {
+    contrast = 1,
+    saturation = 1,
+    exposure = 1,
+    blurRadius = 0,
+    alpha = 1,
+  } = colorCorrection || {};
+
+  /** adjustment filter */
+  const adjustments = {
+    brightness: exposure,
+    contrast,
+    saturation,
+    alpha,
+  };
 
   const app = useApp();
 
@@ -319,38 +343,62 @@ const PixiGifSprite: React.FC<PixiGifSpriteProps> = (props) => {
             </Container>
           )}
           {gifFrame && gifFrame.length > 0 && (
-            <PixiAnimatedSprite
-              x={x}
-              y={y}
-              width={width}
-              height={height}
-              rotation={rotation}
-              animationSpeed={1}
-              loop={loop}
-              isPlaying={!!tlPlay}
-              // @ts-ignore
-              textures={gifFrameObject}
-              onComplete={handleComplete}
-              onFrameChange={(currentFrame: number) =>
-                setCurrentFrame(currentFrame)
-              }
-              anchor={0.5}
-              {...(!locked &&
-                !isDragging && {
-                  interactive: true,
-                  buttonMode: true,
-                  pointerdown: pointerdown,
-                  pointerover: pointerover,
-                  pointerout: pointerout,
-                  pointerup: pointerup,
-                  mousedown: mousedown,
-                  mouseup: mouseup,
-                  mouseover: mouseover,
-                  mouseout: mouseout,
-                })}
-              forwardRef={animatedSpriteRef}
-              scale={scale}
-            />
+            <Filters
+              scale={1}
+              blur={{ blur: blurRadius, quality: 4 }}
+              adjust={adjustments}
+              apply={({ matrix }: { matrix: any }) => {
+                if (effect === "BlackAndWhite") {
+                  matrix.desaturate();
+                } else if (effect === "Sepia") {
+                  matrix.sepia();
+                } else if (effect === "RetroVintage") {
+                  matrix.negative();
+                } else if (effect === "NightVision") {
+                  matrix.negative();
+                } else if (effect === "Normal") {
+                  matrix.reset();
+                }
+              }}
+              matrix={{
+                enabled: true,
+                // @ts-ignore
+                matrix: CYAN,
+              }}
+            >
+              <PixiAnimatedSprite
+                x={x}
+                y={y}
+                width={width}
+                height={height}
+                rotation={rotation}
+                animationSpeed={1}
+                loop={loop}
+                isPlaying={!!tlPlay}
+                // @ts-ignore
+                textures={gifFrameObject}
+                onComplete={handleComplete}
+                onFrameChange={(currentFrame: number) =>
+                  setCurrentFrame(currentFrame)
+                }
+                anchor={0.5}
+                {...(!locked &&
+                  !isDragging && {
+                    interactive: true,
+                    buttonMode: true,
+                    pointerdown: pointerdown,
+                    pointerover: pointerover,
+                    pointerout: pointerout,
+                    pointerup: pointerup,
+                    mousedown: mousedown,
+                    mouseup: mouseup,
+                    mouseover: mouseover,
+                    mouseout: mouseout,
+                  })}
+                forwardRef={animatedSpriteRef}
+                scale={scale}
+              />
+            </Filters>
           )}
         </Container>
       </Container>

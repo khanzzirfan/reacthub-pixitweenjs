@@ -38,6 +38,10 @@ const meta = {
       colorCorrection: {
         control: "object",
         description: "colorCorrection of the sprite",
+        enabled: {
+          control: "boolean",
+          description: "enabled of the sprite  with color filter mode applied.",
+        },
         brightness: {
           control: "number",
           description: "brightness of the sprite",
@@ -84,9 +88,12 @@ export const Normal: Story = {
   args: {
     uniqueId: "surya001", // uniqueId of the sprite
     src: "https://assets.codepen.io/693612/surya.svg",
+    applyTransformer: false,
+    startAt: 0,
+    endAt: 10,
     transformation: {
-      x: 100,
-      y: 100,
+      x: 200,
+      y: 200,
       width: 150,
       height: 150,
       anchor: 0.5,
@@ -95,11 +102,14 @@ export const Normal: Story = {
       scale: 1,
       tint: 0xffffff,
       blendMode: 0,
-      colorCorrection: {},
+      colorCorrection: {
+        enabled: true,
+        contrast: 1,
+        saturation: 1,
+        exposure: 1,
+        blurRadius: 0,
+      },
     },
-    applyTransformer: false,
-    startAt: 0,
-    endAt: 10,
     initialAlpha: 1,
   },
 };
@@ -113,6 +123,9 @@ export const FadeIn: Story = {
   args: {
     uniqueId: "surya002", // uniqueId of the sprite
     src: "https://assets.codepen.io/693612/surya.svg",
+    applyTransformer: false,
+    startAt: 0,
+    endAt: 10,
     transformation: {
       x: 100,
       y: 100,
@@ -127,9 +140,6 @@ export const FadeIn: Story = {
       animation: "FADE_IN",
       colorCorrection: {},
     },
-    applyTransformer: false,
-    startAt: 0,
-    endAt: 10,
     initialAlpha: 0,
   },
 };

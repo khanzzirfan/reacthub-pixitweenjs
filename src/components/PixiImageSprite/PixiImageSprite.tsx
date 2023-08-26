@@ -80,7 +80,6 @@ const PixiImageSprite: React.FC<PixiImageSpriteProps> = (props) => {
   const [, setIsTransformerDragging] = useState(false);
   const [, setIsMouseOverTransformer] = useState(false);
 
-  console.log("allProps", props);
   //// Refs
   const imageRef = useRef<PIXI.Sprite>(null);
   const containerRef = useRef<PIXI.Container>(null);

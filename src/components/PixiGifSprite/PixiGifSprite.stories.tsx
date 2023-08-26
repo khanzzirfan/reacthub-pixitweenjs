@@ -114,11 +114,14 @@ export const Normal: Story = {
     src: "https://media.giphy.com/media/5VKbvrjxpVJCM/giphy.gif",
     locked: false,
     loop: false,
+    applyTransformer: false,
+    startAt: 0,
+    endAt: 4,
     transformation: {
-      x: 100,
-      y: 100,
-      width: 150,
-      height: 150,
+      x: 200,
+      y: 200,
+      width: 200,
+      height: 200,
       anchor: 0.5,
       rotation: 0,
       alpha: 1,
@@ -127,9 +130,43 @@ export const Normal: Story = {
       blendMode: 0,
       colorCorrection: {},
     },
+    initialAlpha: 1,
+  },
+};
+
+export const Filters: Story = {
+  render: (args: any) => (
+    <AppStateContextProvider {...args}>
+      <PixiGifSprite {...args} />
+    </AppStateContextProvider>
+  ),
+  args: {
+    uniqueId: "suryaGify001", // uniqueId of the sprite
+    src: "https://media.giphy.com/media/5VKbvrjxpVJCM/giphy.gif",
+    locked: false,
+    loop: false,
     applyTransformer: false,
     startAt: 0,
     endAt: 4,
+    transformation: {
+      x: 200,
+      y: 200,
+      width: 200,
+      height: 200,
+      anchor: 0.5,
+      rotation: 0,
+      alpha: 1,
+      scale: 1,
+      tint: 0xffffff,
+      blendMode: 0,
+      colorCorrection: {
+        enabled: true,
+        contrast: 2,
+        saturation: 2,
+        exposure: 2,
+        blurRadius: 1,
+      },
+    },
     initialAlpha: 1,
   },
 };
