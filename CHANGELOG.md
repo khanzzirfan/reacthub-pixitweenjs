@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.18](https://github.com/khanzzirfan/reacthub-pixitweenjs/compare/v0.2.17...v0.2.18) (2023-08-27)
+
+
+### Bug Fixes
+
+* updated video seek bar and the timeline play value ([fbea20d](https://github.com/khanzzirfan/reacthub-pixitweenjs/commit/fbea20da39bd68cd7a69e411faa197291e4abbbd))
+
 ### [0.2.17](https://github.com/khanzzirfan/reacthub-pixitweenjs/compare/v0.2.16...v0.2.17) (2023-08-27)
 
 ### [0.2.16](https://github.com/khanzzirfan/reacthub-pixitweenjs/compare/v0.2.15...v0.2.16) (2023-08-27)
