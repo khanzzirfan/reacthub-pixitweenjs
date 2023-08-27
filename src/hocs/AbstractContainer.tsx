@@ -176,10 +176,12 @@ const AbstractContainer: React.FC<PixiBaseSpriteProps> = (props) => {
               matrix: CYAN,
             }}
           >
-            {props.children}
+            <Container ref={imgGroupRef}>{props.children}</Container>
           </Filters>
         )}
-        {!isFilterOrEffectEnabled && props.children}
+        {!isFilterOrEffectEnabled && (
+          <Container ref={imgGroupRef}>{props.children}</Container>
+        )}
       </Container>
       {applyTransformer && (
         <PixiTransformer

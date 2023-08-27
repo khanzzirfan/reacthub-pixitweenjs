@@ -30,7 +30,6 @@ export const VideoSeekBar: React.FC = () => {
     handlePause,
     handleSeekTest,
     handleRestart,
-    totalDuration: duration,
   } = React.useContext(GsapPixieContext);
 
   /// state
@@ -114,7 +113,7 @@ export const VideoSeekBar: React.FC = () => {
       <Flex flexDir={"row"}>
         <Text>
           Gsap-CurrentTime: {Math.round((time + Number.EPSILON) * 100) / 100} /{" "}
-          {duration}
+          {10}
         </Text>
       </Flex>
     </Flex>

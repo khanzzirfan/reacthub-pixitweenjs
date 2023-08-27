@@ -8,12 +8,10 @@ import {
 } from "react";
 import gsap from "gsap";
 import { emitCustomEvent, useCustomEventListener } from "react-custom-events";
-import { useDebounce } from "../utils/useDebounce";
 
 interface GsapPixieContextProps {
   gsapCtx: React.MutableRefObject<any>;
   tl: React.MutableRefObject<any>;
-  play: boolean;
   isDragging: boolean;
   handlePlay: () => void;
   handlePause: () => void;
@@ -23,7 +21,7 @@ interface GsapPixieContextProps {
   handleRestart: () => void;
   handleRepeat: () => void;
   playerTimeRef: React.MutableRefObject<number>;
-  totalDuration: number;
+  getTimelineDuration: () => number;
 }
 
 // Context has been created
@@ -49,9 +47,6 @@ const GsapPixieContextProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [play, setPlay] = useState<boolean>(false);
   const [isDragging, setIsDragging] = useState<boolean>(false);
-  const [internalDuration, setInternalDuration] = useState<number>(0);
-  const [totalDuration, setTotalDuration] = useState<number>(0);
-  const delayedDuration = useDebounce(internalDuration, 600);
 
   const tl = useRef<any>();
   const gsapCtx = useRef<any>();
@@ -74,13 +69,13 @@ const GsapPixieContextProvider: React.FC<{ children: React.ReactNode }> = ({
     return () => gsapCtx.current.revert();
   }, []);
 
-  gsap.ticker.add(() => {
-    // console.log("timeframe", time, deltaTime, frame);
-    // setFrameNumber(frame);
-    if (tl.current && getTimelineDuration) {
-      setInternalDuration(getTimelineDuration());
-    }
-  });
+  // gsap.ticker.add(() => {
+  //   console.log("timeframe");
+  //   // setFrameNumber(frame);
+  //   if (tl.current && getTimelineDuration) {
+  //     setInternalDuration(getTimelineDuration());
+  //   }
+  // });
 
   const onUpdate = useCallback(() => {
     /// console.log("update event callback");
@@ -96,9 +91,9 @@ const GsapPixieContextProvider: React.FC<{ children: React.ReactNode }> = ({
   }, []);
 
   // set the total duration based on the delayed duration value
-  useEffect(() => {
-    setTotalDuration(delayedDuration);
-  }, [delayedDuration]);
+  // useEffect(() => {
+  //   setTotalDuration(delayedDuration);
+  // }, [delayedDuration]);
 
   useEffect(() => {
     const timeline = tl.current;
@@ -110,7 +105,7 @@ const GsapPixieContextProvider: React.FC<{ children: React.ReactNode }> = ({
       })
       .eventCallback("onInterrupt", function () {
         /// console.log("onInterrupt", timeline.progress());
-        setPlay(false);
+        timeline.pause();
         onUpdate();
       })
       .eventCallback("onUpdate", function () {
@@ -128,30 +123,18 @@ const GsapPixieContextProvider: React.FC<{ children: React.ReactNode }> = ({
       // write a pause event
       .eventCallback("onPause", function () {
         console.log("onPause", timeline.progress());
-        setPlay(false);
         onUpdate();
       })
       .eventCallback("onResume", function () {
         console.log("onResume", timeline.progress());
-        setPlay(true);
         onUpdate();
       })
       .eventCallback("onComplete", function () {
         timeline.seek(0);
         timeline.pause();
-        setPlay(false);
         onUpdate();
       });
   }, []);
-
-  useEffect(() => {
-    const timeline = tl.current;
-    if (!play) {
-      timeline.pause();
-    } else {
-      timeline.resume();
-    }
-  }, [play]);
 
   const handleReset = useCallback(() => {
     const timeline = tl.current;
@@ -232,9 +215,8 @@ const GsapPixieContextProvider: React.FC<{ children: React.ReactNode }> = ({
         handleRestart,
         handleRepeat,
         playerTimeRef,
-        play,
-        totalDuration,
         isDragging,
+        getTimelineDuration,
       }}
     >
       {children}

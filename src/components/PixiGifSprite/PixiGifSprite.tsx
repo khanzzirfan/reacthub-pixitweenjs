@@ -2,9 +2,10 @@ import * as React from "react";
 import { useContext, useEffect, useRef, useState } from "react";
 // @ts-ignore
 import map from "lodash/map";
-// @ts-ignore
-import PropTypes from "prop-types";
-import { GsapPixieContext } from "../../providers/GsapPixieContextProvider";
+import {
+  Events,
+  GsapPixieContext,
+} from "../../providers/GsapPixieContextProvider";
 import { Container, useApp, Graphics, withFilters } from "@pixi/react";
 import { AdjustmentFilter } from "@pixi/filter-adjustment";
 import * as PIXI from "pixi.js";
@@ -17,6 +18,7 @@ import isEmpty from "lodash/isEmpty";
 import { getAnimByName } from "../../utils/GsapAnim";
 import { TransformationEnd } from "../../types/transformation";
 import { PixiAnimatedSprite } from "../PixiAnimatedSprite";
+import { useCustomEventListener } from "react-custom-events";
 
 type PixiGifSpriteProps = {
   uniqueId: string;
@@ -81,6 +83,28 @@ const Filters = withFilters(Container, {
 /** CYAN Filters */
 const CYAN = [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0];
 
+interface GifState {
+  isPlaying: boolean;
+  progress: number;
+  speed: number;
+  isMuted: boolean;
+  isWaiting: boolean;
+  loaded: boolean;
+  size: { width: number; height: number };
+  isDragging: boolean;
+}
+
+const initialState: GifState = {
+  isPlaying: false,
+  progress: 0,
+  speed: 1,
+  isMuted: false,
+  isWaiting: false,
+  loaded: false,
+  size: { width: 50, height: 50 },
+  isDragging: false,
+};
+
 /**
  * PixiGifSprite Component is used to render gif image
  * @param props Gif Sprite props
@@ -108,9 +132,10 @@ const PixiGifSprite: React.FC<PixiGifSpriteProps> = (props) => {
   const parentNode = useRef<PIXI.Container>(null);
   const imgGroupRef = useRef<PIXI.Container>(null);
   const transformerRef = useRef<PIXI.Container>(null);
+  const gifStateRef = useRef<GifState>(initialState);
 
   //// Context
-  const { tl, play: tlPlay } = useContext(GsapPixieContext);
+  const { tl } = useContext(GsapPixieContext);
 
   /// 1001
   const { frames: gifFrames, delays: gifDelays, loaded } = gifState;
@@ -171,6 +196,16 @@ const PixiGifSprite: React.FC<PixiGifSpriteProps> = (props) => {
   // updates current index
   // usePlayback(gifState, () => update(({ index }) => ({ index: index + 1 })));
 
+  /** Adding custom event listners */
+  /** Event Listeneres */
+  useCustomEventListener(Events.PAUSE, (data) => {
+    console.log("pause event", data);
+    if (animatedSpriteRef.current) {
+      animatedSpriteRef.current.stop();
+      gifStateRef.current.isPlaying = false;
+    }
+  });
+
   // transformer to handle sprite transformation
   const handleOnTransformEnd = React.useCallback(
     (endData: TransformationEnd) => {
@@ -215,6 +250,7 @@ const PixiGifSprite: React.FC<PixiGifSpriteProps> = (props) => {
   const gsapOnStart = (startAt: number) => {
     if (animatedSpriteRef.current) {
       animatedSpriteRef.current.gotoAndPlay(startAt || 0);
+      gifStateRef.current.isPlaying = true;
     }
   };
 
@@ -222,21 +258,23 @@ const PixiGifSprite: React.FC<PixiGifSpriteProps> = (props) => {
     if (animatedSpriteRef.current) {
       animatedSpriteRef.current.stop();
       // animatedSpriteRef.current.gotoAndStop(0);
+      gifStateRef.current.isPlaying = false;
     }
   };
 
   const onInterrupt = () => {
-    // console.log('interrupting', refId);
+    if (animatedSpriteRef.current) {
+      animatedSpriteRef.current.stop();
+      gifStateRef.current.isPlaying = false;
+    }
   };
 
   const onUpdate = () => {
     // console.log('timeline paused', ctxTimeLine.paused());
-    // if (animatedSpriteRef.current) {
-    //   animatedSpriteRef.current.play();
-    //   dispatchState({
-    //     play: play,
-    //   });
-    // }
+    if (animatedSpriteRef.current && !gifStateRef.current.isPlaying) {
+      animatedSpriteRef.current.play();
+      gifStateRef.current.isPlaying = true;
+    }
   };
 
   const handleComplete = () => {
@@ -374,7 +412,7 @@ const PixiGifSprite: React.FC<PixiGifSpriteProps> = (props) => {
                 rotation={rotation}
                 animationSpeed={1}
                 loop={loop}
-                isPlaying={!!tlPlay}
+                // isPlaying={!!tlPlay}
                 // @ts-ignore
                 textures={gifFrameObject}
                 onComplete={handleComplete}
