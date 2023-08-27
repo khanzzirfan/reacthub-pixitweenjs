@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { PixiImageSprite } from ".";
 import { AppStateContextProvider } from "../../utils/AppStateProvider";
+import { Effects } from "../../types/Effects";
 
 // More on how to set up stories at: https://storybook.js.org/docs/react/writing-stories/introduction
 const meta = {
@@ -35,6 +36,11 @@ const meta = {
       scale: { control: "number", description: "scale of the sprite" },
       tint: { control: "number", description: "tint of the sprite" },
       blendMode: { control: "number", description: "blendMode of the sprite" },
+      effects: {
+        type: "string",
+        options: Object.values(Effects),
+        description: "filter effects of the sprite",
+      },
       colorCorrection: {
         control: "object",
         description: "colorCorrection of the sprite",
@@ -102,6 +108,7 @@ export const Normal: Story = {
       scale: 1,
       tint: 0xffffff,
       blendMode: 0,
+      effect: Effects.None,
       colorCorrection: {
         enabled: false,
         contrast: 1,
@@ -137,6 +144,7 @@ export const FadeIn: Story = {
       scale: 1,
       tint: 0xffffff,
       blendMode: 0,
+      effect: Effects.None,
       animation: "FADE_IN",
       colorCorrection: {},
     },
@@ -168,6 +176,7 @@ export const Filters: Story = {
       scale: 1,
       tint: 0xffffff,
       blendMode: 0,
+      effect: Effects.None,
       colorCorrection: {
         enabled: true,
         contrast: 1,
@@ -175,6 +184,36 @@ export const Filters: Story = {
         exposure: 1,
         blurRadius: 0,
       },
+    },
+    initialAlpha: 1,
+  },
+};
+
+// More on writing stories with args: https://storybook.js.org/docs/react/writing-stories/args
+export const FilterEffects: Story = {
+  render: (args: any) => (
+    <AppStateContextProvider {...args}>
+      <PixiImageSprite {...args} />
+    </AppStateContextProvider>
+  ),
+  args: {
+    uniqueId: "image-filtereffects001", // uniqueId of the sprite
+    src: "https://assets.codepen.io/693612/surya.svg",
+    applyTransformer: false,
+    startAt: 0,
+    endAt: 10,
+    transformation: {
+      x: 200,
+      y: 200,
+      width: 150,
+      height: 150,
+      anchor: 0.5,
+      rotation: 0,
+      alpha: 1,
+      scale: 1,
+      tint: 0xffffff,
+      blendMode: 0,
+      effect: Effects.BlackAndWhite,
     },
     initialAlpha: 1,
   },

@@ -7,4 +7,5 @@ export enum Effects {
   RetroVintage = "RetroVintage",
   NightVision = "NightVision",
   Normal = "Normal",
+  None = "Normal",
 }
