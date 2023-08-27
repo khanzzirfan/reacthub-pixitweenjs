@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.14](https://github.com/khanzzirfan/reacthub-pixitweenjs/compare/v0.2.13...v0.2.14) (2023-08-27)
+
+
+### Bug Fixes
+
+* updated config and npm publish directories ([6c69db3](https://github.com/khanzzirfan/reacthub-pixitweenjs/commit/6c69db33e5677908495d065cd560151bdc72b374))
+
 ### [0.2.13](https://github.com/khanzzirfan/reacthub-pixitweenjs/compare/v0.2.12...v0.2.13) (2023-08-27)
 
 ### [0.2.12](https://github.com/khanzzirfan/reacthub-pixitweenjs/compare/v0.2.11...v0.2.12) (2023-08-27)
