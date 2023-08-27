@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.8](https://github.com/khanzzirfan/reacthub-pixitweenjs/compare/v0.2.7...v0.2.8) (2023-08-27)
+
+
+### Bug Fixes
+
+* exported all pixi elements ([cec8ce1](https://github.com/khanzzirfan/reacthub-pixitweenjs/commit/cec8ce10588432fd775b6cd3cbb22118b034c4ca))
+
 ### [0.2.7](https://github.com/khanzzirfan/reacthub-pixitweenjs/compare/v0.2.6...v0.2.7) (2023-08-27)
 
 
