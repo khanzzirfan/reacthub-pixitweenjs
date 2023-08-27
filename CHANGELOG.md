@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.7](https://github.com/khanzzirfan/reacthub-pixitweenjs/compare/v0.2.6...v0.2.7) (2023-08-27)
+
+
+### Features
+
+* reupdated the filters and hoc wrappers ([0083847](https://github.com/khanzzirfan/reacthub-pixitweenjs/commit/00838477793b342453341f1dbd3e418c66f02619))
+
+
+### Bug Fixes
+
+* filters applied on all video and other elements ([19100d0](https://github.com/khanzzirfan/reacthub-pixitweenjs/commit/19100d0f16d7f7be4ad0f4622a1b9f67765b3134))
+* pixi fixed colorization component ([8ca4c32](https://github.com/khanzzirfan/reacthub-pixitweenjs/commit/8ca4c326514eb6c677c1460323afe92c34c25060))
+
 ### [0.2.6](https://github.com/khanzzirfan/reacthub-pixitweenjs/compare/v0.2.5...v0.2.6) (2023-08-25)
 
 
