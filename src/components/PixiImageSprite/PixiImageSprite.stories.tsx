@@ -103,7 +103,7 @@ export const Normal: Story = {
       tint: 0xffffff,
       blendMode: 0,
       colorCorrection: {
-        enabled: true,
+        enabled: false,
         contrast: 1,
         saturation: 1,
         exposure: 1,

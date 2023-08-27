@@ -89,7 +89,7 @@ const CYAN = [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0];
 const PixiGifSprite: React.FC<PixiGifSpriteProps> = (props) => {
   //// State
   const [gifFrame, setGifFrame] = React.useState<PIXI.Texture[]>([]);
-  const [gifDuration, setGifDuration] = React.useState<number>(0);
+  const [, setGifDuration] = React.useState<number>(0);
   const [gifFrameObject, setGifFrameObject] = React.useState<
     PIXI.FrameObject[]
   >([]);

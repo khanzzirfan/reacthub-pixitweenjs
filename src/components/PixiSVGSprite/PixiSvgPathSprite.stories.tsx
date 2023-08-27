@@ -101,7 +101,6 @@ export const Normal: Story = {
       colorCorrection: {},
       fill: "#FFC0CB",
     },
-
     initialAlpha: 1,
   },
 };
@@ -134,5 +133,42 @@ export const FadeIn: Story = {
       fill: "#fe2c54",
     },
     initialAlpha: 0,
+  },
+};
+
+// More on writing stories with args: https://storybook.js.org/docs/react/writing-stories/args
+export const Filters: Story = {
+  render: (args: any) => (
+    <AppStateContextProvider {...args}>
+      <PixiSvgPathSprite {...args} />
+    </AppStateContextProvider>
+  ),
+  args: {
+    uniqueId: "svgfilters001", // uniqueId of the sprite
+    path: "M 100 100 L 300 100 L 200 300 z",
+    applyTransformer: false,
+    startAt: 0,
+    endAt: 10,
+    transformation: {
+      x: 200,
+      y: 200,
+      width: 200,
+      height: 200,
+      anchor: 0.5,
+      rotation: 0,
+      alpha: 1,
+      scale: 1,
+      tint: 0xffffff,
+      blendMode: 0,
+      colorCorrection: {
+        enabled: true,
+        contrast: 1,
+        saturation: 2,
+        exposure: 1,
+        blurRadius: 3,
+      },
+      fill: "#FFC0CB",
+    },
+    initialAlpha: 1,
   },
 };

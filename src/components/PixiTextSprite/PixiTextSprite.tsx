@@ -1,26 +1,20 @@
 import * as React from "react";
-import { useContext, useEffect, useRef, useState } from "react";
-import { Container, withFilters, Text } from "@pixi/react";
-import { AdjustmentFilter } from "@pixi/filter-adjustment";
+import { useRef, useState } from "react";
+import { Container, Text } from "@pixi/react";
 import * as PIXI from "pixi.js";
-import gsap from "gsap";
 import Quill from "quill";
 import "quill/dist/quill.snow.css";
-// @ts-ignore
-import PropTypes from "prop-types";
 // @ts-ignore
 import isEmpty from "lodash/isEmpty";
 // @ts-ignore
 import isEqual from "lodash/isEqual";
 // @ts-ignore
 import pick from "lodash/pick";
-import { GsapPixieContext } from "../../providers/GsapPixieContextProvider";
-import PixiTransformer from "../../utils/PixiTransformer";
-import { getAnimByName } from "../../utils/GsapAnim";
-import { TransformationEnd } from "../../types/transformation";
+import { PixiBaseSpriteProps } from "../../types/BaseProps";
+import AbstractContainer from "../../hocs/AbstractContainer";
+import { Effects } from "../../types/Effects";
 
-type PixiTextSpriteProps = {
-  uniqueId: string;
+interface PixiTextSpriteProps extends PixiBaseSpriteProps {
   text: string;
   startAt: number;
   endAt: number;
@@ -87,7 +81,7 @@ type PixiTextSpriteProps = {
       alpha?: number;
       scaleInput?: number;
     };
-    effect?: string;
+    effect?: Effects;
   };
   pointerdown?: () => void;
   pointerup?: () => void;
@@ -99,31 +93,15 @@ type PixiTextSpriteProps = {
   applyTransformer?: boolean;
   onTextUpdate?: (data: any) => void;
   onAnchorTransformationEnd?: (endData: any) => void;
-};
-
-const Filters = withFilters(Container, {
-  blur: PIXI.filters.BlurFilter,
-  adjust: AdjustmentFilter,
-  matrix: PIXI.filters.ColorMatrixFilter,
-});
-
-/** CYAN Filters */
-const CYAN = [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0];
-// change these to control the text size
+}
 
 const PixiTextSprite: React.FC<PixiTextSpriteProps> = (props) => {
   //// State
-  const [isMounted, setIsMounted] = React.useState(false);
-  const [, setIsTransformerDragging] = useState(false);
-  const [, setIsMouseOverTransformer] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
   console.log("allProps", props);
   //// Refs
-  const containerRef = useRef<PIXI.Container>(null);
   const parentNode = useRef<PIXI.Container>(null);
-  const imgGroupRef = useRef<PIXI.Container>(null);
-  const transformerRef = useRef<PIXI.Container>(null);
 
   /// refs
   const textRef = useRef<PIXI.Text>(null);
@@ -132,21 +110,13 @@ const PixiTextSprite: React.FC<PixiTextSpriteProps> = (props) => {
   const textFontSize = useRef<number>(16);
   const textTransformDetailRef = useRef<any>(null);
 
-  //// Context
-  const { tl } = useContext(GsapPixieContext);
-
   /// 1001
   // console.log("contxt Values", tl);
   const {
     uniqueId,
     text,
-    startAt,
-    endAt,
-    initialAlpha,
     locked,
     transformation,
-    applyTransformer,
-    onAnchorTransformationEnd,
     onTextUpdate,
     pointerdown,
     pointerup,
@@ -158,8 +128,6 @@ const PixiTextSprite: React.FC<PixiTextSpriteProps> = (props) => {
   } = props;
 
   const {
-    width = 0,
-    height = 0,
     scale = [1, 1],
     x,
     y,
@@ -185,90 +153,11 @@ const PixiTextSprite: React.FC<PixiTextSpriteProps> = (props) => {
     wordWrapWidth = 50000000,
     leading = 0,
     letterSpacing,
-    colorCorrection = {},
-    animation,
-    effect,
   } = transformation;
-
-  // color corrections
-  const {
-    contrast = 1,
-    saturation = 1,
-    exposure = 1,
-    alpha = 1,
-  } = colorCorrection || {};
-
-  /** adjustment filter */
-  const adjustments = {
-    brightness: exposure,
-    contrast,
-    saturation,
-    alpha,
-  };
-
-  /** handle on tranformer onchange */
-  const handleOnTransformChange = React.useCallback(() => {
-    setIsTransformerDragging(true);
-  }, []);
 
   React.useEffect(() => {
     textFontSize.current = Number(fontSize);
   }, [fontSize]);
-
-  useEffect(() => {
-    let ctx = gsap.context(() => {});
-    if (containerRef.current && tl.current) {
-      const data = {
-        duration: Number(endAt) - Number(startAt),
-      };
-
-      const ease = getAnimByName(animation || "None");
-      ctx = gsap.context(() => {
-        if (!isEmpty(ease.from)) {
-          tl.current
-            .from(containerRef.current, { ...ease.from }, startAt)
-            .to(imgGroupRef.current, { alpha: 1, duration: 0.2 }, startAt)
-            .from(imgGroupRef.current, { ...data }, startAt)
-            .to(containerRef.current, { alpha: 0, duration: 0.2 }, endAt - 0.2);
-        } else if (!isEmpty(ease.to)) {
-          tl.current
-            .to(
-              containerRef.current,
-              { alpha: 1, duration: 0.2, ...ease.to },
-              startAt
-            )
-            .from(imgGroupRef.current, { ...data }, startAt)
-            .to(containerRef.current, { alpha: 0, duration: 0.2 }, endAt - 0.2);
-        } else if (!isEmpty(ease.fromTo)) {
-          tl.current
-            .fromTo(
-              containerRef.current,
-              ease.fromTo?.from,
-              ease.fromTo?.to,
-              startAt
-            )
-            .from(imgGroupRef.current, { ...data }, startAt)
-            .to(containerRef.current, { alpha: 0, duration: 0.2 }, endAt - 0.2);
-        } else {
-          tl.current
-            .to(containerRef.current, { alpha: 1, duration: 0.01 }, startAt)
-            .from(imgGroupRef.current, { ...data }, startAt)
-            .to(
-              containerRef.current,
-              { alpha: 0, duration: 0.1 },
-              Number(endAt) - Number(0.1)
-            );
-        }
-      });
-    }
-    return () => ctx.revert(); // cleanup!
-  }, [animation, startAt, endAt]);
-
-  React.useEffect(() => {
-    if (containerRef.current) {
-      setIsMounted(true);
-    }
-  }, []);
 
   const nFontStyle = ["italic", "oblique"].includes(fontStyle)
     ? fontStyle
@@ -337,6 +226,7 @@ const PixiTextSprite: React.FC<PixiTextSpriteProps> = (props) => {
     };
   }, [transformation]);
 
+  // @ts-ignore
   const handleOnDoubleClickEditText = () => {
     console.log("double click triggered");
     setIsEditing(true);
@@ -351,18 +241,6 @@ const PixiTextSprite: React.FC<PixiTextSpriteProps> = (props) => {
       });
     }
   };
-
-  const handleOnTransformEnd = React.useCallback(
-    (endData: TransformationEnd) => {
-      if (!textRef.current) return;
-      console.log("enddata", endData);
-      if (onAnchorTransformationEnd) {
-        console.log("running onAnchorTransformationEnd");
-        onAnchorTransformationEnd(endData);
-      }
-    },
-    [onAnchorTransformationEnd, uniqueId, width]
-  );
 
   // const handleOnMoveOver = (interactionData) => {
   //   if (!isDragging) {
@@ -440,81 +318,37 @@ const PixiTextSprite: React.FC<PixiTextSpriteProps> = (props) => {
   }, [x, y, isEditing]);
 
   return (
-    // @ts-ignore
-    <Container ref={parentNode}>
-      {/* @ts-ignore */}
-      <Container
-        ref={containerRef}
-        alpha={initialAlpha}
-        position={[x, y]}
-        pivot={[x, y]}
-        width={width}
-        height={height}
-      >
+    <AbstractContainer {...props}>
+      <Container ref={parentNode}>
+        {/* @ts-ignore */}
         {isEditing && <Container ref={textInputGroupRef}></Container>}
-        <Filters
-          scale={1}
-          blur={{ blur: blurRadius, quality: 4 }}
-          adjust={adjustments}
-          apply={({ matrix }: { matrix: any }) => {
-            if (effect === "BlackAndWhite") {
-              matrix.desaturate();
-            } else if (effect === "Sepia") {
-              matrix.sepia();
-            } else if (effect === "RetroVintage") {
-              matrix.negative();
-            } else if (effect === "NightVision") {
-              matrix.negative();
-            } else if (effect === "Normal") {
-              matrix.reset();
-            }
-          }}
-          matrix={{
-            enabled: true,
-            // @ts-ignore
-            matrix: CYAN,
-          }}
-        >
-          {/* @ts-ignore */}
-          <Container alpha={isEditing ? 0 : 1} ref={textInnerGroupRef}>
-            <Text
-              style={pixiStyles}
-              x={x}
-              y={y}
-              rotation={rotation}
-              anchor={0.5}
-              text={text}
-              {...(!isEditing &&
-                !locked && {
-                  interactive: true,
-                  buttonMode: true,
-                  pointerdown: pointerdown,
-                  pointerout: mouseout,
-                  pointerover: pointerover,
-                  pointerup: pointerup,
-                  mousedown: mousedown,
-                  mouseup: mouseup,
-                  mouseover: mouseover,
-                })}
-              ref={textRef}
-              scale={scale}
-            />
-          </Container>
-        </Filters>
+        {/* @ts-ignore */}
+        <Container alpha={isEditing ? 0 : 1} ref={textInnerGroupRef}>
+          <Text
+            style={pixiStyles}
+            x={x}
+            y={y}
+            rotation={rotation}
+            anchor={0.5}
+            text={text}
+            {...(!isEditing &&
+              !locked && {
+                interactive: true,
+                buttonMode: true,
+                pointerdown: pointerdown,
+                pointerout: mouseout,
+                pointerover: pointerover,
+                pointerup: pointerup,
+                mousedown: mousedown,
+                mouseup: mouseup,
+                mouseover: mouseover,
+              })}
+            ref={textRef}
+            scale={scale}
+          />
+        </Container>
       </Container>
-      {applyTransformer && (
-        <PixiTransformer
-          pixiTransformerRef={transformerRef}
-          imageRef={containerRef}
-          isMounted={isMounted}
-          transformCommit={handleOnTransformEnd}
-          transformChange={handleOnTransformChange}
-          mouseoverEvent={setIsMouseOverTransformer}
-          uniqueId={uniqueId}
-          onDoubleClick={handleOnDoubleClickEditText}
-        />
-      )}
-    </Container>
+    </AbstractContainer>
   );
 };
 
