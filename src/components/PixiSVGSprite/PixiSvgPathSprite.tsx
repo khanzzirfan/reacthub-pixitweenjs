@@ -31,6 +31,7 @@ interface PixiSvgPathSpriteProps extends PixiBaseSpriteProps {
     tint?: number;
     blendMode?: number;
     animation?: string;
+    hexColor?: string;
     fill?: string;
     fontWeight?: string;
     fontStyle?: string;
@@ -91,6 +92,7 @@ const PixiSvgPathSprite: React.FC<PixiSvgPathSpriteProps> = (props) => {
       width,
       height,
       anchor,
+      hexColor,
       fill,
       stroke = "none",
       strokeWidth = 0,
@@ -108,7 +110,9 @@ const PixiSvgPathSprite: React.FC<PixiSvgPathSpriteProps> = (props) => {
     // console.log('path', path);
     // console.log('transformedPath', transformedPath);
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}"> 
-        <path stroke="${stroke}" stroke-width="${strokeWidth}" fill="${fill}" d="${transformedPath}">
+        <path stroke="${stroke}" stroke-width="${strokeWidth}" fill="${
+      hexColor || fill
+    }" d="${transformedPath}">
         </path>
       </svg>`;
 
@@ -118,7 +122,7 @@ const PixiSvgPathSprite: React.FC<PixiSvgPathSpriteProps> = (props) => {
     return () => {
       // removeTransformer();
     };
-  }, [app, path, stroke, strokeWidth, fill]);
+  }, [app, path, stroke, strokeWidth, hexColor, fill]);
 
   return (
     <AbstractContainer {...props}>

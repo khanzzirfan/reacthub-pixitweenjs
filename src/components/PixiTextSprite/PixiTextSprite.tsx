@@ -137,7 +137,7 @@ const PixiTextSprite: React.FC<PixiTextSpriteProps> = (props) => {
 
     // stroke
     stroke,
-    strokeThickness: strokeWidth,
+    strokeThickness = 0,
     // drop shadow
     blurRadius = 0,
     blurEnabled = false,
@@ -170,8 +170,11 @@ const PixiTextSprite: React.FC<PixiTextSpriteProps> = (props) => {
       fontFamily: fontFamily,
       fontSize: fontSize,
       fill: fill || "white", //[color, '#00ff99'], // gradient
-      stroke: stroke,
-      strokeThickness: strokeWidth,
+      ...(stroke &&
+        strokeThickness > 0 && {
+          stroke: stroke,
+          strokeThickness: strokeThickness,
+        }),
       ...(nFontStyle && {
         fontStyle: nFontStyle as unknown as PIXI.TextStyleFontStyle,
       }),
@@ -204,7 +207,7 @@ const PixiTextSprite: React.FC<PixiTextSpriteProps> = (props) => {
     nLetterSpacing,
     shadowColor,
     stroke,
-    strokeWidth,
+    strokeThickness,
     wordWrapWidth,
   ]);
 

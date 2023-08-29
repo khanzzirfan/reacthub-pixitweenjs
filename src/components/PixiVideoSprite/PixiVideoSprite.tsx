@@ -2,7 +2,7 @@ import * as React from "react";
 import { useContext, useEffect, useRef, useState } from "react";
 // @ts-ignore
 import PropTypes from "prop-types";
-import { useCustomEventListener } from "react-custom-events";
+import { useCustomEventListener } from "../../events";
 import {
   GsapPixieContext,
   Events,
@@ -248,11 +248,12 @@ const PixiVideoSprite: React.FC<PixiVideoSpriteProps> = (props) => {
   const gsapOnStart = (startAt: number) => {
     if (videoElement.current) {
       console.log("video gsapOnStart", playerTimeRef.current, gsapDragging);
+      const roundedPlayerTime = Number(Math.round(playerTimeRef.current));
 
       // check the start and end times are between the playerTimeRef.current to start video;
       if (
-        playerTimeRef.current >= startAt &&
-        playerTimeRef.current <= endAt &&
+        roundedPlayerTime >= startAt &&
+        roundedPlayerTime <= endAt &&
         !gsapDragging
       ) {
         videoElement.current.currentTime =

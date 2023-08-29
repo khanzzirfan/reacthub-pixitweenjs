@@ -38,8 +38,12 @@ const Events = {
   SEEK: "GSAP_SEEK",
   RESET: "GSAP_RESET",
   COMPLETE: "GSAP_COMPLETE",
-  DRAGGING_START: "GSAP_DRAGGING_START",
-  DRAGGING_END: "GSAP_DRAGGING_END",
+  SEEK_START: "GSAP_SEEK_START",
+  SEEK_END: "GSAP_SEEK_END",
+  SCRUBBER_SEEK: "GSAP_SCRUBBER_SEEK",
+  SCRUBBER_PROGRESS_UPDATE: "GSAP_SCRUBBER_PROGRESS_UPDATE",
+  SCRUBBER_PLAY: "GSAP_SCRUBBER_PLAY",
+  SCRUBBER_PAUSE: "GSAP_SCRUBBER_PAUSE",
 };
 
 // Provider
@@ -169,6 +173,14 @@ const GsapPixieContextProvider: React.FC<{ children: React.ReactNode }> = ({
     timeline.seek(4);
   }, []);
 
+  const handleProgressUpdate = (progress: number) => {
+    if (progress > 0) {
+      const timeline = tl.current;
+      timeline.current.progress(progress);
+      timeline.current.pause();
+    }
+  };
+
   // const setTimelineDuration = useCallback(() => {
   //   const timeline = tl.current;
   //   timeline.totalDuration(3);
@@ -194,15 +206,33 @@ const GsapPixieContextProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   /** Event listener dragging */
-  useCustomEventListener(Events.DRAGGING_START, () => {
-    console.log("dragging start");
+  useCustomEventListener(Events.SEEK_START, () => {
     setIsDragging(true);
   });
 
-  useCustomEventListener(Events.DRAGGING_END, () => {
-    setIsDragging(false);
-    console.log("dragging end");
+  useCustomEventListener(Events.SCRUBBER_PLAY, () => {
+    handlePlay();
   });
+
+  useCustomEventListener(Events.SCRUBBER_PAUSE, () => {
+    handlePause();
+  });
+
+  useCustomEventListener(Events.SCRUBBER_SEEK, (time: number) => {
+    handleSeek(time);
+  });
+
+  useCustomEventListener(Events.SEEK_END, () => {
+    setIsDragging(false);
+  });
+
+  useCustomEventListener(
+    Events.SCRUBBER_PROGRESS_UPDATE,
+    (progress: number) => {
+      handleProgressUpdate(progress);
+    }
+  );
+  /** EOF event listners */
 
   return (
     <GsapPixieContext.Provider

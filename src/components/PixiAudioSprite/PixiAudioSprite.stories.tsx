@@ -44,6 +44,23 @@ export const Normal: Story = {
   },
 };
 
+// More on writing stories with args: https://storybook.js.org/docs/react/writing-stories/args
+export const Speech: Story = {
+  render: (args: any) => (
+    <AppStateContextProvider {...args}>
+      <PixiAudioSprite {...args} />
+    </AppStateContextProvider>
+  ),
+  args: {
+    uniqueId: "audio001", // uniqueId of the sprite
+    src: "https://eyecastvideoeditorfiles.s3.ap-southeast-2.amazonaws.com/public%2Firfan%40trolio.com%2F6472d56e805c3bffc3cded33%2Fvideos%2F7M7ixuYvwQ%2Fsingle-speaker-speech-audio.mp3",
+    startAt: 0,
+    endAt: 5,
+    mute: false,
+    speed: 1,
+  },
+};
+
 export const Customized: Story = {
   render: (args: any) => (
     <AppStateContextProvider {...args}>

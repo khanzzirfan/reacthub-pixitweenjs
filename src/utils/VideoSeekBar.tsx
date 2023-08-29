@@ -72,13 +72,13 @@ export const VideoSeekBar: React.FC = () => {
    */
   const handleOnSliderChangeStart = () => {
     // trigger custom event and pause the timeline
-    emitCustomEvent(Events.DRAGGING_START);
+    emitCustomEvent(Events.SEEK_START);
     timeline && timeline.current.pause();
   };
 
   const handleOnSliderChangeEnd = () => {
     // trigger custom event and pause the timeline
-    emitCustomEvent(Events.DRAGGING_END);
+    emitCustomEvent(Events.SEEK_END);
     timeline && timeline.current.pause();
   };
 
