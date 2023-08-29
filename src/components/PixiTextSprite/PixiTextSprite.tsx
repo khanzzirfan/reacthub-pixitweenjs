@@ -19,7 +19,7 @@ interface PixiTextSpriteProps extends PixiBaseSpriteProps {
   startAt: number;
   endAt: number;
   initialAlpha: number;
-  locked: boolean;
+  disabled?: boolean;
   transformation: {
     x: number;
     y: number;
@@ -115,16 +115,10 @@ const PixiTextSprite: React.FC<PixiTextSpriteProps> = (props) => {
   const {
     uniqueId,
     text,
-    locked,
+    disabled,
     transformation,
     onTextUpdate,
     pointerdown,
-    pointerup,
-    mousedown,
-    mouseup,
-    pointerover,
-    mouseover,
-    mouseout,
   } = props;
 
   const {
@@ -332,16 +326,10 @@ const PixiTextSprite: React.FC<PixiTextSpriteProps> = (props) => {
             anchor={0.5}
             text={text}
             {...(!isEditing &&
-              !locked && {
+              !disabled && {
                 interactive: true,
                 buttonMode: true,
                 pointerdown: pointerdown,
-                pointerout: mouseout,
-                pointerover: pointerover,
-                pointerup: pointerup,
-                mousedown: mousedown,
-                mouseup: mouseup,
-                mouseover: mouseover,
               })}
             ref={textRef}
             scale={scale}

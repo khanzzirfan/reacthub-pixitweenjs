@@ -11,14 +11,14 @@ import { AdjustmentFilter } from "@pixi/filter-adjustment";
 import * as PIXI from "pixi.js";
 import gsap from "gsap";
 import { useWorkerParser, usePlayerState } from "@react-gifs/tools";
-import PixiTransformer from "../../utils/PixiTransformer";
+import PixiTransformer from "../PixiTransformer/PixiTransformer";
 
 // @ts-ignore
 import isEmpty from "lodash/isEmpty";
 import { getAnimByName } from "../../utils/GsapAnim";
 import { TransformationEnd } from "../../types/transformation";
 import { PixiAnimatedSprite } from "../PixiAnimatedSprite";
-import { useCustomEventListener } from "react-custom-events";
+import { useCustomEventListener } from "../../events";
 
 type PixiGifSpriteProps = {
   uniqueId: string;
@@ -133,6 +133,7 @@ const PixiGifSprite: React.FC<PixiGifSpriteProps> = (props) => {
   const imgGroupRef = useRef<PIXI.Container>(null);
   const transformerRef = useRef<PIXI.Container>(null);
   const gifStateRef = useRef<GifState>(initialState);
+  const alphaRef = useRef<number>(props.initialAlpha);
 
   //// Context
   const { tl } = useContext(GsapPixieContext);
@@ -145,7 +146,6 @@ const PixiGifSprite: React.FC<PixiGifSpriteProps> = (props) => {
     src,
     startAt,
     endAt,
-    initialAlpha,
     locked,
     loop,
     transformation: {
@@ -205,7 +205,6 @@ const PixiGifSprite: React.FC<PixiGifSpriteProps> = (props) => {
       gifStateRef.current.isPlaying = false;
     }
   });
-
   // transformer to handle sprite transformation
   const handleOnTransformEnd = React.useCallback(
     (endData: TransformationEnd) => {
@@ -284,6 +283,14 @@ const PixiGifSprite: React.FC<PixiGifSpriteProps> = (props) => {
     // }
   };
 
+  const gsapOnAlphaStart = (params: { alpha: number }) => {
+    alphaRef.current = params.alpha;
+  };
+
+  const gsapOnAlphaComplete = (params: { alpha: number }) => {
+    alphaRef.current = params.alpha;
+  };
+
   useEffect(() => {
     let ctx = gsap.context(() => {});
     if (containerRef.current && tl.current) {
@@ -298,42 +305,47 @@ const PixiGifSprite: React.FC<PixiGifSpriteProps> = (props) => {
         onUpdateParams: [],
       };
 
+      const alphaStartParams = {
+        onStart: gsapOnAlphaStart,
+        onStartParams: [{ alpha: 1 }],
+      };
+
+      const alphaCompleteParams = {
+        onComplete: gsapOnAlphaComplete,
+        onCompleteParams: [{ alpha: 0 }],
+      };
+
       const ease = getAnimByName(animation || "None");
       ctx = gsap.context(() => {
+        tl.current
+          .to(
+            containerRef.current,
+            { alpha: 1, duration: 0.01, ...alphaStartParams },
+            startAt
+          )
+          .from(containerRef.current, { ...data }, startAt)
+          .to(
+            containerRef.current,
+            { alpha: 0, duration: 0.1, ...alphaCompleteParams },
+            Number(endAt) - 0.09
+          );
+
         if (!isEmpty(ease.from)) {
-          tl.current
-            .from(containerRef.current, { ...ease.from }, startAt)
-            .to(imgGroupRef.current, { alpha: 1, duration: 0.2 }, startAt)
-            .from(imgGroupRef.current, { ...data }, startAt)
-            .to(containerRef.current, { alpha: 0, duration: 0.2 }, endAt - 0.2);
+          tl.current.from(containerRef.current, { ...ease.from }, startAt);
         } else if (!isEmpty(ease.to)) {
-          tl.current
-            .to(
-              containerRef.current,
-              { alpha: 1, duration: 0.2, ...ease.to },
-              startAt
-            )
-            .from(imgGroupRef.current, { ...data }, startAt)
-            .to(containerRef.current, { alpha: 0, duration: 0.2 }, endAt - 0.2);
+          tl.current.to(
+            containerRef.current,
+            { alpha: 1, duration: 0.2, ...ease.to },
+            startAt
+          );
         } else if (!isEmpty(ease.fromTo)) {
-          tl.current
-            .fromTo(
-              containerRef.current,
-              ease.fromTo?.from,
-              ease.fromTo?.to,
-              startAt
-            )
-            .from(imgGroupRef.current, { ...data }, startAt)
-            .to(containerRef.current, { alpha: 0, duration: 0.2 }, endAt - 0.2);
+          tl.current.fromTo(
+            containerRef.current,
+            ease.fromTo?.from,
+            ease.fromTo?.to,
+            startAt
+          );
         } else {
-          tl.current
-            .to(containerRef.current, { alpha: 1, duration: 0.01 }, startAt)
-            .from(imgGroupRef.current, { ...data }, startAt)
-            .to(
-              containerRef.current,
-              { alpha: 0, duration: 0.1 },
-              Number(endAt) - Number(0.1)
-            );
         }
       });
     }
@@ -366,7 +378,7 @@ const PixiGifSprite: React.FC<PixiGifSpriteProps> = (props) => {
       {/* @ts-ignore */}
       <Container
         ref={containerRef}
-        alpha={initialAlpha}
+        alpha={alphaRef.current}
         position={[x, y]}
         pivot={[x, y]}
         width={width}

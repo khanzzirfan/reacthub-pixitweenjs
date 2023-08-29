@@ -13,7 +13,7 @@ import {
   GsapPixieContext,
   Events,
 } from "../providers/GsapPixieContextProvider";
-import { emitCustomEvent } from "react-custom-events";
+import { emitCustomEvent } from "../events";
 
 import { gsap } from "gsap";
 import { Draggable } from "gsap/Draggable";

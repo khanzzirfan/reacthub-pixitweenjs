@@ -4,3 +4,6 @@ export * from "./providers";
 
 // types
 export * from "./types";
+
+// Events
+export * from "./events";

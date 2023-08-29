@@ -93,7 +93,7 @@ export const Normal: Story = {
   args: {
     uniqueId: "TextSpritexx001", // uniqueId of the sprite
     text: "Hello Welcome to PixiJS",
-    locked: false,
+    disabled: false,
     applyTransformer: false,
     transformation: {
       x: 200,
@@ -138,7 +138,7 @@ export const FadeIn: Story = {
   args: {
     uniqueId: "TextSprite001", // uniqueId of the sprite
     text: "Hello Welcome to PixiJS",
-    locked: false,
+    disabled: false,
     applyTransformer: false,
     transformation: {
       x: 200,
@@ -185,7 +185,7 @@ export const Filters: Story = {
   args: {
     uniqueId: "TextSpritexx001", // uniqueId of the sprite
     text: "Hello Welcome to PixiJS",
-    locked: false,
+    disabled: false,
     applyTransformer: false,
     transformation: {
       x: 200,

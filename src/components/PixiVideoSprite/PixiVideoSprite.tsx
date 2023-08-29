@@ -11,7 +11,7 @@ import { Sprite, Container, withFilters } from "@pixi/react";
 import { AdjustmentFilter } from "@pixi/filter-adjustment";
 import * as PIXI from "pixi.js";
 import gsap from "gsap";
-import PixiTransformer from "../../utils/PixiTransformer";
+import PixiTransformer from "../PixiTransformer/PixiTransformer";
 
 // @ts-ignore
 import isEmpty from "lodash/isEmpty";
@@ -125,6 +125,7 @@ const PixiVideoSprite: React.FC<PixiVideoSpriteProps> = (props) => {
   const transformerRef = useRef<PIXI.Container>(null);
   const videoElement = useRef<HTMLVideoElement>(null);
   const videoStateRef = useRef<VideoState>(initialState);
+  const alphaRef = useRef<number>(props.initialAlpha);
 
   //// Context
   const {
@@ -145,7 +146,6 @@ const PixiVideoSprite: React.FC<PixiVideoSpriteProps> = (props) => {
     endAt,
     frameStartAt,
     frameEndAt,
-    initialAlpha,
     transformation: {
       x,
       y,
@@ -324,6 +324,14 @@ const PixiVideoSprite: React.FC<PixiVideoSpriteProps> = (props) => {
     }
   };
 
+  const gsapOnAlphaStart = (params: { alpha: number }) => {
+    alphaRef.current = params.alpha;
+  };
+
+  const gsapOnAlphaComplete = (params: { alpha: number }) => {
+    alphaRef.current = params.alpha;
+  };
+
   useEffect(() => {
     let ctx = gsap.context(() => {});
     if (containerRef.current && tl.current) {
@@ -338,42 +346,48 @@ const PixiVideoSprite: React.FC<PixiVideoSpriteProps> = (props) => {
         onUpdateParams: [],
       };
 
+      const alphaStartParams = {
+        onStart: gsapOnAlphaStart,
+        onStartParams: [{ alpha: 1 }],
+      };
+
+      const alphaCompleteParams = {
+        onComplete: gsapOnAlphaComplete,
+        onCompleteParams: [{ alpha: 0 }],
+      };
+
       const ease = getAnimByName(animation || "None");
+
       ctx = gsap.context(() => {
+        tl.current
+          .to(
+            containerRef.current,
+            { alpha: 1, duration: 0.01, ...alphaStartParams },
+            startAt
+          )
+          .from(containerRef.current, { ...data }, startAt)
+          .to(
+            containerRef.current,
+            { alpha: 0, duration: 0.1, ...alphaCompleteParams },
+            Number(endAt) - 0.09
+          );
+
         if (!isEmpty(ease.from)) {
-          tl.current
-            .from(containerRef.current, { ...ease.from }, startAt)
-            .to(imgGroupRef.current, { alpha: 1, duration: 0.2 }, startAt)
-            .from(imgGroupRef.current, { ...data }, startAt)
-            .to(containerRef.current, { alpha: 0, duration: 0.2 }, endAt - 0.2);
+          tl.current.from(containerRef.current, { ...ease.from }, startAt);
         } else if (!isEmpty(ease.to)) {
-          tl.current
-            .to(
-              containerRef.current,
-              { alpha: 1, duration: 0.2, ...ease.to },
-              startAt
-            )
-            .from(imgGroupRef.current, { ...data }, startAt)
-            .to(containerRef.current, { alpha: 0, duration: 0.2 }, endAt - 0.2);
+          tl.current.to(
+            containerRef.current,
+            { alpha: 1, duration: 0.2, ...ease.to },
+            startAt
+          );
         } else if (!isEmpty(ease.fromTo)) {
-          tl.current
-            .fromTo(
-              containerRef.current,
-              ease.fromTo?.from,
-              ease.fromTo?.to,
-              startAt
-            )
-            .from(imgGroupRef.current, { ...data }, startAt)
-            .to(containerRef.current, { alpha: 0, duration: 0.2 }, endAt - 0.2);
+          tl.current.fromTo(
+            containerRef.current,
+            ease.fromTo?.from,
+            ease.fromTo?.to,
+            startAt
+          );
         } else {
-          tl.current
-            .to(containerRef.current, { alpha: 1, duration: 0.01 }, startAt)
-            .from(imgGroupRef.current, { ...data }, startAt)
-            .to(
-              containerRef.current,
-              { alpha: 0, duration: 0.1 },
-              Number(endAt) - Number(0.1)
-            );
         }
       });
     }
@@ -517,7 +531,7 @@ const PixiVideoSprite: React.FC<PixiVideoSpriteProps> = (props) => {
       {/* @ts-ignore */}
       <Container
         ref={containerRef}
-        alpha={initialAlpha}
+        alpha={alphaRef.current}
         position={[x, y]}
         pivot={[x, y]}
         width={width}

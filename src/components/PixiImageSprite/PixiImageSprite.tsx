@@ -6,9 +6,15 @@ import * as PIXI from "pixi.js";
 import isEmpty from "lodash/isEmpty";
 // setup hocs
 import AbstractContainer from "../../hocs/AbstractContainer";
-import { PixiBaseSpriteProps } from "../../types/BaseProps";
+import {
+  PixiBaseSpriteProps,
+  ForwardedRefResponse,
+} from "../../types/BaseProps";
 
-const PixiImageSprite: React.FC<PixiBaseSpriteProps> = (props) => {
+const PixiImageSprite = React.forwardRef<
+  ForwardedRefResponse | null,
+  PixiBaseSpriteProps
+>((props, ref) => {
   //// State
 
   //// Refs
@@ -24,15 +30,10 @@ const PixiImageSprite: React.FC<PixiBaseSpriteProps> = (props) => {
     transformation: { x, y, width, height, anchor },
     pointerdown,
     pointerup,
-    mousedown,
-    mouseup,
-    pointerover,
-    mouseover,
-    mouseout,
   } = props;
 
   return (
-    <AbstractContainer {...props}>
+    <AbstractContainer {...props} ref={ref}>
       <Container ref={imgGroupRef}>
         <Sprite
           image={src}
@@ -46,15 +47,10 @@ const PixiImageSprite: React.FC<PixiBaseSpriteProps> = (props) => {
           interactive={true}
           pointerdown={pointerdown}
           pointerup={pointerup}
-          pointerover={pointerover}
-          mousedown={mousedown}
-          mouseup={mouseup}
-          mouseover={mouseover}
-          mouseout={mouseout}
         />
       </Container>
     </AbstractContainer>
   );
-};
+});
 
 export default PixiImageSprite;

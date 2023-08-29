@@ -7,7 +7,7 @@ import {
   useLayoutEffect,
 } from "react";
 import gsap from "gsap";
-import { emitCustomEvent, useCustomEventListener } from "react-custom-events";
+import { emitCustomEvent, useCustomEventListener } from "../events";
 
 interface GsapPixieContextProps {
   gsapCtx: React.MutableRefObject<any>;
@@ -37,6 +37,7 @@ const Events = {
   REPEAT: "GSAP_REPEAT",
   SEEK: "GSAP_SEEK",
   RESET: "GSAP_RESET",
+  COMPLETE: "GSAP_COMPLETE",
   DRAGGING_START: "GSAP_DRAGGING_START",
   DRAGGING_END: "GSAP_DRAGGING_END",
 };
@@ -45,7 +46,7 @@ const Events = {
 const GsapPixieContextProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [play, setPlay] = useState<boolean>(false);
+  /// const [play, setPlay] = useState<boolean>(false);
   const [isDragging, setIsDragging] = useState<boolean>(false);
 
   const tl = useRef<any>();
@@ -122,16 +123,19 @@ const GsapPixieContextProvider: React.FC<{ children: React.ReactNode }> = ({
       // })
       // write a pause event
       .eventCallback("onPause", function () {
-        console.log("onPause", timeline.progress());
+        // console.log("onPause", timeline.progress());
         onUpdate();
       })
       .eventCallback("onResume", function () {
-        console.log("onResume", timeline.progress());
+        // console.log("onResume", timeline.progress());
         onUpdate();
       })
       .eventCallback("onComplete", function () {
-        timeline.seek(0);
         timeline.pause();
+        timeline.revert();
+        // emit event timeline complete
+        emitCustomEvent(Events.COMPLETE, { uniqueId: "timeline" });
+        console.log("Emitted events");
         onUpdate();
       });
   }, []);
@@ -145,7 +149,7 @@ const GsapPixieContextProvider: React.FC<{ children: React.ReactNode }> = ({
   const handleRestart = useCallback(() => {
     const timeline = tl.current;
     timeline.restart();
-    setPlay(true);
+    // setPlay(true);
   }, []);
 
   const handleRepeat = useCallback(() => {
@@ -180,12 +184,11 @@ const GsapPixieContextProvider: React.FC<{ children: React.ReactNode }> = ({
     const timeline = tl.current;
     timeline.pause();
     emitCustomEvent(Events.PAUSE);
-    setPlay(false);
   };
 
   const handlePlay = () => {
     const timeline = tl.current;
-    setPlay(true);
+    // setPlay(true);
     timeline.resume();
     emitCustomEvent(Events.RESUME);
   };
@@ -201,7 +204,6 @@ const GsapPixieContextProvider: React.FC<{ children: React.ReactNode }> = ({
     console.log("dragging end");
   });
 
-  console.log("set play updated", play);
   return (
     <GsapPixieContext.Provider
       value={{

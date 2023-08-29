@@ -97,11 +97,6 @@ const PixiSvgPathSprite: React.FC<PixiSvgPathSpriteProps> = (props) => {
     },
     pointerdown,
     pointerup,
-    mousedown,
-    mouseup,
-    pointerover,
-    mouseover,
-    mouseout,
   } = props;
 
   const app = useApp();
@@ -142,11 +137,6 @@ const PixiSvgPathSprite: React.FC<PixiSvgPathSpriteProps> = (props) => {
               interactive={true}
               pointerdown={pointerdown}
               pointerup={pointerup}
-              pointerover={pointerover}
-              mousedown={mousedown}
-              mouseup={mouseup}
-              mouseover={mouseover}
-              mouseout={mouseout}
             />
           )}
         </Container>

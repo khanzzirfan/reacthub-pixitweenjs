@@ -9,6 +9,7 @@ export interface PixiBaseSpriteProps {
   startAt: number;
   endAt: number;
   initialAlpha: number;
+  disabled?: boolean;
   transformation: {
     x: number;
     y: number;
@@ -46,6 +47,7 @@ export interface PixiBaseSpriteProps {
   };
   pointerdown?: () => void;
   pointerup?: () => void;
+  pointerout?: () => void;
   mousedown?: () => void;
   mouseup?: () => void;
   pointerover?: () => void;
@@ -53,4 +55,9 @@ export interface PixiBaseSpriteProps {
   mouseout?: () => void;
   applyTransformer?: boolean;
   onAnchorTransformationEnd?: (endData: any) => void;
+}
+
+export interface ForwardedRefResponse {
+  getIsTransformerDragging: () => boolean;
+  getIsMouseOverTransformer: () => boolean;
 }

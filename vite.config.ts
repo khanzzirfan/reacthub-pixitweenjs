@@ -3,6 +3,7 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import dts from "vite-plugin-dts";
 import EnvironmentPlugin from "vite-plugin-environment";
+// import terser from "@rollup/plugin-terser";
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -20,11 +21,16 @@ export default defineConfig({
       fileName: (format) => `index.${format}.js`,
     },
     rollupOptions: {
+      /// plugins: [terser()],
       external: [
         "react",
         "react-dom",
         "pixi.js",
         "gsap",
+        "@pixi/sound",
+        "@pixi/react",
+        "@pixi/assets",
+        "reacthub-react-bindings",
         // "pixi.js-legacy",
         // "pixi-sound",
         // "pixi-viewport",
@@ -39,6 +45,9 @@ export default defineConfig({
           "react-dom": "ReactDOM",
           "pixi.js": "PIXI",
           gsap: "gsap",
+          "@pixi/sound": "PIXI.sound",
+          "@pixi/react": "PIXIReact",
+          "@pixi/assets": "PIXIAssets",
         },
       },
     },

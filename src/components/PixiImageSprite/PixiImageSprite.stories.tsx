@@ -96,7 +96,7 @@ export const Normal: Story = {
     src: "https://assets.codepen.io/693612/surya.svg",
     applyTransformer: false,
     startAt: 0,
-    endAt: 10,
+    endAt: 5,
     transformation: {
       x: 200,
       y: 200,
@@ -132,7 +132,7 @@ export const FadeIn: Story = {
     src: "https://assets.codepen.io/693612/surya.svg",
     applyTransformer: false,
     startAt: 0,
-    endAt: 10,
+    endAt: 5,
     transformation: {
       x: 100,
       y: 100,
@@ -164,7 +164,7 @@ export const Filters: Story = {
     src: "https://assets.codepen.io/693612/surya.svg",
     applyTransformer: false,
     startAt: 0,
-    endAt: 10,
+    endAt: 5,
     transformation: {
       x: 200,
       y: 200,
@@ -201,7 +201,7 @@ export const FilterEffects: Story = {
     src: "https://assets.codepen.io/693612/surya.svg",
     applyTransformer: false,
     startAt: 0,
-    endAt: 10,
+    endAt: 5,
     transformation: {
       x: 200,
       y: 200,

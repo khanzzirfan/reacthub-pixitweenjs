@@ -141,6 +141,7 @@ const PixiTransformer = ({
 
   return (
     <Transformer
+      // @ts-ignore
       ref={pixiTransformerRef}
       group={isMounted ? [imageRef.current] : []}
       rotateEnabled={true}

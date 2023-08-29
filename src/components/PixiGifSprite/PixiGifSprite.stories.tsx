@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { PixiGifSprite } from ".";
 import { AppStateContextProvider } from "../../utils/AppStateProvider";
+import { Effects } from "../../types/Effects";
 
 // More on how to set up stories at: https://storybook.js.org/docs/react/writing-stories/introduction
 const meta = {
@@ -131,6 +132,39 @@ export const Normal: Story = {
       colorCorrection: {},
     },
     initialAlpha: 1,
+  },
+};
+
+export const FadeIn: Story = {
+  render: (args: any) => (
+    <AppStateContextProvider {...args}>
+      <PixiGifSprite {...args} />
+    </AppStateContextProvider>
+  ),
+  args: {
+    uniqueId: "suryaGifyFadeIn001", // uniqueId of the sprite
+    src: "https://media.giphy.com/media/5VKbvrjxpVJCM/giphy.gif",
+    locked: false,
+    loop: false,
+    applyTransformer: false,
+    startAt: 0,
+    endAt: 4,
+    transformation: {
+      x: 200,
+      y: 200,
+      width: 200,
+      height: 200,
+      anchor: 0.5,
+      rotation: 0,
+      alpha: 1,
+      scale: 1,
+      tint: 0xffffff,
+      blendMode: 0,
+      effect: Effects.None,
+      animation: "FADE_IN",
+      colorCorrection: {},
+    },
+    initialAlpha: 0,
   },
 };
 
