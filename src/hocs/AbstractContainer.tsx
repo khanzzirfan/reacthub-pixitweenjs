@@ -10,10 +10,14 @@ import { Effects } from "../types/Effects";
 import PixiTransformer from "../components/PixiTransformer/PixiTransformer";
 import { PixiBaseSpriteProps, ForwardedRefResponse } from "../types/BaseProps";
 import { TransformationEnd } from "../types/transformation";
-import { GsapPixieContext } from "../providers/GsapPixieContextProvider";
+import {
+  GsapPixieContext,
+  Events,
+} from "../providers/GsapPixieContextProvider";
 import { getAnimByName } from "../utils/GsapAnim";
 // @ts-ignore
 import isEmpty from "lodash/isEmpty";
+import { useCustomEventListener } from "../events";
 
 /** CYAN Filters */
 const CYAN = [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0];
@@ -66,6 +70,8 @@ const AbstractContainer = React.forwardRef<
     pointerover,
   } = props;
 
+  // log all props
+  console.log("abstractallProps", props);
   // color corrections
   const {
     contrast = 1,
@@ -82,6 +88,15 @@ const AbstractContainer = React.forwardRef<
     ...(saturation > 1 && { saturation: saturation }),
     ...(alpha !== 0 && { alpha: alpha }),
   };
+
+  /** Adding custom event listners */
+  /** Event Listeneres */
+  useCustomEventListener(Events.COMPLETE, () => {
+    if (containerRef.current) {
+      alphaRef.current = initialAlpha;
+      setPixiAlpha(initialAlpha);
+    }
+  });
 
   // Write use effects or impative code here
   React.useImperativeHandle(
@@ -103,20 +118,18 @@ const AbstractContainer = React.forwardRef<
     }
   }, []);
 
-  const gsapOnAlphaComplete = () => {
-    console.log("gsapOnAlphaComplete complete");
-  };
-
   const gsapOnAlphaReverseComplete = () => {
     console.log("reverse complete");
     alphaRef.current = initialAlpha;
-    setPixiAlpha(initialAlpha);
+    /// setPixiAlpha(initialAlpha);
   };
 
-  const gsapResetAlpha = () => {
-    console.log("global time complete", initialAlpha);
-    alphaRef.current = initialAlpha;
-    setPixiAlpha(initialAlpha);
+  const gsapOnAlphaStart = (params: { alpha: number }) => {
+    alphaRef.current = params.alpha;
+  };
+
+  const gsapOnAlphaComplete = (params: { alpha: number }) => {
+    alphaRef.current = params.alpha;
   };
 
   React.useEffect(() => {
@@ -127,19 +140,34 @@ const AbstractContainer = React.forwardRef<
         duration: Number(endAt) - Number(startAt),
       };
 
+      const alphaStartParams = {
+        onStart: gsapOnAlphaStart,
+        onReverseComplete: gsapOnAlphaReverseComplete,
+        onStartParams: [{ alpha: 1 }],
+      };
+
+      const alphaCompleteParams = {
+        onComplete: gsapOnAlphaComplete,
+        onCompleteParams: [{ alpha: 0 }],
+      };
+
       const ease = getAnimByName(animation || "None");
       ctx = gsap.context(() => {
         // initial alpha and duration of timeline setup
         tl.current
-          .to(containerRef.current, { alpha: 1, duration: 0.1 }, startAt)
+          .to(
+            containerRef.current,
+            { alpha: 1, duration: 0.1, ...alphaStartParams },
+            startAt
+          )
           ///.from(containerRef.current, { ...data }, startAt)
           .to(
             containerRef.current,
-            { alpha: 0, duration: 0.1, onComplete: gsapOnAlphaComplete },
+            { alpha: 0, duration: 0.1, ...alphaCompleteParams },
             Number(endAt) - 0.09
-          ) // reset alpha on timeline reverse or complete.
-          .eventCallback("onComplete", gsapResetAlpha, [])
-          .eventCallback("onReverseComplete", gsapOnAlphaReverseComplete, []);
+          ); // reset alpha on timeline reverse or complete.
+        // .eventCallback("onComplete", gsapResetAlpha, []);
+        // .eventCallback("onReverseComplete", gsapOnAlphaReverseComplete, []);
 
         if (!ignoreTlForVideo) {
           tl.current.from(containerRef.current, { ...data }, startAt);
@@ -160,7 +188,15 @@ const AbstractContainer = React.forwardRef<
         }
       });
     }
-    return () => ctx.revert(); // cleanup!
+    return () => {
+      console.log("unmounting");
+      if (tl.current) {
+        console.log("1001 kill timeline");
+        tl.current.progress(0).kill();
+        gsap.killTweensOf(tl.current);
+      }
+      ctx.revert(); // cleanup!
+    };
   }, [animation, startAt, endAt, ignoreTlForVideo]);
 
   /** handle on tranformer onchange */
@@ -190,7 +226,6 @@ const AbstractContainer = React.forwardRef<
   const isFilterOrEffectEnabled =
     colorCorrection?.enabled || (effect && effect !== Effects.Normal);
 
-  console.log("container alpha update", alphaRef.current, pixiAlpha);
   return (
     <Container ref={parentNode}>
       <Container

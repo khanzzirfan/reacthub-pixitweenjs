@@ -18,11 +18,9 @@ import {
   ForwardedRefResponse,
 } from "../../types/BaseProps";
 
-interface PixiVideoSpriteProps extends PixiBaseSpriteProps {
+export interface PixiVideoSpriteProps extends PixiBaseSpriteProps {
   uniqueId: string;
   src: string;
-  startAt: number;
-  endAt: number;
   frameStartAt: number;
   frameEndAt: number;
   mute: boolean;
@@ -94,6 +92,8 @@ const PixiVideoSprite = React.forwardRef<
     uniqueId,
     mute = false,
     src,
+    startAt,
+    endAt,
     frameStartAt,
     frameEndAt,
     transformation: { x, y, width, height, animation },
@@ -107,7 +107,7 @@ const PixiVideoSprite = React.forwardRef<
     element.src = src;
     element.crossOrigin = "Anonymus";
     element.autoplay = false;
-    element.currentTime = frameStartAt;
+    element.currentTime = frameStartAt === 0 ? 0.001 : frameStartAt;
     return element;
   }, [src, frameStartAt]);
 
@@ -142,7 +142,12 @@ const PixiVideoSprite = React.forwardRef<
 
   /** Gsap Start and Stop Events */
   const gsapOnStart = (frameStartAt: number) => {
-    /// console.log("startAt", frameStartAt, frameEndAt, playerTimeRef.current);
+    console.log(
+      "pixivideo gsapOnStart",
+      frameStartAt,
+      frameEndAt,
+      tweenRef.current?.time()
+    );
     if (videoElement.current) {
       // console.log("video gsapOnStart", playerTimeRef.current, gsapDragging);
       // const roundedPlayerTime = Number(Math.round(playerTimeRef.current));
@@ -226,6 +231,7 @@ const PixiVideoSprite = React.forwardRef<
   useEffect(() => {
     let ctx = gsap.context(() => {});
     if (containerRef.current && tl.current) {
+      console.log("timlinepixi", frameStartAt, frameEndAt);
       const data = {
         duration: Number(frameEndAt) - Number(frameStartAt),
         onStart: gsapOnStart,
@@ -237,6 +243,10 @@ const PixiVideoSprite = React.forwardRef<
         onUpdateParams: [frameStartAt, frameEndAt],
       };
 
+      // kill tween before adding it.
+      if (tweenRef.current) {
+        tweenRef.current.kill();
+      }
       ctx = gsap.context(() => {
         tweenRef.current = gsap.from(
           containerRef.current,
@@ -244,11 +254,17 @@ const PixiVideoSprite = React.forwardRef<
           data,
           frameStartAt
         );
-        tl.current.add(tweenRef.current, frameStartAt);
+        tl.current.add(tweenRef.current, startAt);
       });
     }
-    return () => ctx.revert(); // cleanup!
-  }, [animation, frameStartAt, frameEndAt]);
+    return () => {
+      if (tweenRef.current) {
+        tweenRef.current.kill();
+        gsap.killTweensOf(tweenRef.current);
+      }
+      ctx.revert(); // cleanup!
+    };
+  }, [animation, startAt, endAt, frameStartAt, frameEndAt]);
 
   React.useEffect(() => {
     if (containerRef.current) {
@@ -362,6 +378,7 @@ const PixiVideoSprite = React.forwardRef<
 
     return () => {
       if (videoElement.current) {
+        videoElement.current.pause();
         videoElement.current.removeEventListener("loadedmetadata", onload);
         videoElement.current.removeEventListener("ended", onEnd);
         videoElement.current.removeEventListener("loadstart", onLoadStart);

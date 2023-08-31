@@ -216,3 +216,35 @@ export const SplitPosition: Story = {
     locked: false,
   },
 };
+
+export const SplitStartPos: Story = {
+  render: (args: any) => (
+    <AppStateContextProvider {...args}>
+      <PixiVideoSprite {...args} />
+    </AppStateContextProvider>
+  ),
+  args: {
+    uniqueId: "videofiter002", // uniqueId of the sprite
+    src: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+    transformation: {
+      x: 290,
+      y: 250,
+      width: 550,
+      height: 400,
+      anchor: 0.5,
+      rotation: 0,
+      alpha: 1,
+      scale: 1,
+      tint: 0xffffff,
+      blendMode: 0,
+    },
+    applyTransformer: false,
+    startAt: 5,
+    endAt: 10,
+    frameStartAt: 0,
+    frameEndAt: 10,
+    initialAlpha: 1,
+    mute: false,
+    locked: false,
+  },
+};

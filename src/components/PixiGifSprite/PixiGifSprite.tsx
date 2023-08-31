@@ -27,6 +27,8 @@ export interface PixiGifSpriteProps extends PixiBaseSpriteProps {
   src: string;
   startAt: number;
   endAt: number;
+  frameStartAt: number;
+  frameEndAt: number;
   initialAlpha: number;
   locked: boolean;
   loop: boolean;
@@ -94,6 +96,8 @@ const PixiGifSprite = React.forwardRef<
     src,
     startAt,
     endAt,
+    frameStartAt,
+    frameEndAt,
     loop,
     transformation: { width = 0, height = 0, x, y, animation },
   } = props;
@@ -227,28 +231,40 @@ const PixiGifSprite = React.forwardRef<
     let ctx = gsap.context(() => {});
     if (containerRef.current && tl.current) {
       const data = {
-        duration: Number(endAt) - Number(startAt),
+        duration: Number(frameEndAt) - Number(frameStartAt),
         onStart: gsapOnStart,
         onComplete: gsapOnComplete,
-        onStartParams: [startAt, endAt],
+        onStartParams: [frameStartAt, frameEndAt],
         onCompleteParams: [],
         onInterrupt: onInterrupt,
         onUpdate: onUpdate,
-        onUpdateParams: [startAt, endAt],
+        onUpdateParams: [frameStartAt, frameEndAt],
       };
 
+      if (tweenRef.current) {
+        tweenRef.current.kill();
+      }
       ctx = gsap.context(() => {
         tweenRef.current = gsap.from(
           containerRef.current,
           // @ts-ignore
           data,
-          startAt
+          frameStartAt
         );
         tl.current.add(tweenRef.current, startAt);
       });
     }
-    return () => ctx.revert(); // cleanup!
-  }, [animation, startAt, endAt]);
+    return () => {
+      if (tweenRef.current) {
+        tweenRef.current.kill();
+        gsap.killTweensOf(tweenRef.current);
+      }
+      ctx.revert(); // cleanup!
+      if (containerRef.current) {
+        containerRef.current.destroy();
+      }
+    };
+  }, [animation, startAt, endAt, frameStartAt, frameEndAt]);
 
   return (
     <AbstractContainer {...props} ref={ref} ignoreTlForVideo={true}>

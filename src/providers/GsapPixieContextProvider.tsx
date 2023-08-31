@@ -53,7 +53,7 @@ const GsapPixieContextProvider: React.FC<{ children: React.ReactNode }> = ({
   /// const [play, setPlay] = useState<boolean>(false);
   const [isDragging, setIsDragging] = useState<boolean>(false);
 
-  const tl = useRef<any>();
+  const tl = useRef<gsap.core.Timeline>();
   const gsapCtx = useRef<any>();
   const playerTimeRef = useRef<number>(0.001);
 
@@ -66,12 +66,21 @@ const GsapPixieContextProvider: React.FC<{ children: React.ReactNode }> = ({
       // add a box and circle animation to our timeline and play on first render
       // console.log("creating timeline");
       tl.current && tl.current.progress(0).kill();
+      tl.current && tl.current.clear();
+      tl.current && gsap.killTweensOf(tl.current);
       tl.current = gsap.timeline({
         paused: true,
         defaults: { duration: 0 },
       });
     });
-    return () => gsapCtx.current.revert();
+    return () => {
+      // console.log("destroying timeline");
+      if (tl.current) {
+        tl.current.progress(0).kill();
+        gsap.killTweensOf(tl.current);
+      }
+      gsapCtx.current.revert();
+    };
   }, []);
 
   // gsap.ticker.add(() => {
@@ -84,17 +93,19 @@ const GsapPixieContextProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const onUpdate = useCallback(() => {
     /// console.log("update event callback");
-    const timeline = tl.current;
-    let now = timeline.time();
-    // let elapsedTime;
-    // if (playerTimeRef.current) {
-    //   elapsedTime = now - playerTimeRef.current;
-    // }
-    // console.log(
-    //   `elapseTime :${elapsedTime} now:${now} playerTime:${playerTimeRef.current}`
-    // );
-    //time = now;
-    playerTimeRef.current = now;
+    if (tl.current) {
+      const timeline = tl.current;
+      let now = timeline.time();
+      // let elapsedTime;
+      // if (playerTimeRef.current) {
+      //   elapsedTime = now - playerTimeRef.current;
+      // }
+      // console.log(
+      //   `elapseTime :${elapsedTime} now:${now} playerTime:${playerTimeRef.current}`
+      // );
+      //time = now;
+      playerTimeRef.current = now;
+    }
   }, []);
 
   // set the total duration based on the delayed duration value
@@ -103,84 +114,81 @@ const GsapPixieContextProvider: React.FC<{ children: React.ReactNode }> = ({
   // }, [delayedDuration]);
 
   useEffect(() => {
-    const timeline = tl.current;
-    timeline
-      .eventCallback("onStart", function () {
-        // console.log(
-        //   "Gsap Context onstart",
-        //   timeline.progress(),
-        //   playerTimeRef.current
-        // );
-        // setPlay(true);
-        // onUpdate();
-      })
-      .eventCallback("onInterrupt", function () {
-        /// console.log("onInterrupt", timeline.progress());
-        timeline.pause();
-        onUpdate();
-      })
-      .eventCallback("onUpdate", function () {
-        // console.log(
-        //   "Gsap Context onupdate",
-        //   timeline.progress(),
-        //   playerTimeRef.current
-        // );
-        onUpdate();
-      })
-      // .eventCallback("onRepeat", function () {
-      //   /// console.log("onrepeat", timeline.progress());
-      //   onUpdate();
-      // })
-      // .eventCallback("onReverseComplete", function () {
-      //   /// console.log("onReverseComplete", timeline.progress());
-      //   onUpdate();
-      // })
-      // write a pause event
-      .eventCallback("onPause", function () {
-        // console.log("onPause", timeline.progress());
-        onUpdate();
-      })
-      .eventCallback("onResume", function () {
-        // console.log("onResume", timeline.progress());
-        onUpdate();
-      })
-      .eventCallback("onComplete", function () {
-        timeline.pause();
-        timeline.revert();
-        // emit event timeline complete
-        emitCustomEvent(Events.COMPLETE, { uniqueId: "timeline" });
-        console.log("Emitted events");
-        onUpdate();
-      });
+    if (tl.current) {
+      const timeline = tl.current;
+      timeline
+        .eventCallback("onStart", function () {
+          // console.log(
+          //   "Gsap Context onstart",
+          //   timeline.progress(),
+          //   playerTimeRef.current
+          // );
+          // setPlay(true);
+          // onUpdate();
+        })
+        .eventCallback("onInterrupt", function () {
+          /// console.log("onInterrupt", timeline.progress());
+          timeline.pause();
+          onUpdate();
+        })
+        .eventCallback("onUpdate", function () {
+          // console.log(
+          //   "Gsap Context onupdate",
+          //   timeline.progress(),
+          //   playerTimeRef.current
+          // );
+          onUpdate();
+        })
+        // .eventCallback("onRepeat", function () {
+        //   /// console.log("onrepeat", timeline.progress());
+        //   onUpdate();
+        // })
+        // .eventCallback("onReverseComplete", function () {
+        //   /// console.log("onReverseComplete", timeline.progress());
+        //   onUpdate();
+        // })
+        // write a pause event
+        .eventCallback("onComplete", function () {
+          timeline.pause();
+          timeline.revert();
+          // emit event timeline complete
+          emitCustomEvent(Events.COMPLETE, { uniqueId: "timeline" });
+          console.log("Emitted events");
+          onUpdate();
+        });
+    }
   }, []);
 
   const handleReset = useCallback(() => {
-    const timeline = tl.current;
-
-    timeline.revert();
+    tl.current && tl.current.revert();
   }, []);
 
   const handleRestart = useCallback(() => {
-    const timeline = tl.current;
-    timeline.restart();
+    tl.current && tl.current.restart();
     // setPlay(true);
   }, []);
 
   const handleRepeat = useCallback(() => {
-    const timeline = tl.current;
-    timeline.repeat(1);
-    timeline.restart();
+    if (tl.current) {
+      const timeline = tl.current;
+      timeline.repeat(1);
+      timeline.restart();
+    }
     // setPlay(true);
   }, []);
 
   const handleSeek = useCallback((value: number) => {
-    const timeline = tl.current;
-    timeline.seek(value);
+    if (tl.current) {
+      const timeline = tl.current;
+      timeline.seek(value);
+    }
   }, []);
 
   const handleSeekTest = useCallback(() => {
-    const timeline = tl.current;
-    timeline.seek(4);
+    if (tl.current) {
+      const timeline = tl.current;
+      timeline.seek(4);
+    }
   }, []);
 
   const handleProgressUpdate = (progress: number) => {
@@ -203,16 +211,20 @@ const GsapPixieContextProvider: React.FC<{ children: React.ReactNode }> = ({
   }, []);
 
   const handlePause = () => {
-    const timeline = tl.current;
-    timeline.pause();
-    emitCustomEvent(Events.PAUSE);
+    if (tl.current) {
+      const timeline = tl.current;
+      timeline.pause();
+      emitCustomEvent(Events.PAUSE);
+    }
   };
 
   const handlePlay = () => {
-    const timeline = tl.current;
-    // setPlay(true);
-    timeline.resume();
-    emitCustomEvent(Events.RESUME);
+    if (tl.current) {
+      const timeline = tl.current;
+      // setPlay(true);
+      timeline.resume();
+      emitCustomEvent(Events.RESUME);
+    }
   };
 
   /** Event listener dragging */

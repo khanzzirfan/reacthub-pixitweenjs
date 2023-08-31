@@ -173,6 +173,9 @@ const PixiAudioSprite: React.FC<PixiAudioSpriteProps> = (props) => {
         onUpdateParams: [audStartAt, audEndAt],
       };
 
+      if (tweenRef.current) {
+        tweenRef.current.kill();
+      }
       // gsap context for tl to revert timeline;
       ctx = gsap.context(() => {
         // @ts-ignore
@@ -192,10 +195,16 @@ const PixiAudioSprite: React.FC<PixiAudioSpriteProps> = (props) => {
           );
 
         // add tween
-        tl.current.add(tweenRef.current, audStartAt);
+        tl.current.add(tweenRef.current, startAt);
       });
     }
-    return () => ctx.revert(); // cleanup!
+    return () => {
+      if (tweenRef.current) {
+        tweenRef.current.kill();
+        gsap.killTweensOf(tweenRef.current);
+      }
+      ctx.revert(); // cleanup!
+    };
   }, [startAt, endAt, audStartAt, audEndAt]);
 
   React.useEffect(() => {
@@ -232,6 +241,12 @@ const PixiAudioSprite: React.FC<PixiAudioSpriteProps> = (props) => {
     }
     return () => {
       // app.loader.reset();
+      // reset the audio container ref
+      if (audioContainerRef.current) {
+        audioContainerRef.current.pause && audioContainerRef.current.pause();
+        audioContainerRef.current.destroy &&
+          audioContainerRef.current.destroy();
+      }
     };
   }, [uniqueId, src]);
 

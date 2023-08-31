@@ -54,6 +54,8 @@ const meta = {
     applyTransformer: { control: "boolean", description: "applyTransformer" },
     startAt: { control: "number", description: "startAt" },
     endAt: { control: "number", description: "endAt" },
+    frameStartAt: { control: "number", description: "frameStartAt" },
+    frameEndAt: { control: "number", description: "frameEndAt" },
     initialAlpha: {
       control: "number",
       min: 0,
@@ -118,6 +120,8 @@ export const Normal: Story = {
     applyTransformer: false,
     startAt: 0,
     endAt: 3,
+    frameStartAt: 0,
+    frameEndAt: 3,
     transformation: {
       x: 200,
       y: 200,
@@ -149,6 +153,8 @@ export const FadeIn: Story = {
     applyTransformer: false,
     startAt: 0,
     endAt: 2.5,
+    frameStartAt: 0,
+    frameEndAt: 2.5,
     transformation: {
       x: 200,
       y: 200,
@@ -182,6 +188,8 @@ export const Filters: Story = {
     applyTransformer: false,
     startAt: 0,
     endAt: 4,
+    frameStartAt: 0,
+    frameEndAt: 4,
     transformation: {
       x: 200,
       y: 200,
@@ -220,6 +228,41 @@ export const SplitPosition: Story = {
     applyTransformer: false,
     startAt: 0,
     endAt: 3,
+    frameStartAt: 0,
+    frameEndAt: 3,
+    transformation: {
+      x: 200,
+      y: 200,
+      width: 200,
+      height: 200,
+      anchor: 0.5,
+      rotation: 0,
+      alpha: 1,
+      scale: 1,
+      tint: 0xffffff,
+      blendMode: 0,
+      colorCorrection: {},
+    },
+    initialAlpha: 1,
+  },
+};
+
+export const SplitStartPos: Story = {
+  render: (args: any) => (
+    <AppStateContextProvider {...args}>
+      <PixiGifSprite {...args} />
+    </AppStateContextProvider>
+  ),
+  args: {
+    uniqueId: "suryaGify001", // uniqueId of the sprite
+    src: "https://media.giphy.com/media/5VKbvrjxpVJCM/giphy.gif",
+    locked: false,
+    loop: false,
+    applyTransformer: false,
+    startAt: 5,
+    endAt: 8,
+    frameStartAt: 0,
+    frameEndAt: 3,
     transformation: {
       x: 200,
       y: 200,
