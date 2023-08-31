@@ -90,7 +90,9 @@ const GsapPixieContextProvider: React.FC<{ children: React.ReactNode }> = ({
     // if (playerTimeRef.current) {
     //   elapsedTime = now - playerTimeRef.current;
     // }
-    //  console.log(`elapseTime :${elapsedTime} and frame: ${frameNumber}`);
+    // console.log(
+    //   `elapseTime :${elapsedTime} now:${now} playerTime:${playerTimeRef.current}`
+    // );
     //time = now;
     playerTimeRef.current = now;
   }, []);
@@ -104,7 +106,11 @@ const GsapPixieContextProvider: React.FC<{ children: React.ReactNode }> = ({
     const timeline = tl.current;
     timeline
       .eventCallback("onStart", function () {
-        // console.log("onstart", timeline.progress());
+        // console.log(
+        //   "Gsap Context onstart",
+        //   timeline.progress(),
+        //   playerTimeRef.current
+        // );
         // setPlay(true);
         // onUpdate();
       })
@@ -114,7 +120,11 @@ const GsapPixieContextProvider: React.FC<{ children: React.ReactNode }> = ({
         onUpdate();
       })
       .eventCallback("onUpdate", function () {
-        /// console.log("onupdate", timeline.progress());
+        // console.log(
+        //   "Gsap Context onupdate",
+        //   timeline.progress(),
+        //   playerTimeRef.current
+        // );
         onUpdate();
       })
       // .eventCallback("onRepeat", function () {
@@ -175,9 +185,9 @@ const GsapPixieContextProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const handleProgressUpdate = (progress: number) => {
     if (progress > 0) {
-      const timeline = tl.current;
-      timeline.current.progress(progress);
-      timeline.current.pause();
+      // const timeline = tl.current;
+      // timeline.current.progress(progress);
+      // timeline.current.pause();
     }
   };
 

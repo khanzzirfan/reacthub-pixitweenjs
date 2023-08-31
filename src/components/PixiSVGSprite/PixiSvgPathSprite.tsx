@@ -9,7 +9,10 @@ import { SVG } from "pixi-svg";
 import svgpath from "svgpath";
 // @ts-ignore
 import isEmpty from "lodash/isEmpty";
-import { PixiBaseSpriteProps } from "../../types/BaseProps";
+import {
+  PixiBaseSpriteProps,
+  ForwardedRefResponse,
+} from "../../types/BaseProps";
 import AbstractContainer from "../../hocs/AbstractContainer";
 import { Effects } from "../../types/Effects";
 
@@ -71,7 +74,10 @@ interface PixiSvgPathSpriteProps extends PixiBaseSpriteProps {
   onAnchorTransformationEnd?: (endData: any) => void;
 }
 
-const PixiSvgPathSprite: React.FC<PixiSvgPathSpriteProps> = (props) => {
+const PixiSvgPathSprite = React.forwardRef<
+  ForwardedRefResponse | null,
+  PixiSvgPathSpriteProps
+>((props, ref) => {
   //// State
   const [texture, setTexture] = React.useState<any>(null);
 
@@ -125,7 +131,7 @@ const PixiSvgPathSprite: React.FC<PixiSvgPathSpriteProps> = (props) => {
   }, [app, path, stroke, strokeWidth, hexColor, fill]);
 
   return (
-    <AbstractContainer {...props}>
+    <AbstractContainer {...props} ref={ref}>
       <Container ref={parentNode}>
         <Container ref={imgGroupRef}>
           {texture && (
@@ -147,6 +153,6 @@ const PixiSvgPathSprite: React.FC<PixiSvgPathSpriteProps> = (props) => {
       </Container>
     </AbstractContainer>
   );
-};
+});
 
 export default PixiSvgPathSprite;

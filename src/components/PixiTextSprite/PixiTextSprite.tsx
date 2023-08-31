@@ -10,7 +10,10 @@ import isEmpty from "lodash/isEmpty";
 import isEqual from "lodash/isEqual";
 // @ts-ignore
 import pick from "lodash/pick";
-import { PixiBaseSpriteProps } from "../../types/BaseProps";
+import {
+  PixiBaseSpriteProps,
+  ForwardedRefResponse,
+} from "../../types/BaseProps";
 import AbstractContainer from "../../hocs/AbstractContainer";
 import { Effects } from "../../types/Effects";
 
@@ -95,7 +98,10 @@ interface PixiTextSpriteProps extends PixiBaseSpriteProps {
   onAnchorTransformationEnd?: (endData: any) => void;
 }
 
-const PixiTextSprite: React.FC<PixiTextSpriteProps> = (props) => {
+const PixiTextSprite = React.forwardRef<
+  ForwardedRefResponse | null,
+  PixiTextSpriteProps
+>((props, ref) => {
   //// State
   const [isEditing, setIsEditing] = useState(false);
 
@@ -122,10 +128,8 @@ const PixiTextSprite: React.FC<PixiTextSpriteProps> = (props) => {
   } = props;
 
   const {
-    scale = [1, 1],
     x,
     y,
-    rotation = 1,
     /// font
     fontFamily = "Arial",
     fontWeight = "normal",
@@ -315,7 +319,7 @@ const PixiTextSprite: React.FC<PixiTextSpriteProps> = (props) => {
   }, [x, y, isEditing]);
 
   return (
-    <AbstractContainer {...props}>
+    <AbstractContainer {...props} ref={ref}>
       <Container ref={parentNode}>
         {/* @ts-ignore */}
         {isEditing && <Container ref={textInputGroupRef}></Container>}
@@ -325,7 +329,6 @@ const PixiTextSprite: React.FC<PixiTextSpriteProps> = (props) => {
             style={pixiStyles}
             x={x}
             y={y}
-            rotation={rotation}
             anchor={0.5}
             text={text}
             {...(!isEditing &&
@@ -335,13 +338,12 @@ const PixiTextSprite: React.FC<PixiTextSpriteProps> = (props) => {
                 pointerdown: pointerdown,
               })}
             ref={textRef}
-            scale={scale}
           />
         </Container>
       </Container>
     </AbstractContainer>
   );
-};
+});
 
 export default PixiTextSprite;
 

@@ -117,7 +117,7 @@ export const Normal: Story = {
     loop: false,
     applyTransformer: false,
     startAt: 0,
-    endAt: 4,
+    endAt: 3,
     transformation: {
       x: 200,
       y: 200,
@@ -148,7 +148,7 @@ export const FadeIn: Story = {
     loop: false,
     applyTransformer: false,
     startAt: 0,
-    endAt: 4,
+    endAt: 2.5,
     transformation: {
       x: 200,
       y: 200,
@@ -200,6 +200,38 @@ export const Filters: Story = {
         exposure: 2,
         blurRadius: 1,
       },
+    },
+    initialAlpha: 1,
+  },
+};
+
+// More on writing stories with args: https://storybook.js.org/docs/react/writing-stories/args
+export const SplitPosition: Story = {
+  render: (args: any) => (
+    <AppStateContextProvider {...args}>
+      <PixiGifSprite {...args} />
+    </AppStateContextProvider>
+  ),
+  args: {
+    uniqueId: "suryaGify001", // uniqueId of the sprite
+    src: "https://media.giphy.com/media/5VKbvrjxpVJCM/giphy.gif",
+    locked: false,
+    loop: false,
+    applyTransformer: false,
+    startAt: 0,
+    endAt: 3,
+    transformation: {
+      x: 200,
+      y: 200,
+      width: 200,
+      height: 200,
+      anchor: 0.5,
+      rotation: 0,
+      alpha: 1,
+      scale: 1,
+      tint: 0xffffff,
+      blendMode: 0,
+      colorCorrection: {},
     },
     initialAlpha: 1,
   },

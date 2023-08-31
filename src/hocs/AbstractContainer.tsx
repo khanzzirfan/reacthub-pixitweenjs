@@ -18,15 +18,19 @@ import isEmpty from "lodash/isEmpty";
 /** CYAN Filters */
 const CYAN = [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0];
 
+interface AbstractContainerProps extends PixiBaseSpriteProps {
+  ignoreTlForVideo?: boolean;
+}
+
 const AbstractContainer = React.forwardRef<
   ForwardedRefResponse | null,
-  PixiBaseSpriteProps
+  AbstractContainerProps
 >((props, ref) => {
   //// State
   const [isMounted, setIsMounted] = React.useState(false);
   const [isTransformerDragging, setIsTransformerDragging] = useState(false);
   const [isMouseOverTransformer, setIsMouseOverTransformer] = useState(false);
-
+  const [pixiAlpha, setPixiAlpha] = useState<number>(props.initialAlpha);
   //// Refs
   const containerRef = useRef<PIXI.Container>(null);
   const parentNode = useRef<PIXI.Container>(null);
@@ -43,15 +47,24 @@ const AbstractContainer = React.forwardRef<
     startAt,
     endAt,
     initialAlpha,
-    transformation: { x, y, width, height, colorCorrection, animation, effect },
+    transformation: {
+      x,
+      y,
+      width,
+      height,
+      scale = [1, 1],
+      rotation = 0,
+      colorCorrection,
+      animation,
+      effect,
+    },
     applyTransformer,
     disabled,
+    ignoreTlForVideo,
     pointerdown,
     pointerout,
     pointerover,
   } = props;
-
-  console.log("all abstract props", props);
 
   // color corrections
   const {
@@ -90,52 +103,47 @@ const AbstractContainer = React.forwardRef<
     }
   }, []);
 
-  const gsapOnAlphaStart = (params: { alpha: number }) => {
-    alphaRef.current = params.alpha;
-  };
-
-  const gsapOnAlphaComplete = (params: { alpha: number }) => {
-    alphaRef.current = params.alpha;
+  const gsapOnAlphaComplete = () => {
+    console.log("gsapOnAlphaComplete complete");
   };
 
   const gsapOnAlphaReverseComplete = () => {
     console.log("reverse complete");
     alphaRef.current = initialAlpha;
+    setPixiAlpha(initialAlpha);
+  };
+
+  const gsapResetAlpha = () => {
+    console.log("global time complete", initialAlpha);
+    alphaRef.current = initialAlpha;
+    setPixiAlpha(initialAlpha);
   };
 
   React.useEffect(() => {
     let ctx = gsap.context(() => {});
     if (containerRef.current && tl.current) {
       const data = {
+        alpha: 1,
         duration: Number(endAt) - Number(startAt),
-      };
-
-      const alphaStartParams = {
-        onStart: gsapOnAlphaStart,
-        onReverseComplete: gsapOnAlphaReverseComplete,
-        onStartParams: [{ alpha: 1 }],
-      };
-
-      const alphaCompleteParams = {
-        onComplete: gsapOnAlphaComplete,
-        onCompleteParams: [{ alpha: 0 }],
       };
 
       const ease = getAnimByName(animation || "None");
       ctx = gsap.context(() => {
         // initial alpha and duration of timeline setup
         tl.current
+          .to(containerRef.current, { alpha: 1, duration: 0.1 }, startAt)
+          ///.from(containerRef.current, { ...data }, startAt)
           .to(
             containerRef.current,
-            { alpha: 1, duration: 0.1, ...alphaStartParams },
-            startAt
-          )
-          .from(containerRef.current, { ...data }, startAt)
-          .to(
-            containerRef.current,
-            { alpha: 0, duration: 0.1, ...alphaCompleteParams },
+            { alpha: 0, duration: 0.1, onComplete: gsapOnAlphaComplete },
             Number(endAt) - 0.09
-          );
+          ) // reset alpha on timeline reverse or complete.
+          .eventCallback("onComplete", gsapResetAlpha, [])
+          .eventCallback("onReverseComplete", gsapOnAlphaReverseComplete, []);
+
+        if (!ignoreTlForVideo) {
+          tl.current.from(containerRef.current, { ...data }, startAt);
+        }
 
         // add ease animation effects
         if (!isEmpty(ease.from)) {
@@ -149,12 +157,11 @@ const AbstractContainer = React.forwardRef<
             ease.fromTo?.to,
             startAt
           );
-        } else {
         }
       });
     }
     return () => ctx.revert(); // cleanup!
-  }, [animation, startAt, endAt]);
+  }, [animation, startAt, endAt, ignoreTlForVideo]);
 
   /** handle on tranformer onchange */
   const handleOnTransformChange = React.useCallback(() => {
@@ -183,15 +190,18 @@ const AbstractContainer = React.forwardRef<
   const isFilterOrEffectEnabled =
     colorCorrection?.enabled || (effect && effect !== Effects.Normal);
 
+  console.log("container alpha update", alphaRef.current, pixiAlpha);
   return (
     <Container ref={parentNode}>
       <Container
         ref={containerRef}
-        alpha={alphaRef.current}
+        alpha={alphaRef.current || pixiAlpha}
         position={[x, y]}
         pivot={[x, y]}
         width={width}
         height={height}
+        scale={scale}
+        rotation={rotation}
         {...(!disabled &&
           !isTransformerDragging && {
             interactive: true,

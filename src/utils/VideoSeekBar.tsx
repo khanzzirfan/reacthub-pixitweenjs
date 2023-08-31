@@ -15,11 +15,6 @@ import {
 } from "../providers/GsapPixieContextProvider";
 import { emitCustomEvent } from "../events";
 
-import { gsap } from "gsap";
-import { Draggable } from "gsap/Draggable";
-
-gsap.registerPlugin(Draggable);
-
 export const VideoSeekBar: React.FC = () => {
   const rafRef = React.useRef<number>();
   const sliderThumbRef = React.useRef<HTMLDivElement>(null);
@@ -34,7 +29,6 @@ export const VideoSeekBar: React.FC = () => {
 
   /// state
   const [time, setTime] = React.useState<number>(0);
-  const totalVideoSeconds = 20;
 
   const animate = () => {
     /// console.log("totalDuration", timeline.current.totalDuration());
@@ -50,20 +44,9 @@ export const VideoSeekBar: React.FC = () => {
   }, []); // Make sure the effect runs only once
 
   const handleOnSliderChange = (value: number) => {
-    console.log("onslider change", value);
-    const nTotSeconds =
-      totalVideoSeconds && totalVideoSeconds > 0 ? totalVideoSeconds : 1;
-    const progress = value / nTotSeconds;
-    console.log("progressbar", value, progress);
-
     playerTimeRef.current = value;
-    // handleSeek(value);
-    // // @ts-ignore
-    timeline && timeline.current.progress(progress);
-    // timeline && timeline.current.pause();
-    // gsap.set(sliderProgressRef.current!, {
-    //   scaleX: progress,
-    // });
+    timeline && timeline.current.time(value);
+    ///timeline && timeline.current.progress(progress);
   };
 
   /** on slider start

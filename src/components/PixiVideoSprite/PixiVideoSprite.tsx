@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef } from "react";
 // @ts-ignore
 import PropTypes from "prop-types";
 import { useCustomEventListener } from "../../events";
@@ -7,18 +7,18 @@ import {
   GsapPixieContext,
   Events,
 } from "../../providers/GsapPixieContextProvider";
-import { Sprite, Container, withFilters } from "@pixi/react";
-import { AdjustmentFilter } from "@pixi/filter-adjustment";
+import { Sprite, Container } from "@pixi/react";
 import * as PIXI from "pixi.js";
 import gsap from "gsap";
-import PixiTransformer from "../PixiTransformer/PixiTransformer";
-
+import AbstractContainer from "../../hocs/AbstractContainer";
 // @ts-ignore
 import isEmpty from "lodash/isEmpty";
-import { getAnimByName } from "../../utils/GsapAnim";
-import { TransformationEnd } from "../../types/transformation";
+import {
+  PixiBaseSpriteProps,
+  ForwardedRefResponse,
+} from "../../types/BaseProps";
 
-type PixiVideoSpriteProps = {
+interface PixiVideoSpriteProps extends PixiBaseSpriteProps {
   uniqueId: string;
   src: string;
   startAt: number;
@@ -28,40 +28,6 @@ type PixiVideoSpriteProps = {
   mute: boolean;
   locked: boolean;
   initialAlpha: number;
-  transformation: {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-    anchor: number;
-    rotation?: number;
-    alpha?: number;
-    scale?: number | [number, number];
-    tint?: number;
-    blendMode?: number;
-    animation?: string;
-    colorCorrection?: {
-      enabled?: boolean;
-      temperature?: number;
-      hue?: number;
-      contrast?: number;
-      saturation?: number;
-      exposure?: number;
-      reset?: boolean;
-      sharpness?: number;
-      value?: number;
-      levels?: number;
-      luminance?: number;
-      enhance?: number;
-      blurRadius?: number;
-      red?: number;
-      green?: number;
-      blue?: number;
-      alpha?: number;
-      scaleInput?: number;
-    };
-    effect?: string;
-  };
   pointerdown?: () => void;
   pointerup?: () => void;
   mousedown?: () => void;
@@ -71,7 +37,7 @@ type PixiVideoSpriteProps = {
   mouseout?: () => void;
   applyTransformer?: boolean;
   onAnchorTransformationEnd?: (endData: any) => void;
-};
+}
 
 interface VideoState {
   isPlaying: boolean;
@@ -82,16 +48,8 @@ interface VideoState {
   loaded: boolean;
   size: { width: number; height: number };
   isDragging: boolean;
+  timeDiff: number;
 }
-
-const Filters = withFilters(Container, {
-  blur: PIXI.filters.BlurFilter,
-  adjust: AdjustmentFilter,
-  matrix: PIXI.filters.ColorMatrixFilter,
-});
-
-/** CYAN Filters */
-const CYAN = [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0];
 
 const initialState: VideoState = {
   isPlaying: false,
@@ -102,37 +60,32 @@ const initialState: VideoState = {
   loaded: false,
   size: { width: 50, height: 50 },
   isDragging: false,
+  timeDiff: 0,
 };
 
-const PixiVideoSprite: React.FC<PixiVideoSpriteProps> = (props) => {
+const PixiVideoSprite = React.forwardRef<
+  ForwardedRefResponse | null,
+  PixiVideoSpriteProps
+>((props, ref) => {
   //// State
-  const [isMounted, setIsMounted] = React.useState(false);
+  const [, setIsMounted] = React.useState(false);
   /// const [isTransformerDragging, setIsTransformerDragging] = useState(false);
-  const [, setIsMouseOverTransformer] = useState(false);
   const [, setVideoState] = React.useState({
     isWaiting: false,
     isStalled: false,
   });
   const [videoTexture, setVideoTexture] =
     React.useState<PIXI.Texture<PIXI.Resource>>();
-  const [isDragging, setIsDragging] = useState(false);
 
   //// Refs
   const imageRef = useRef<PIXI.Sprite>(null);
   const containerRef = useRef<PIXI.Container>(null);
-  const parentNode = useRef<PIXI.Container>(null);
-  const imgGroupRef = useRef<PIXI.Container>(null);
-  const transformerRef = useRef<PIXI.Container>(null);
   const videoElement = useRef<HTMLVideoElement>(null);
   const videoStateRef = useRef<VideoState>(initialState);
-  const alphaRef = useRef<number>(props.initialAlpha);
+  const tweenRef = useRef<gsap.core.Tween>();
 
   //// Context
-  const {
-    tl,
-    playerTimeRef,
-    isDragging: gsapDragging,
-  } = useContext(GsapPixieContext);
+  const { tl, isDragging: gsapDragging } = useContext(GsapPixieContext);
 
   // console log draggging
   /// 1001
@@ -140,69 +93,13 @@ const PixiVideoSprite: React.FC<PixiVideoSpriteProps> = (props) => {
   const {
     uniqueId,
     mute = false,
-    locked = false,
     src,
-    startAt,
-    endAt,
     frameStartAt,
     frameEndAt,
-    transformation: {
-      x,
-      y,
-      width,
-      height,
-      scale,
-      rotation,
-      animation,
-      colorCorrection,
-      effect,
-    },
-    pointerdown,
-    pointerup,
-    mousedown,
-    mouseup,
-    pointerover,
-    mouseover,
-    mouseout,
-    applyTransformer,
-    onAnchorTransformationEnd,
+    transformation: { x, y, width, height, animation },
   } = props;
 
   const videoUrl = src || "";
-
-  // color corrections
-  const {
-    contrast = 1,
-    saturation = 1,
-    exposure = 1,
-    blurRadius = 0,
-    alpha = 1,
-  } = colorCorrection || {};
-
-  /** adjustment filter */
-  const adjustments = {
-    brightness: exposure,
-    contrast,
-    saturation,
-    alpha,
-  };
-
-  /** handle on tranformer onchange */
-  const handleOnTransformChange = React.useCallback(() => {
-    setIsDragging(true);
-  }, []);
-
-  // transformer to handle sprite transformation
-  const handleOnTransformEnd = React.useCallback(
-    (endData: TransformationEnd) => {
-      console.log("changeEnd", endData);
-      if (onAnchorTransformationEnd) {
-        console.log("running onAnchorTransformationEnd");
-        onAnchorTransformationEnd(endData);
-      }
-    },
-    []
-  );
 
   /**Adding this alternative workaround to work with mov/mk4 video types */
   const videoSrcElement = React.useMemo(() => {
@@ -210,14 +107,13 @@ const PixiVideoSprite: React.FC<PixiVideoSpriteProps> = (props) => {
     element.src = src;
     element.crossOrigin = "Anonymus";
     element.autoplay = false;
-    element.currentTime = 0.0001;
+    element.currentTime = frameStartAt;
     return element;
-  }, [src]);
+  }, [src, frameStartAt]);
 
   /** Adding custom event listners */
   /** Event Listeneres */
-  useCustomEventListener(Events.PAUSE, (data) => {
-    console.log("pause event", data);
+  useCustomEventListener(Events.PAUSE, () => {
     if (videoElement.current) {
       const vid = videoElement.current;
       const isVidPlaying =
@@ -232,7 +128,7 @@ const PixiVideoSprite: React.FC<PixiVideoSpriteProps> = (props) => {
 
   // /** stop video playing when gsapDragging is true */
   React.useEffect(() => {
-    console.log("current", videoElement.current, gsapDragging);
+    // console.log("current", videoElement.current, gsapDragging);
     if (videoElement.current) {
       if (gsapDragging) {
         videoElement.current.pause();
@@ -245,19 +141,15 @@ const PixiVideoSprite: React.FC<PixiVideoSpriteProps> = (props) => {
   }, [gsapDragging]);
 
   /** Gsap Start and Stop Events */
-  const gsapOnStart = (startAt: number) => {
+  const gsapOnStart = (frameStartAt: number) => {
+    /// console.log("startAt", frameStartAt, frameEndAt, playerTimeRef.current);
     if (videoElement.current) {
-      console.log("video gsapOnStart", playerTimeRef.current, gsapDragging);
-      const roundedPlayerTime = Number(Math.round(playerTimeRef.current));
-
+      // console.log("video gsapOnStart", playerTimeRef.current, gsapDragging);
+      // const roundedPlayerTime = Number(Math.round(playerTimeRef.current));
       // check the start and end times are between the playerTimeRef.current to start video;
-      if (
-        roundedPlayerTime >= startAt &&
-        roundedPlayerTime <= endAt &&
-        !gsapDragging
-      ) {
-        videoElement.current.currentTime =
-          Number(frameStartAt) || Number(startAt);
+      videoElement.current.currentTime = Number(frameStartAt);
+      if (!gsapDragging) {
+        videoElement.current.currentTime = Number(frameStartAt);
         videoElement.current.play();
         videoStateRef.current.isPlaying = true;
       }
@@ -265,7 +157,7 @@ const PixiVideoSprite: React.FC<PixiVideoSpriteProps> = (props) => {
   };
 
   const gsapOnComplete = () => {
-    console.log("onComplete triggered");
+    // console.log("onComplete triggered");
     if (videoElement.current) {
       const vid = videoElement.current;
       const isVidPlaying =
@@ -284,14 +176,20 @@ const PixiVideoSprite: React.FC<PixiVideoSpriteProps> = (props) => {
   };
 
   const onUpdate = () => {
-    if (videoElement.current) {
+    // console.log(
+    //   "gsap video onUpdate 10001",
+    //   playerTimeRef.current,
+    //   tweenRef.current.time()
+    // );
+    if (videoElement.current && tweenRef.current) {
+      const currentTweenTime = frameStartAt + tweenRef.current?.time();
       // console.log(
       //   "currenttime vs player reftime",
       //   videoElement.current.currentTime,
       //   playerTimeRef.current
       // );
       const absDiff = Math.abs(
-        videoElement.current.currentTime - playerTimeRef.current
+        videoElement.current.currentTime - currentTweenTime
       );
 
       const vid = videoElement.current;
@@ -302,13 +200,13 @@ const PixiVideoSprite: React.FC<PixiVideoSpriteProps> = (props) => {
         vid.readyState > vid.HAVE_CURRENT_DATA;
 
       if (videoStateRef.current.isDragging) {
-        console.log("video updating", playerTimeRef.current);
-        videoElement.current.currentTime = playerTimeRef.current;
+        // console.log("video updating 1002", playerTimeRef.current);
+        videoElement.current.currentTime = currentTweenTime;
         videoElement.current.play();
         setTimeout(() => {
           videoStateRef.current.isPlaying = false;
           if (videoElement.current) videoElement.current.pause();
-        }, 55);
+        }, 300);
         videoStateRef.current.isPlaying = false;
       } else if (!videoStateRef.current.isPlaying) {
         // if (!isVidPlaying) videoElement.current.play();
@@ -325,75 +223,32 @@ const PixiVideoSprite: React.FC<PixiVideoSpriteProps> = (props) => {
     }
   };
 
-  const gsapOnAlphaStart = (params: { alpha: number }) => {
-    alphaRef.current = params.alpha;
-  };
-
-  const gsapOnAlphaComplete = (params: { alpha: number }) => {
-    alphaRef.current = params.alpha;
-  };
-
   useEffect(() => {
     let ctx = gsap.context(() => {});
     if (containerRef.current && tl.current) {
       const data = {
-        duration: Number(endAt) - Number(startAt),
+        duration: Number(frameEndAt) - Number(frameStartAt),
         onStart: gsapOnStart,
         onComplete: gsapOnComplete,
-        onStartParams: [startAt],
+        onStartParams: [frameStartAt, frameEndAt],
         onCompleteParams: [],
         onInterrupt: onInterrupt,
         onUpdate: onUpdate,
-        onUpdateParams: [],
+        onUpdateParams: [frameStartAt, frameEndAt],
       };
-
-      const alphaStartParams = {
-        onStart: gsapOnAlphaStart,
-        onStartParams: [{ alpha: 1 }],
-      };
-
-      const alphaCompleteParams = {
-        onComplete: gsapOnAlphaComplete,
-        onCompleteParams: [{ alpha: 0 }],
-      };
-
-      const ease = getAnimByName(animation || "None");
 
       ctx = gsap.context(() => {
-        tl.current
-          .to(
-            containerRef.current,
-            { alpha: 1, duration: 0.01, ...alphaStartParams },
-            startAt
-          )
-          .from(containerRef.current, { ...data }, startAt)
-          .to(
-            containerRef.current,
-            { alpha: 0, duration: 0.1, ...alphaCompleteParams },
-            Number(endAt) - 0.09
-          );
-
-        if (!isEmpty(ease.from)) {
-          tl.current.from(containerRef.current, { ...ease.from }, startAt);
-        } else if (!isEmpty(ease.to)) {
-          tl.current.to(
-            containerRef.current,
-            { alpha: 1, duration: 0.2, ...ease.to },
-            startAt
-          );
-        } else if (!isEmpty(ease.fromTo)) {
-          tl.current.fromTo(
-            containerRef.current,
-            ease.fromTo?.from,
-            ease.fromTo?.to,
-            startAt
-          );
-        } else {
-        }
+        tweenRef.current = gsap.from(
+          containerRef.current,
+          // @ts-ignore
+          data,
+          frameStartAt
+        );
+        tl.current.add(tweenRef.current, frameStartAt);
       });
     }
     return () => ctx.revert(); // cleanup!
-  }, [animation, startAt, endAt]);
+  }, [animation, frameStartAt, frameEndAt]);
 
   React.useEffect(() => {
     if (containerRef.current) {
@@ -416,12 +271,12 @@ const PixiVideoSprite: React.FC<PixiVideoSpriteProps> = (props) => {
         !vid.paused &&
         !vid.ended &&
         vid.readyState > vid.HAVE_CURRENT_DATA;
-      if (isVidPlaying && (isDragging || gsapDragging)) {
+      if (isVidPlaying && gsapDragging) {
         videoElement.current.pause();
         videoStateRef.current.isPlaying = false;
       }
     }
-  }, [isDragging, gsapDragging]);
+  }, [gsapDragging]);
 
   // load // load meta // load seek through
   React.useEffect(() => {
@@ -488,8 +343,7 @@ const PixiVideoSprite: React.FC<PixiVideoSpriteProps> = (props) => {
       if (!texture) return;
       // texture.baseTexture.resource.source.currentSrc = urlWithTimestamp;
       setVideoTexture(texture);
-      // @ts-ignore
-      console.log(texture.baseTexture.resource.source);
+
       // @ts-ignore
       videoElement.current = texture.baseTexture.resource.source;
       // @ts-ignore
@@ -507,104 +361,39 @@ const PixiVideoSprite: React.FC<PixiVideoSpriteProps> = (props) => {
     });
 
     return () => {
-      // @ts-ignore
-      videoElement.current.removeEventListener("loadedmetadata", onload);
-      // @ts-ignore
-      videoElement.current.removeEventListener("ended", onEnd);
-      // @ts-ignore
-      videoElement.current.removeEventListener("loadstart", onLoadStart);
-      // @ts-ignore
-      videoElement.current.removeEventListener(
-        "canplaythrough",
-        onCanPlayThrough
-      );
-      // @ts-ignore
-      videoElement.current.removeEventListener("stalled", onStalled);
+      if (videoElement.current) {
+        videoElement.current.removeEventListener("loadedmetadata", onload);
+        videoElement.current.removeEventListener("ended", onEnd);
+        videoElement.current.removeEventListener("loadstart", onLoadStart);
+        videoElement.current.removeEventListener(
+          "canplaythrough",
+          onCanPlayThrough
+        );
+        videoElement.current.removeEventListener("stalled", onStalled);
+      }
     };
     // create a new Sprite using the video texture (yes it's that easy)
     // const videoSprite = new PIXI.Sprite(texture);
   }, [videoUrl, uniqueId, frameStartAt, frameEndAt, videoSrcElement]);
 
   return (
-    // @ts-ignore
-    <Container ref={parentNode}>
+    <AbstractContainer {...props} ref={ref} ignoreTlForVideo={true}>
       {/* @ts-ignore */}
-      {/* @ts-ignore */}
-      <Container
-        ref={containerRef}
-        alpha={alphaRef.current}
-        position={[x, y]}
-        pivot={[x, y]}
-        width={width}
-        height={height}
-      >
-        <Filters
-          scale={1}
-          blur={{ blur: blurRadius, quality: 4 }}
-          adjust={adjustments}
-          apply={({ matrix }: { matrix: any }) => {
-            if (effect === "BlackAndWhite") {
-              matrix.desaturate();
-            } else if (effect === "Sepia") {
-              matrix.sepia();
-            } else if (effect === "RetroVintage") {
-              matrix.negative();
-            } else if (effect === "NightVision") {
-              matrix.negative();
-            } else if (effect === "Normal") {
-              matrix.reset();
-            }
-          }}
-          matrix={{
-            enabled: true,
-            // @ts-ignore
-            matrix: CYAN,
-          }}
-        >
-          {/* @ts-ignore */}
-          <Container ref={imgGroupRef}>
-            {videoTexture && (
-              <Sprite
-                texture={videoTexture}
-                width={width}
-                height={height}
-                anchor={0.5}
-                x={x}
-                y={y}
-                {...(!locked &&
-                  !isDragging && {
-                    interactive: true,
-                    buttonMode: true,
-                    pointerdown: pointerdown,
-                    pointerover: pointerover,
-                    pointerout: mouseout,
-                    mousedown: mousedown,
-                    mouseover: mouseover,
-                    mouseout: mouseout,
-                    mouseup: mouseup,
-                    pointerup: pointerup,
-                  })}
-                ref={imageRef}
-                scale={scale}
-                rotation={rotation}
-              />
-            )}
-          </Container>
-        </Filters>
+      <Container ref={containerRef}>
+        {videoTexture && (
+          <Sprite
+            texture={videoTexture}
+            width={width}
+            height={height}
+            anchor={0.5}
+            x={x}
+            y={y}
+            ref={imageRef}
+          />
+        )}
       </Container>
-      {applyTransformer && (
-        <PixiTransformer
-          pixiTransformerRef={transformerRef}
-          imageRef={containerRef}
-          isMounted={isMounted}
-          transformCommit={handleOnTransformEnd}
-          transformChange={handleOnTransformChange}
-          mouseoverEvent={setIsMouseOverTransformer}
-          uniqueId={uniqueId}
-        />
-      )}
-    </Container>
+    </AbstractContainer>
   );
-};
+});
 
 export default PixiVideoSprite;

@@ -88,7 +88,7 @@ const PixiTransformer = ({
     const y = imageRef.current.y;
     const width = imageRef.current.width;
     const height = imageRef.current.height;
-    const rotate = imageRef.current.rotation;
+    const rotation = imageRef.current.rotation;
     const scale: [number, number] = [
       imageRef.current.scale.x,
       imageRef.current.scale.y,
@@ -101,7 +101,7 @@ const PixiTransformer = ({
           y: Math.round(y),
           width: Math.round(Math.max(5, width)),
           height: Math.round(Math.max(5, height)),
-          rotate: Math.round(rotate),
+          rotation: rotation,
           scale: scale,
         },
       });
@@ -148,14 +148,14 @@ const PixiTransformer = ({
       boxRotationEnabled={true}
       centeredScaling={true}
       boxScalingEnabled={true}
-      wireframeStyle={{ thickness: 1, color: anchorFill }}
+      wireframeStyle={{ thickness: 2, color: anchorFill }}
       lockAspectRatio={true}
       scaleEnabled={true}
       handleStyle={{
         // color: colorYellow,
         outlineColor: colorYellow,
         shape: "circle",
-        radius: 9,
+        radius: 10,
       }}
       transformchange={handleOnTransformChange}
       transformcommit={handleOnTransformCommit}

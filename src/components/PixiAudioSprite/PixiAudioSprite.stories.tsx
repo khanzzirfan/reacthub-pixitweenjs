@@ -19,6 +19,16 @@ const meta = {
     },
     startAt: { control: "number", description: "startAt" },
     endAt: { control: "number", description: "endAt" },
+    audioStartAt: {
+      control: "number",
+      description:
+        "audio start at seconds if different from the sequence play startAt time",
+    },
+    audioEndAt: {
+      control: "number",
+      description:
+        "audio ends at seconds if different from the sequence play endAt time",
+    },
     mute: { control: "boolean", description: "mute" },
     speed: { control: "number", description: "speed" },
   },
@@ -39,6 +49,8 @@ export const Normal: Story = {
     src: "https://eyecastvideoeditorfiles.s3.ap-southeast-2.amazonaws.com/public%2Firfan%40trolio.com%2F6472d56e805c3bffc3cded33%2Fvideos%2F8Qq3DKrGnQ%2Fpiano2-CoolEdit.mp3",
     startAt: 0,
     endAt: 5,
+    audioStartAt: 0,
+    audioEndAt: 5,
     mute: false,
     speed: 1,
   },
@@ -56,6 +68,8 @@ export const Speech: Story = {
     src: "https://eyecastvideoeditorfiles.s3.ap-southeast-2.amazonaws.com/public%2Firfan%40trolio.com%2F6472d56e805c3bffc3cded33%2Fvideos%2F7M7ixuYvwQ%2Fsingle-speaker-speech-audio.mp3",
     startAt: 0,
     endAt: 5,
+    audioStartAt: 0,
+    audioEndAt: 5,
     mute: false,
     speed: 1,
   },
@@ -73,6 +87,25 @@ export const Customized: Story = {
     startAt: 0,
     endAt: 5,
     mute: true,
+    speed: 1,
+  },
+};
+
+// More on writing stories with args: https://storybook.js.org/docs/react/writing-stories/args
+export const SplitPosition: Story = {
+  render: (args: any) => (
+    <AppStateContextProvider {...args}>
+      <PixiAudioSprite {...args} />
+    </AppStateContextProvider>
+  ),
+  args: {
+    uniqueId: "audio001", // uniqueId of the sprite
+    src: "https://eyecastvideoeditorfiles.s3.ap-southeast-2.amazonaws.com/public%2Firfan%40trolio.com%2F6472d56e805c3bffc3cded33%2Fvideos%2F7M7ixuYvwQ%2Fsingle-speaker-speech-audio.mp3",
+    startAt: 0,
+    endAt: 9,
+    audioStartAt: 4,
+    audioEndAt: 8,
+    mute: false,
     speed: 1,
   },
 };
