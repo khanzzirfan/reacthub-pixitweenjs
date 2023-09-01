@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.80](https://github.com/khanzzirfan/reacthub-pixitweenjs/compare/v0.2.79...v0.2.80) (2023-09-01)
+
 ### [0.2.79](https://github.com/khanzzirfan/reacthub-pixitweenjs/compare/v0.2.78...v0.2.79) (2023-09-01)
 
 ### [0.2.78](https://github.com/khanzzirfan/reacthub-pixitweenjs/compare/v0.2.77...v0.2.78) (2023-09-01)
