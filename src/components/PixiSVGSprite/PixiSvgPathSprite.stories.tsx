@@ -68,6 +68,14 @@ const meta = {
       action: "pointerdown",
       description: "pointerdown event",
     },
+    pointerout: {
+      action: "pointerout",
+      description: "pointerout event",
+    },
+    pointerover: {
+      action: "pointerover",
+      description: "pointerover event",
+    },
   },
 } satisfies Meta<typeof PixiSvgPathSprite>;
 

@@ -11,6 +11,7 @@ import * as PIXI from "pixi.js";
 import gsap from "gsap";
 import { useWorkerParser, usePlayerState } from "@react-gifs/tools";
 import AbstractContainer from "../../hocs/AbstractContainer";
+import { withFiltersHook } from "../../hooks/withFiltersHook";
 
 // @ts-ignore
 import isEmpty from "lodash/isEmpty";
@@ -99,8 +100,26 @@ const PixiGifSprite = React.forwardRef<
     frameStartAt,
     frameEndAt,
     loop,
-    transformation: { width = 0, height = 0, x, y, animation },
+    transformation: {
+      width = 0,
+      height = 0,
+      x,
+      y,
+      animation,
+      colorCorrection = {},
+    },
   } = props;
+
+  /// hooks
+  const {
+    temperatureFilter,
+    sharpnessFilter,
+    hueFilter,
+    blurFilter,
+    adjustmentFilter,
+  } = withFiltersHook(colorCorrection);
+
+  const { blurRadius = 0 } = colorCorrection;
 
   const frameDelay = 0.1;
   //  load and parse gif
@@ -286,6 +305,14 @@ const PixiGifSprite = React.forwardRef<
             }
             anchor={0.5}
             forwardRef={animatedSpriteRef}
+            filters={[
+              temperatureFilter,
+              sharpnessFilter,
+              hueFilter,
+              adjustmentFilter,
+              // conditionally add blur filter
+              ...(blurRadius > 0 ? [blurFilter] : []),
+            ]}
           />
         )}
       </Container>

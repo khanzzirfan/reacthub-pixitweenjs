@@ -15,8 +15,9 @@ import {
 } from "../../types/BaseProps";
 import AbstractContainer from "../../hocs/AbstractContainer";
 import { Effects } from "../../types/Effects";
+import { withFiltersHook } from "../../hooks/withFiltersHook";
 
-interface PixiSvgPathSpriteProps extends PixiBaseSpriteProps {
+export interface PixiSvgPathSpriteProps extends PixiBaseSpriteProps {
   uniqueId: string;
   path: string;
   startAt: number;
@@ -102,6 +103,7 @@ const PixiSvgPathSprite = React.forwardRef<
       fill,
       stroke = "none",
       strokeWidth = 0,
+      colorCorrection = {},
     },
     pointerdown,
     pointerup,
@@ -110,6 +112,16 @@ const PixiSvgPathSprite = React.forwardRef<
   const app = useApp();
 
   // const fillColor = PIXI.utils.string2hex(fill || "#262730");
+  /// hooks
+  const {
+    temperatureFilter,
+    sharpnessFilter,
+    hueFilter,
+    blurFilter,
+    adjustmentFilter,
+  } = withFiltersHook(colorCorrection);
+
+  const { blurRadius = 0 } = colorCorrection;
 
   React.useEffect(() => {
     const transformedPath = svgpath(path).scale(5).translate(0, 0).toString();
@@ -147,6 +159,14 @@ const PixiSvgPathSprite = React.forwardRef<
               interactive={true}
               pointerdown={pointerdown}
               pointerup={pointerup}
+              filters={[
+                temperatureFilter,
+                sharpnessFilter,
+                hueFilter,
+                adjustmentFilter,
+                // conditionally add blur filter
+                ...(blurRadius > 0 ? [blurFilter] : []),
+              ]}
             />
           )}
         </Container>

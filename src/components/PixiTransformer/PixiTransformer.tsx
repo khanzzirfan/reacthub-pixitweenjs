@@ -2,6 +2,8 @@ import * as PIXI from "pixi.js";
 import * as React from "react";
 // @ts-ignore
 import { Transformer } from "reacthub-react-bindings";
+import { emitCustomEvent } from "../../events";
+import { Events } from "../../providers";
 
 type PixiTransformerProps = {
   pixiTransformerRef: React.MutableRefObject<any>;
@@ -12,6 +14,7 @@ type PixiTransformerProps = {
   mouseoverEvent?: (flag: boolean) => void;
   onDoubleClick?: (data: any) => void;
   uniqueId?: string;
+  isText?: boolean;
 };
 
 type PixiTransformerState = {
@@ -30,8 +33,9 @@ const PixiTransformer = ({
   transformCommit,
   transformChange,
   mouseoverEvent,
-  onDoubleClick,
+  // onDoubleClick,
   uniqueId = "",
+  isText = false,
 }: PixiTransformerProps) => {
   // states
   const colorYellow = PIXI.utils.string2hex("#F3C409");
@@ -57,20 +61,20 @@ const PixiTransformer = ({
     transformerState.current.isDragging = true;
   }, []);
 
-  const handleOnMouseUp = React.useCallback(() => {
-    // update transfomer state to is not dragging.
-    transformerState.current.isDragging = false;
-  }, []);
+  // const handleOnMouseUp = React.useCallback(() => {
+  //   // update transfomer state to is not dragging.
+  //   transformerState.current.isDragging = false;
+  // }, []);
 
-  const handleOnMouseUpOutside = React.useCallback(() => {
-    // update transfomer state to is not dragging.
-    transformerState.current.isDragging = false;
-  }, []);
+  // const handleOnMouseUpOutside = React.useCallback(() => {
+  //   // update transfomer state to is not dragging.
+  //   transformerState.current.isDragging = false;
+  // }, []);
 
-  const handleOnDoubleClick = React.useCallback(() => {
-    console.log("dobule click in pixi transformer");
-    if (onDoubleClick) onDoubleClick({ uniqueId });
-  }, [onDoubleClick]);
+  // const handleOnDoubleClick = React.useCallback(() => {
+  //   console.log("dobule click in pixi transformer");
+  //   if (onDoubleClick) onDoubleClick({ uniqueId });
+  // }, [onDoubleClick]);
 
   // add handler for transform change
   const handleOnTransformChange = React.useCallback(
@@ -78,6 +82,7 @@ const PixiTransformer = ({
       // update transfomer state to is draggin.
       transformerState.current.isDragging = true;
       if (transformChange) transformChange(e);
+      emitCustomEvent(Events.TRANSFORMER_DRAG_START, { uniqueId: "timeline" });
     },
     [transformChange]
   );
@@ -93,6 +98,12 @@ const PixiTransformer = ({
       imageRef.current.scale.x,
       imageRef.current.scale.y,
     ];
+
+    // from the scale understand if its postive or negative numbers
+    // if negative then we need to flip the image
+    const isNegativeScaleX = scale[0] < 0 ? -1 : 1;
+    const isNegativeScaleY = scale[1] < 0 ? -1 : 1;
+
     if (transformCommit) {
       transformCommit({
         uniqueId,
@@ -102,9 +113,10 @@ const PixiTransformer = ({
           width: Math.round(Math.max(5, width)),
           height: Math.round(Math.max(5, height)),
           rotation: rotation,
-          scale: scale,
+          scale: isText ? scale : [isNegativeScaleX, isNegativeScaleY], // @todo: fix this for text
         },
       });
+      emitCustomEvent(Events.TRANSFORMER_DRAG_END, { uniqueId: "timeline" });
     }
     // update transformer state to is not dragging.
     transformerState.current.isDragging = false;
@@ -115,26 +127,26 @@ const PixiTransformer = ({
       pixiTransformerRef.current.on("mouseover", handleOnMouseOver);
       pixiTransformerRef.current.on("mouseout", handleOnMouseOut);
       pixiTransformerRef.current.on("mousedown", handleOnMouseDown);
-      pixiTransformerRef.current.on("mouseup", handleOnMouseUp);
-      pixiTransformerRef.current.on("mouseupoutside", handleOnMouseUpOutside);
+      // pixiTransformerRef.current.on("mouseup", handleOnMouseUp);
+      // pixiTransformerRef.current.on("mouseupoutside", handleOnMouseUpOutside);
       /// pixiTransformerRef.current.on("dblclick", handleOnDoubleClick);
-      pixiTransformerRef.current.addListener("dblclick", handleOnDoubleClick);
+      /// pixiTransformerRef.current.addListener("dblclick", handleOnDoubleClick);
     }
     return () => {
       if (pixiTransformerRef.current) {
         pixiTransformerRef.current.off("mouseover", handleOnMouseOver);
         pixiTransformerRef.current.off("mouseout", handleOnMouseOut);
         pixiTransformerRef.current.off("mousedown", handleOnMouseDown);
-        pixiTransformerRef.current.off("mouseup", handleOnMouseUp);
-        pixiTransformerRef.current.off(
-          "mouseupoutside",
-          handleOnMouseUpOutside
-        );
-        ////  pixiTransformerRef.current.off("dblclick", handleOnDoubleClick);
-        pixiTransformerRef.current.removeListener(
-          "dblclick",
-          handleOnDoubleClick
-        );
+        // pixiTransformerRef.current.off("mouseup", handleOnMouseUp);
+        // pixiTransformerRef.current.off(
+        //   "mouseupoutside",
+        //   handleOnMouseUpOutside
+        // );
+        // ////  pixiTransformerRef.current.off("dblclick", handleOnDoubleClick);
+        // pixiTransformerRef.current.removeListener(
+        //   "dblclick",
+        //   handleOnDoubleClick
+        // );
       }
     };
   }, []);

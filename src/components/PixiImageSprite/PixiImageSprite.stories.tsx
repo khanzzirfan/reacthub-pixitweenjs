@@ -78,6 +78,14 @@ const meta = {
       action: "pointerdown",
       description: "pointerdown event",
     },
+    pointerout: {
+      action: "pointerout",
+      description: "pointerout event",
+    },
+    pointerover: {
+      action: "pointerover",
+      description: "pointerover event",
+    },
   },
 } satisfies Meta<typeof PixiImageSprite>;
 
@@ -154,48 +162,217 @@ export const FadeIn: Story = {
 
 // More on writing stories with args: https://storybook.js.org/docs/react/writing-stories/args
 export const Filters: Story = {
-  render: (args: any) => (
-    <AppStateContextProvider {...args}>
-      <PixiImageSprite {...args} />
-    </AppStateContextProvider>
-  ),
-  args: {
-    uniqueId: "image-filters001", // uniqueId of the sprite
-    src: "https://assets.codepen.io/693612/surya.svg",
-    applyTransformer: false,
-    startAt: 0,
-    endAt: 5,
-    transformation: {
-      x: 200,
-      y: 200,
-      width: 150,
-      height: 150,
-      anchor: 0.5,
-      rotation: 0,
-      alpha: 1,
-      scale: 1,
-      tint: 0xffffff,
-      blendMode: 0,
-      effect: Effects.None,
-      colorCorrection: {
-        enabled: true,
-        contrast: 1,
-        saturation: 2,
-        exposure: 1,
-        blurRadius: 0,
+  render: (args: any) => {
+    const initialProps = {
+      uniqueId: "image-filters001", // uniqueId of the sprite
+      src: "http://i.imgur.com/wehQ1GV.jpg",
+      applyTransformer: false,
+      startAt: 0,
+      endAt: 5,
+      transformation: {
+        x: 200,
+        y: 200,
+        width: 300,
+        height: 300,
+        anchor: 0.5,
+        rotation: 0,
+        alpha: 1,
+        scale: 1,
+        tint: 0xffffff,
+        blendMode: 0,
+        effect: Effects.None,
+        colorCorrection: {
+          enabled: true,
+          temperature: 0,
+          hue: 0,
+          brightness: 1,
+          contrast: 1,
+          saturation: 2,
+          exposure: 1,
+          blurRadius: 0,
+          alpha: 1,
+          gamma: 1,
+          red: 1,
+          green: 1,
+          blue: 1,
+          ...args,
+        },
       },
+      initialAlpha: 1,
+    };
+    return (
+      <AppStateContextProvider {...initialProps}>
+        <PixiImageSprite {...initialProps} />
+      </AppStateContextProvider>
+    );
+  },
+
+  args: {
+    // @ts-ignore
+    alpha: 1,
+    gamma: 1,
+    red: 1,
+    green: 1,
+    blue: 1,
+    temperature: 0,
+    hue: 0,
+    sharpness: 0,
+    brightness: 1,
+    contrast: 1,
+    saturation: 1,
+    exposure: 1,
+    blurRadius: 0,
+  },
+  argTypes: {
+    // @ts-ignore
+    alpha: {
+      control: "range",
+      min: 0,
+      max: 1,
+      step: 0.2,
+      description: "alpha of the sprite",
     },
-    initialAlpha: 1,
+    hue: {
+      control: "range",
+      min: 1,
+      max: 360,
+      step: 50,
+      description:
+        "hue of the sprite filter supplied to transformation property in the props.",
+    },
+    sharpness: {
+      control: "range",
+      min: 0,
+      max: 10,
+      step: 1,
+      description:
+        "sharpness of the sprite filter supplied to transformation property in the props.",
+    },
+    brightness: {
+      control: "range",
+      min: 0,
+      max: 10,
+      step: 1,
+      description:
+        "brightness of the sprite filter supplied to transformation property in the props.",
+    },
+    contrast: {
+      control: "range",
+      min: 0,
+      max: 10,
+      step: 1,
+      description:
+        "contrast of the sprite filter supplied to transformation property in the props.",
+    },
+    saturation: {
+      control: "range",
+      min: 0,
+      max: 10,
+      step: 1,
+      description:
+        "saturation of the sprite filter supplied to transformation property in the props.",
+    },
+    exposure: {
+      control: "range",
+      min: 0,
+      max: 10,
+      step: 1,
+      description:
+        "exposure of the sprite filter supplied to transformation property in the props.",
+    },
+    blurRadius: {
+      control: "range",
+      min: 0,
+      max: 10,
+      step: 1,
+      description:
+        "blurRadius of the sprite filter supplied to transformation property in the props.",
+    },
+    red: {
+      control: "range",
+      min: 1,
+      max: 255,
+      step: 10,
+      description:
+        "red of the sprite filter supplied to transformation property in the props.",
+    },
+    green: {
+      control: "range",
+      min: 1,
+      max: 255,
+      step: 10,
+      description:
+        "green of the sprite filter supplied to transformation property in the props.",
+    },
+    blue: {
+      control: "range",
+      min: 1,
+      max: 255,
+      step: 10,
+      description:
+        "blue of the sprite filter supplied to transformation property in the props.",
+    },
+    gamma: {
+      control: "range",
+      min: 0,
+      max: 10,
+      step: 0.5,
+      description:
+        "gamma of the sprite filter supplied to transformation property in the props.",
+    },
+  },
+  parameters: {
+    controls: {
+      include: [
+        "startAt",
+        "endAt",
+        "alpha",
+        "gamma",
+        "red",
+        "green",
+        "blue",
+        "brightness",
+        "contrast",
+        "saturation",
+        "hue",
+        "temperature",
+        "sharpness",
+        "blurRadius",
+      ],
+    },
   },
 };
 
 // More on writing stories with args: https://storybook.js.org/docs/react/writing-stories/args
 export const FilterEffects: Story = {
-  render: (args: any) => (
-    <AppStateContextProvider {...args}>
-      <PixiImageSprite {...args} />
-    </AppStateContextProvider>
-  ),
+  render: (args: any) => {
+    const initialProps = {
+      uniqueId: "image-filters001", // uniqueId of the sprite
+      src: "http://i.imgur.com/wehQ1GV.jpg",
+      applyTransformer: false,
+      startAt: 0,
+      endAt: 5,
+      transformation: {
+        x: 200,
+        y: 200,
+        width: 300,
+        height: 300,
+        anchor: 0.5,
+        rotation: 0,
+        alpha: 1,
+        scale: 1,
+        tint: 0xffffff,
+        blendMode: 0,
+        effect: args.effect,
+      },
+      initialAlpha: 1,
+    };
+    return (
+      <AppStateContextProvider {...initialProps}>
+        <PixiImageSprite {...initialProps} />
+      </AppStateContextProvider>
+    );
+  },
   args: {
     uniqueId: "image-filtereffects001", // uniqueId of the sprite
     src: "https://assets.codepen.io/693612/surya.svg",
@@ -216,5 +393,19 @@ export const FilterEffects: Story = {
       effect: Effects.BlackAndWhite,
     },
     initialAlpha: 1,
+  },
+  argTypes: {
+    // @ts-ignore
+    effect: {
+      control: "select",
+      options: Object.values(Effects),
+      description:
+        "filter effects of the sprite. it is enum type supplied as prop to the transformation property in the props.",
+    },
+  },
+  parameters: {
+    controls: {
+      include: ["effect"],
+    },
   },
 };

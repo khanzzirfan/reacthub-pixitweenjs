@@ -10,6 +10,7 @@ export interface PixiBaseSpriteProps {
   endAt: number;
   initialAlpha: number;
   disabled?: boolean;
+  isDragging?: boolean;
   transformation: {
     x: number;
     y: number;
@@ -41,6 +42,7 @@ export interface PixiBaseSpriteProps {
       green?: number;
       blue?: number;
       alpha?: number;
+      gamma?: number;
       scaleInput?: number;
     };
     effect?: Effects;

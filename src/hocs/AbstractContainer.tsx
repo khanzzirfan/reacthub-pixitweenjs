@@ -1,9 +1,7 @@
 import * as React from "react";
 import { useContext, useRef, useState } from "react";
 import gsap from "gsap";
-
 import { Container, withFilters } from "@pixi/react";
-import { AdjustmentFilter } from "@pixi/filter-adjustment";
 import * as PIXI from "pixi.js";
 import { Effects } from "../types/Effects";
 // import pixiTransfomer from "../utils/PixiTransformer";
@@ -24,6 +22,8 @@ const CYAN = [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0];
 
 interface AbstractContainerProps extends PixiBaseSpriteProps {
   ignoreTlForVideo?: boolean;
+  isText?: boolean;
+  isDragging?: boolean;
 }
 
 const AbstractContainer = React.forwardRef<
@@ -35,6 +35,7 @@ const AbstractContainer = React.forwardRef<
   const [isTransformerDragging, setIsTransformerDragging] = useState(false);
   const [isMouseOverTransformer, setIsMouseOverTransformer] = useState(false);
   const [pixiAlpha, setPixiAlpha] = useState<number>(props.initialAlpha);
+
   //// Refs
   const containerRef = useRef<PIXI.Container>(null);
   const parentNode = useRef<PIXI.Container>(null);
@@ -58,7 +59,6 @@ const AbstractContainer = React.forwardRef<
       height,
       scale = [1, 1],
       rotation = 0,
-      colorCorrection,
       animation,
       effect,
     },
@@ -68,26 +68,21 @@ const AbstractContainer = React.forwardRef<
     pointerdown,
     pointerout,
     pointerover,
+    isText,
+    isDragging,
   } = props;
 
   // log all props
-  console.log("abstractallProps", props);
   // color corrections
-  const {
-    contrast = 1,
-    saturation = 1,
-    brightness = 1,
-    alpha = 1,
-    blurRadius = 0,
-  } = colorCorrection || {};
 
-  /** adjustment filter */
-  const adjustments = {
-    ...(brightness > 1 && { brightness: brightness }),
-    ...(contrast > 1 && { contrast: contrast }),
-    ...(saturation > 1 && { saturation: saturation }),
-    ...(alpha !== 0 && { alpha: alpha }),
-  };
+  /** dot config */
+  // const dotConfig = {
+  //   // scale: 1,
+  //   // angle: 5,
+  //   // distance: 5,
+  // };
+
+  /**Apply sharpness */
 
   /** Adding custom event listners */
   /** Event Listeneres */
@@ -118,25 +113,31 @@ const AbstractContainer = React.forwardRef<
     }
   }, []);
 
+  const handleMouseOverTransformer = React.useCallback(() => {
+    setIsMouseOverTransformer(true);
+    if (pointerover) pointerover();
+  }, []);
+
   const gsapOnAlphaReverseComplete = () => {
     console.log("reverse complete");
     alphaRef.current = initialAlpha;
-    /// setPixiAlpha(initialAlpha);
+    setPixiAlpha(initialAlpha);
   };
 
   const gsapOnAlphaStart = (params: { alpha: number }) => {
     alphaRef.current = params.alpha;
+    setPixiAlpha(params.alpha);
   };
 
   const gsapOnAlphaComplete = (params: { alpha: number }) => {
     alphaRef.current = params.alpha;
+    setPixiAlpha(params.alpha);
   };
 
   React.useEffect(() => {
     let ctx = gsap.context(() => {});
     if (containerRef.current && tl.current) {
       const data = {
-        alpha: 1,
         duration: Number(endAt) - Number(startAt),
       };
 
@@ -154,44 +155,71 @@ const AbstractContainer = React.forwardRef<
       const ease = getAnimByName(animation || "None");
       ctx = gsap.context(() => {
         // initial alpha and duration of timeline setup
-        tl.current
-          .to(
-            containerRef.current,
-            { alpha: 1, duration: 0.1, ...alphaStartParams },
-            startAt
-          )
-          ///.from(containerRef.current, { ...data }, startAt)
-          .to(
-            containerRef.current,
-            { alpha: 0, duration: 0.1, ...alphaCompleteParams },
-            Number(endAt) - 0.09
-          ); // reset alpha on timeline reverse or complete.
-        // .eventCallback("onComplete", gsapResetAlpha, []);
-        // .eventCallback("onReverseComplete", gsapOnAlphaReverseComplete, []);
+
+        // add ease animation effects
+        if (!isEmpty(ease.from)) {
+          tl.current
+            .from(containerRef.current, { ...ease.from }, startAt)
+            .to(
+              containerRef.current,
+              { alpha: 1, duration: 0.1, ...alphaStartParams },
+              startAt
+            )
+            .to(
+              containerRef.current,
+              { alpha: 0, duration: 0.1, ...alphaCompleteParams },
+              Number(endAt) - 0.09
+            );
+        } else if (!isEmpty(ease.to)) {
+          tl.current
+            .to(
+              containerRef.current,
+              { alpha: 1, duration: 0.1, ...ease.to, ...alphaStartParams },
+              startAt
+            )
+            .to(
+              containerRef.current,
+              { alpha: 0, duration: 0.1, ...alphaCompleteParams },
+              Number(endAt) - 0.09
+            );
+        } else if (!isEmpty(ease.fromTo)) {
+          tl.current
+            .fromTo(
+              containerRef.current,
+              ease.fromTo?.from,
+              { ...ease.fromTo?.to, ...alphaStartParams },
+              startAt
+            )
+            .to(
+              containerRef.current,
+              { alpha: 0, duration: 0.1, ...alphaCompleteParams },
+              Number(endAt) - 0.09
+            );
+        } else {
+          tl.current
+            .to(
+              containerRef.current,
+              { alpha: 1, duration: 0.1, ...alphaStartParams },
+              startAt
+            )
+            ///.from(containerRef.current, { ...data }, startAt)
+            .to(
+              containerRef.current,
+              { alpha: 0, duration: 0.1, ...alphaCompleteParams },
+              Number(endAt) - 0.09
+            ); // reset alpha on timeline reverse or complete.
+          // .eventCallback("onComplete", gsapResetAlpha, []);
+          // .eventCallback("onReverseComplete", gsapOnAlphaReverseComplete, []);
+        }
 
         if (!ignoreTlForVideo) {
           tl.current.from(containerRef.current, { ...data }, startAt);
         }
-
-        // add ease animation effects
-        if (!isEmpty(ease.from)) {
-          tl.current.from(containerRef.current, { ...ease.from }, startAt);
-        } else if (!isEmpty(ease.to)) {
-          tl.current.to(containerRef.current, { ...ease.to }, startAt);
-        } else if (!isEmpty(ease.fromTo)) {
-          tl.current.fromTo(
-            containerRef.current,
-            ease.fromTo?.from,
-            ease.fromTo?.to,
-            startAt
-          );
-        }
       });
     }
     return () => {
-      console.log("unmounting");
       if (tl.current) {
-        console.log("1001 kill timeline");
+        // console.log("1001 kill timeline");
         tl.current.progress(0).kill();
         gsap.killTweensOf(tl.current);
       }
@@ -218,19 +246,19 @@ const AbstractContainer = React.forwardRef<
   );
 
   const Filters = withFilters(Container, {
-    ...(blurRadius > 0 && { blur: PIXI.filters.BlurFilter }),
-    ...(!isEmpty(adjustments) && { adjust: AdjustmentFilter }),
     matrix: PIXI.filters.ColorMatrixFilter,
   });
 
-  const isFilterOrEffectEnabled =
-    colorCorrection?.enabled || (effect && effect !== Effects.Normal);
+  console.log("abstraction props", props);
+  console.log("alphaRef", uniqueId, alphaRef.current, pixiAlpha, initialAlpha);
+  const alpha = alphaRef.current || pixiAlpha;
+  // condition to disable pointer events when disabled or isDragging or alpha = 0
 
   return (
     <Container ref={parentNode}>
       <Container
         ref={containerRef}
-        alpha={alphaRef.current || pixiAlpha}
+        alpha={alpha}
         position={[x, y]}
         pivot={[x, y]}
         width={width}
@@ -238,7 +266,9 @@ const AbstractContainer = React.forwardRef<
         scale={scale}
         rotation={rotation}
         {...(!disabled &&
-          !isTransformerDragging && {
+          !isTransformerDragging &&
+          !isDragging &&
+          alpha > 0 && {
             interactive: true,
             buttonMode: true,
             pointerdown: pointerdown,
@@ -246,38 +276,29 @@ const AbstractContainer = React.forwardRef<
             pointerout: pointerout,
           })}
       >
-        <Container>
-          {isFilterOrEffectEnabled && (
-            <Filters
-              scale={1}
-              blur={{ blur: blurRadius, quality: 4 }}
-              adjust={adjustments}
-              apply={({ matrix }: { matrix: any }) => {
-                if (effect === Effects.BlackAndWhite) {
-                  matrix.desaturate();
-                } else if (effect === Effects.Sepia) {
-                  matrix.sepia();
-                } else if (effect === Effects.RetroVintage) {
-                  matrix.negative();
-                } else if (effect === Effects.NightVision) {
-                  matrix.negative();
-                } else if (effect === Effects.Normal) {
-                  matrix.reset();
-                }
-              }}
-              matrix={{
-                enabled: true,
-                // @ts-ignore
-                matrix: CYAN,
-              }}
-            >
-              <Container ref={imgGroupRef}>{props.children}</Container>
-            </Filters>
-          )}
-          {!isFilterOrEffectEnabled && (
-            <Container ref={imgGroupRef}>{props.children}</Container>
-          )}
-        </Container>
+        <Filters
+          scale={1}
+          apply={({ matrix }: { matrix: any }) => {
+            if (effect === Effects.BlackAndWhite) {
+              matrix.desaturate();
+            } else if (effect === Effects.Sepia) {
+              matrix.sepia();
+            } else if (effect === Effects.RetroVintage) {
+              matrix.negative();
+            } else if (effect === Effects.NightVision) {
+              matrix.negative();
+            } else if (effect === Effects.Normal) {
+              matrix.reset();
+            }
+          }}
+          matrix={{
+            enabled: true,
+            // @ts-ignore
+            matrix: CYAN,
+          }}
+        >
+          <Container ref={imgGroupRef}>{props.children}</Container>
+        </Filters>
       </Container>
       {applyTransformer && (
         <PixiTransformer
@@ -286,8 +307,9 @@ const AbstractContainer = React.forwardRef<
           isMounted={isMounted}
           transformCommit={handleOnTransformEnd}
           transformChange={handleOnTransformChange}
-          mouseoverEvent={setIsMouseOverTransformer}
+          mouseoverEvent={handleMouseOverTransformer}
           uniqueId={uniqueId}
+          isText={isText}
         />
       )}
     </Container>

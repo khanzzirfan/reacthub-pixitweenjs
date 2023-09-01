@@ -17,6 +17,7 @@ import {
   PixiBaseSpriteProps,
   ForwardedRefResponse,
 } from "../../types/BaseProps";
+import { withFiltersHook } from "../../hooks/withFiltersHook";
 
 export interface PixiVideoSpriteProps extends PixiBaseSpriteProps {
   uniqueId: string;
@@ -96,8 +97,19 @@ const PixiVideoSprite = React.forwardRef<
     endAt,
     frameStartAt,
     frameEndAt,
-    transformation: { x, y, width, height, animation },
+    transformation: { x, y, width, height, animation, colorCorrection = {} },
+    pointerdown,
   } = props;
+
+  const { blurRadius = 0 } = colorCorrection;
+  // use with filters hoooks to get the filters
+  const {
+    temperatureFilter,
+    sharpnessFilter,
+    hueFilter,
+    blurFilter,
+    adjustmentFilter,
+  } = withFiltersHook(colorCorrection);
 
   const videoUrl = src || "";
 
@@ -137,17 +149,12 @@ const PixiVideoSprite = React.forwardRef<
       } else {
         videoStateRef.current.isDragging = false;
       }
+      videoElement.current.muted = mute;
     }
-  }, [gsapDragging]);
+  }, [mute, gsapDragging]);
 
   /** Gsap Start and Stop Events */
   const gsapOnStart = (frameStartAt: number) => {
-    console.log(
-      "pixivideo gsapOnStart",
-      frameStartAt,
-      frameEndAt,
-      tweenRef.current?.time()
-    );
     if (videoElement.current) {
       // console.log("video gsapOnStart", playerTimeRef.current, gsapDragging);
       // const roundedPlayerTime = Number(Math.round(playerTimeRef.current));
@@ -406,6 +413,17 @@ const PixiVideoSprite = React.forwardRef<
             x={x}
             y={y}
             ref={imageRef}
+            // @ts-ignore
+            interactive={true}
+            pointerdown={pointerdown}
+            filters={[
+              temperatureFilter,
+              sharpnessFilter,
+              hueFilter,
+              adjustmentFilter,
+              // conditionally add blur filter
+              ...(blurRadius > 0 ? [blurFilter] : []),
+            ]}
           />
         )}
       </Container>

@@ -64,11 +64,6 @@ const meta = {
       description:
         "on transforamtion end the event is fire callback with latest sprite transformation properties.",
     },
-    pointerdown: {
-      action: "pointerdown",
-      description: "pointerdown event",
-    },
-
     pointerup: {
       action: "pointerup",
       description: "pointerup event",
@@ -76,6 +71,18 @@ const meta = {
     onTextUpdate: {
       action: "onTextUpdate",
       description: "onTextUpdate event",
+    },
+    pointerdown: {
+      action: "pointerdown",
+      description: "pointerdown event",
+    },
+    pointerout: {
+      action: "pointerout",
+      description: "pointerout event",
+    },
+    pointerover: {
+      action: "pointerover",
+      description: "pointerover event",
     },
   },
 } satisfies Meta<typeof PixiTextSprite>;

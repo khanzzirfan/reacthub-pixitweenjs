@@ -17,6 +17,8 @@ export const AppStateContextProvider: React.FC<
 > = ({ children, ...props }) => {
   console.log("AppStateContextProvider", props);
   const [appState, setAppState] = React.useState<AppState>(props);
+  const [mouseOverSprite, setMouseOverSprite] = React.useState<boolean>(false);
+
   const appStateRef = React.useRef<AppState>(appState);
 
   useDeepEffect(() => {
@@ -41,7 +43,13 @@ export const AppStateContextProvider: React.FC<
     []
   );
 
-  const onMouseOverSprite = React.useCallback(() => {}, []);
+  const onMouseOverSprite = React.useCallback(() => {
+    setMouseOverSprite(true);
+  }, []);
+
+  const onMouseOutSprite = React.useCallback(() => {
+    setMouseOverSprite(false);
+  }, []);
 
   const onClickSprite = React.useCallback(() => {}, []);
 
@@ -53,6 +61,10 @@ export const AppStateContextProvider: React.FC<
         onAnchorTransformationEnd,
         onMouseOverSprite,
         onClickSprite,
+        pointerdown: onClickSprite,
+        pointerover: onMouseOverSprite,
+        pointerout: onMouseOutSprite,
+        mouseOverSprite,
       })}
     </>
   );

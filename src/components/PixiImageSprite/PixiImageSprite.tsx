@@ -10,6 +10,7 @@ import {
   PixiBaseSpriteProps,
   ForwardedRefResponse,
 } from "../../types/BaseProps";
+import { withFiltersHook } from "../../hooks/withFiltersHook";
 
 const PixiImageSprite = React.forwardRef<
   ForwardedRefResponse | null,
@@ -27,10 +28,19 @@ const PixiImageSprite = React.forwardRef<
   // console.log("contxt Values", tl);
   const {
     src,
-    transformation: { x, y, width, height, anchor },
+    transformation: { x, y, width, height, anchor, colorCorrection = {} },
     pointerdown,
-    pointerup,
   } = props;
+
+  const { blurRadius = 0 } = colorCorrection;
+  // use with filters hoooks to get the filters
+  const {
+    temperatureFilter,
+    sharpnessFilter,
+    hueFilter,
+    blurFilter,
+    adjustmentFilter,
+  } = withFiltersHook(colorCorrection);
 
   return (
     <AbstractContainer {...props} ref={ref}>
@@ -46,7 +56,14 @@ const PixiImageSprite = React.forwardRef<
           // @ts-ignore
           interactive={true}
           pointerdown={pointerdown}
-          pointerup={pointerup}
+          filters={[
+            temperatureFilter,
+            sharpnessFilter,
+            hueFilter,
+            adjustmentFilter,
+            // conditionally add blur filter
+            ...(blurRadius > 0 ? [blurFilter] : []),
+          ]}
         />
       </Container>
     </AbstractContainer>

@@ -16,8 +16,9 @@ import {
 } from "../../types/BaseProps";
 import AbstractContainer from "../../hocs/AbstractContainer";
 import { Effects } from "../../types/Effects";
+import { withFiltersHook } from "../../hooks/withFiltersHook";
 
-interface PixiTextSpriteProps extends PixiBaseSpriteProps {
+export interface PixiTextSpriteProps extends PixiBaseSpriteProps {
   text: string;
   startAt: number;
   endAt: number;
@@ -151,7 +152,19 @@ const PixiTextSprite = React.forwardRef<
     wordWrapWidth = 50000000,
     leading = 0,
     letterSpacing,
+    colorCorrection = {},
   } = transformation;
+
+  /// hooks
+  const {
+    temperatureFilter,
+    sharpnessFilter,
+    hueFilter,
+    blurFilter,
+    adjustmentFilter,
+  } = withFiltersHook(colorCorrection);
+
+  const { blurRadius: blurRadiusx = 0 } = colorCorrection;
 
   React.useEffect(() => {
     textFontSize.current = Number(fontSize);
@@ -319,7 +332,7 @@ const PixiTextSprite = React.forwardRef<
   }, [x, y, isEditing]);
 
   return (
-    <AbstractContainer {...props} ref={ref}>
+    <AbstractContainer {...props} ref={ref} isText={true}>
       <Container ref={parentNode}>
         {/* @ts-ignore */}
         {isEditing && <Container ref={textInputGroupRef}></Container>}
@@ -338,6 +351,14 @@ const PixiTextSprite = React.forwardRef<
                 pointerdown: pointerdown,
               })}
             ref={textRef}
+            filters={[
+              temperatureFilter,
+              sharpnessFilter,
+              hueFilter,
+              adjustmentFilter,
+              // conditionally add blur filter
+              ...(blurRadiusx > 0 ? [blurFilter] : []),
+            ]}
           />
         </Container>
       </Container>
