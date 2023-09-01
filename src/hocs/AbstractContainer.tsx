@@ -24,6 +24,7 @@ interface AbstractContainerProps extends PixiBaseSpriteProps {
   ignoreTlForVideo?: boolean;
   isText?: boolean;
   isDragging?: boolean;
+  isGif?: boolean;
 }
 
 const AbstractContainer = React.forwardRef<
@@ -70,6 +71,7 @@ const AbstractContainer = React.forwardRef<
     pointerover,
     isText,
     isDragging,
+    isGif,
   } = props;
 
   // log all props
@@ -276,29 +278,32 @@ const AbstractContainer = React.forwardRef<
             pointerout: pointerout,
           })}
       >
-        <Filters
-          scale={1}
-          apply={({ matrix }: { matrix: any }) => {
-            if (effect === Effects.BlackAndWhite) {
-              matrix.desaturate();
-            } else if (effect === Effects.Sepia) {
-              matrix.sepia();
-            } else if (effect === Effects.RetroVintage) {
-              matrix.negative();
-            } else if (effect === Effects.NightVision) {
-              matrix.negative();
-            } else if (effect === Effects.Normal) {
-              matrix.reset();
-            }
-          }}
-          matrix={{
-            enabled: true,
-            // @ts-ignore
-            matrix: CYAN,
-          }}
-        >
-          <Container ref={imgGroupRef}>{props.children}</Container>
-        </Filters>
+        {!isGif && (
+          <Filters
+            scale={1}
+            apply={({ matrix }: { matrix: any }) => {
+              if (effect === Effects.BlackAndWhite) {
+                matrix.desaturate();
+              } else if (effect === Effects.Sepia) {
+                matrix.sepia();
+              } else if (effect === Effects.RetroVintage) {
+                matrix.negative();
+              } else if (effect === Effects.NightVision) {
+                matrix.negative();
+              } else if (effect === Effects.Normal) {
+                matrix.reset();
+              }
+            }}
+            matrix={{
+              enabled: true,
+              // @ts-ignore
+              matrix: CYAN,
+            }}
+          >
+            <Container ref={imgGroupRef}>{props.children}</Container>
+          </Filters>
+        )}
+        {isGif && <Container ref={imgGroupRef}>{props.children}</Container>}
       </Container>
       {applyTransformer && (
         <PixiTransformer

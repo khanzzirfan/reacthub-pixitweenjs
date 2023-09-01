@@ -108,6 +108,7 @@ const PixiGifSprite = React.forwardRef<
       animation,
       colorCorrection = {},
     },
+    pointerdown,
   } = props;
 
   /// hooks
@@ -169,7 +170,6 @@ const PixiGifSprite = React.forwardRef<
           };
         }
       );
-
       setGifFrame(texturedFrames);
       setGifFrameObject(frameObj);
       let duration = 0;
@@ -185,33 +185,45 @@ const PixiGifSprite = React.forwardRef<
   const debGifStart = debounce((time: number) => {
     if (animatedSpriteRef.current) {
       let frameNumber = time === 0 ? 0 : time / frameDelay;
+      // if frame number is nan then set it to 0
+      frameNumber = isNaN(frameNumber) ? 0 : frameNumber;
       const lastFrame = gifStateRef.current.totalFrames;
-      frameNumber = frameNumber >= lastFrame ? lastFrame : frameNumber;
-      animatedSpriteRef.current.gotoAndPlay(frameNumber || 0);
-      gifStateRef.current.isPlaying = true;
+      frameNumber = frameNumber > lastFrame ? lastFrame : frameNumber;
+      if (frameNumber >= lastFrame) {
+        animatedSpriteRef.current.gotoAndStop(0);
+        gifStateRef.current.isPlaying = false;
+      } else {
+        animatedSpriteRef.current.gotoAndPlay(frameNumber || 0);
+        gifStateRef.current.isPlaying = true;
+      }
     }
-  }, 50);
+  }, 20);
 
   const debGifStop = debounce(() => {
     if (animatedSpriteRef.current) {
       animatedSpriteRef.current.stop();
       gifStateRef.current.isPlaying = false;
     }
-  }, 150);
+  }, 50);
 
   /** Gsap Start and Stop Events */
   const gsapOnStart = (startAt: number) => {
     if (animatedSpriteRef.current) {
       let frameNumber = startAt === 0 ? 0 : startAt / frameDelay;
+      frameNumber = isNaN(frameNumber) ? 0 : frameNumber;
       const lastFrame = gifStateRef.current.totalFrames;
-      frameNumber = frameNumber >= lastFrame ? lastFrame : frameNumber;
-      animatedSpriteRef.current.gotoAndPlay(frameNumber || 0);
-      gifStateRef.current.isPlaying = true;
+      frameNumber = frameNumber > lastFrame ? lastFrame : frameNumber;
+      if (frameNumber >= lastFrame) {
+        animatedSpriteRef.current.gotoAndStop(0);
+        gifStateRef.current.isPlaying = false;
+      } else {
+        animatedSpriteRef.current.gotoAndPlay(frameNumber || 0);
+        gifStateRef.current.isPlaying = true;
+      }
     }
   };
 
   const gsapOnComplete = () => {
-    console.log("local gif time complete");
     if (animatedSpriteRef.current) {
       animatedSpriteRef.current.stop();
       // animatedSpriteRef.current.gotoAndStop(0);
@@ -260,6 +272,7 @@ const PixiGifSprite = React.forwardRef<
         onUpdateParams: [frameStartAt, frameEndAt],
       };
 
+      // kill tween before adding it.
       if (tweenRef.current) {
         tweenRef.current.kill();
       }
@@ -279,14 +292,16 @@ const PixiGifSprite = React.forwardRef<
         gsap.killTweensOf(tweenRef.current);
       }
       ctx.revert(); // cleanup!
-      if (containerRef.current) {
-        containerRef.current.destroy();
-      }
     };
   }, [animation, startAt, endAt, frameStartAt, frameEndAt]);
 
   return (
-    <AbstractContainer {...props} ref={ref} ignoreTlForVideo={true}>
+    <AbstractContainer
+      {...props}
+      ref={ref}
+      ignoreTlForVideo={true}
+      isGif={true}
+    >
       <Container ref={containerRef}>
         {gifFrame && gifFrame.length > 0 && (
           <PixiAnimatedSprite
@@ -305,6 +320,9 @@ const PixiGifSprite = React.forwardRef<
             }
             anchor={0.5}
             forwardRef={animatedSpriteRef}
+            // @ts-ignore
+            interactive={true}
+            pointerdown={pointerdown}
             filters={[
               temperatureFilter,
               sharpnessFilter,
