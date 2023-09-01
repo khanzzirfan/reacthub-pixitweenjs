@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.72](https://github.com/khanzzirfan/reacthub-pixitweenjs/compare/v0.2.71...v0.2.72) (2023-09-01)
+
+
+### Bug Fixes
+
+* updated filter hooks ([72fde16](https://github.com/khanzzirfan/reacthub-pixitweenjs/commit/72fde162eac752ea8aef2729413149c9f48ec9ea))
+
 ### [0.2.71](https://github.com/khanzzirfan/reacthub-pixitweenjs/compare/v0.2.70...v0.2.71) (2023-09-01)
 
 ### [0.2.70](https://github.com/khanzzirfan/reacthub-pixitweenjs/compare/v0.2.69...v0.2.70) (2023-09-01)
