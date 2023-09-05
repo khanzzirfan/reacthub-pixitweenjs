@@ -99,11 +99,11 @@ export const Normal: Story = {
   ),
   args: {
     uniqueId: "TextSpritexx001", // uniqueId of the sprite
-    text: "Hello Welcome to PixiJS",
+    text: "Welcome to PixiJS",
     disabled: false,
     applyTransformer: false,
     transformation: {
-      x: 200,
+      x: 300,
       y: 200,
       width: 200,
       height: 200,
@@ -114,8 +114,11 @@ export const Normal: Story = {
       blendMode: 0,
       colorCorrection: {},
       fill: "#00ff99",
-      fontSize: 80,
+      fontSize: 50,
       fontFamily: "Arial",
+      fontStyle: "italic",
+      fontWeight: "bold",
+      fontVariant: "normal",
       align: "center",
       stroke: "#522d2d",
       strokeThickness: 0,

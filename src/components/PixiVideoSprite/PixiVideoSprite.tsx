@@ -44,6 +44,7 @@ interface VideoState {
   speed: number;
   isMuted: boolean;
   isWaiting: boolean;
+  isStalled: boolean;
   loaded: boolean;
   size: { width: number; height: number };
   isDragging: boolean;
@@ -56,6 +57,7 @@ const initialState: VideoState = {
   speed: 1,
   isMuted: false,
   isWaiting: false,
+  isStalled: false,
   loaded: false,
   size: { width: 50, height: 50 },
   isDragging: false,
@@ -68,11 +70,7 @@ const PixiVideoSprite = React.forwardRef<
 >((props, ref) => {
   //// State
   const [, setIsMounted] = React.useState(false);
-  /// const [isTransformerDragging, setIsTransformerDragging] = useState(false);
-  const [, setVideoState] = React.useState({
-    isWaiting: false,
-    isStalled: false,
-  });
+
   const [videoTexture, setVideoTexture] =
     React.useState<PIXI.Texture<PIXI.Resource>>();
 
@@ -221,12 +219,15 @@ const PixiVideoSprite = React.forwardRef<
         }, 300);
         videoStateRef.current.isPlaying = false;
       } else if (!videoStateRef.current.isPlaying) {
-        // if (!isVidPlaying) videoElement.current.play();
-        // videoStateRef.current.isPlaying = true;
-        // let the video play and update current time
-        // videoElement.current.currentTime = playerTimeRef.current;
-        if (!isVidPlaying) videoElement.current.play();
-        videoStateRef.current.isPlaying = true;
+        // console.log("video updating 1003", playerTimeRef.current);
+        if (
+          tl.current?.isActive() &&
+          tweenRef.current &&
+          tweenRef.current.isActive()
+        ) {
+          if (!isVidPlaying) videoElement.current.play();
+          videoStateRef.current.isPlaying = true;
+        }
       } else if (absDiff > 0.3) {
         // videoElement.current.currentTime = playerTimeRef.current;
         // if (!isVidPlaying) videoElement.current.play();
@@ -238,7 +239,6 @@ const PixiVideoSprite = React.forwardRef<
   useEffect(() => {
     let ctx = gsap.context(() => {});
     if (containerRef.current && tl.current) {
-      console.log("timlinepixi", frameStartAt, frameEndAt);
       const data = {
         duration: Number(frameEndAt) - Number(frameStartAt),
         onStart: gsapOnStart,
@@ -325,7 +325,8 @@ const PixiVideoSprite = React.forwardRef<
           videoElement.current.pause();
         }
       }
-      setVideoState({ isWaiting: false, isStalled: false });
+      videoStateRef.current.isWaiting = false;
+      videoStateRef.current.isStalled = false;
     };
 
     const onLoadStart = function () {
@@ -333,17 +334,22 @@ const PixiVideoSprite = React.forwardRef<
       if (videoElement.current) {
         videoElement.current.pause();
       }
-      setVideoState({ isWaiting: true, isStalled: false });
+
+      videoStateRef.current.isWaiting = true;
+      videoStateRef.current.isStalled = false;
     };
 
     const onCanPlayThrough = function () {
       //dispatchState({ isWaiting: false, isStalled: false });
-      setVideoState({ isWaiting: false, isStalled: false });
+      videoStateRef.current.isWaiting = false;
+      videoStateRef.current.isStalled = false;
     };
 
     const onStalled = function () {
       //dispatchState({ isStalled: true });
-      setVideoState({ isWaiting: false, isStalled: true });
+      //setVideoState({ isWaiting: false, isStalled: true });
+      videoStateRef.current.isWaiting = false;
+      videoStateRef.current.isStalled = true;
     };
 
     // create a new Sprite using the video texture (yes it's that easy)
@@ -384,6 +390,8 @@ const PixiVideoSprite = React.forwardRef<
     });
 
     return () => {
+      console.log("unmounting video sprite", uniqueId, videoElement.current);
+      console.log("spriteref", imageRef.current);
       if (videoElement.current) {
         videoElement.current.pause();
         videoElement.current.removeEventListener("loadedmetadata", onload);
@@ -394,6 +402,9 @@ const PixiVideoSprite = React.forwardRef<
           onCanPlayThrough
         );
         videoElement.current.removeEventListener("stalled", onStalled);
+
+        /** unmount it completely */
+        // Stop and remove the video element when the component unmounts
       }
     };
     // create a new Sprite using the video texture (yes it's that easy)
@@ -413,8 +424,6 @@ const PixiVideoSprite = React.forwardRef<
             x={x}
             y={y}
             ref={imageRef}
-            // @ts-ignore
-            interactive={true}
             pointerdown={pointerdown}
             filters={[
               temperatureFilter,
@@ -432,3 +441,9 @@ const PixiVideoSprite = React.forwardRef<
 });
 
 export default PixiVideoSprite;
+
+// @ts-ignore
+PixiVideoSprite.whyDidYouRender = {
+  logOnDifferentValues: true,
+  customName: "PixiVideoSprite",
+};

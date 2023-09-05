@@ -58,6 +58,7 @@ const GsapPixieContextProvider: React.FC<{ children: React.ReactNode }> = ({
   const tl = useRef<gsap.core.Timeline>();
   const gsapCtx = useRef<any>();
   const playerTimeRef = useRef<number>(0.001);
+  const playerProgressRef = useRef<number>(0);
 
   // const parentElementRef = useRef<any>();
   // передаем предка анимируемых элементов
@@ -76,7 +77,6 @@ const GsapPixieContextProvider: React.FC<{ children: React.ReactNode }> = ({
       });
     });
     return () => {
-      // console.log("destroying timeline");
       if (tl.current) {
         tl.current.progress(0).kill();
         gsap.killTweensOf(tl.current);
@@ -178,6 +178,35 @@ const GsapPixieContextProvider: React.FC<{ children: React.ReactNode }> = ({
     }
     // setPlay(true);
   }, []);
+
+  const handleInvalidate = useCallback(() => {
+    if (tl.current) {
+      const timeline = tl.current;
+      timeline.invalidate();
+    }
+  }, []);
+
+  // /**
+  //  * Invalidate and restore the timeline to its current progress value
+  //  */
+  // const handleInvalidateAndRestore = useCallback(() => {
+  //   // track interval id
+  //   let intervalId: NodeJS.Timeout;
+  //   if (tl.current) {
+  //     const timeline = tl.current;
+  //     console.log("handle invalidate and restore", timeline.progress());
+  //     // set current progress and then invalidate
+  //     const currentProgress = timeline.progress();
+  //     playerProgressRef.current = currentProgress;
+  //     timeline.invalidate().progress(currentProgress);
+  //     intervalId = setInterval(() => {
+  //       timeline.progress(currentProgress);
+  //     }, 500);
+  //   }
+  //   return () => {
+  //     clearInterval(intervalId);
+  //   };
+  // }, []);
 
   const handleSeek = useCallback((value: number) => {
     if (tl.current) {

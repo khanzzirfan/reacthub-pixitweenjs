@@ -76,7 +76,6 @@ const PixiGifSprite = React.forwardRef<
   const [gifFrameObject, setGifFrameObject] = React.useState<
     PIXI.FrameObject[]
   >([]);
-  const [, setCurrentFrame] = useState<number>(0);
   const [, setIsComplete] = useState<boolean>(false);
 
   const [gifState, update] = usePlayerState({ autoPlay: false });
@@ -131,8 +130,7 @@ const PixiGifSprite = React.forwardRef<
 
   /** Adding custom event listners */
   /** Event Listeneres */
-  useCustomEventListener(Events.PAUSE, (data) => {
-    console.log("pause event", data);
+  useCustomEventListener(Events.PAUSE, () => {
     if (animatedSpriteRef.current) {
       animatedSpriteRef.current.stop();
       gifStateRef.current.isPlaying = false;
@@ -245,7 +243,13 @@ const PixiGifSprite = React.forwardRef<
       debGifStart(currentTweenTime);
       debGifStop();
       gifStateRef.current.isPlaying = false;
-    } else if (animatedSpriteRef.current && !gifStateRef.current.isPlaying) {
+    } else if (
+      tweenRef.current &&
+      animatedSpriteRef.current &&
+      !gifStateRef.current.isPlaying &&
+      tweenRef.current.isActive() &&
+      tl.current.isActive()
+    ) {
       debGifStart(currentTweenTime);
       gifStateRef.current.isPlaying = true;
     }
@@ -287,6 +291,7 @@ const PixiGifSprite = React.forwardRef<
       });
     }
     return () => {
+      console.log("PixiGif Sprite Component cleanup");
       if (tweenRef.current) {
         tweenRef.current.kill();
         gsap.killTweensOf(tweenRef.current);
@@ -315,9 +320,6 @@ const PixiGifSprite = React.forwardRef<
             // @ts-ignore
             textures={gifFrameObject}
             onComplete={handleComplete}
-            onFrameChange={(currentFrame: number) =>
-              setCurrentFrame(currentFrame)
-            }
             anchor={0.5}
             forwardRef={animatedSpriteRef}
             // @ts-ignore
@@ -339,3 +341,9 @@ const PixiGifSprite = React.forwardRef<
 });
 
 export default PixiGifSprite;
+
+// @ts-ignore
+PixiGifSprite.whyDidYouRender = {
+  logOnDifferentValues: true,
+  customName: "PixiGifSprite",
+};

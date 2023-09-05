@@ -16,7 +16,10 @@ import { getAnimByName } from "../utils/GsapAnim";
 // @ts-ignore
 import isEmpty from "lodash/isEmpty";
 import { useCustomEventListener } from "../events";
-
+import {
+  PixiOverlayTilingSprite,
+  OverlayTypes,
+} from "../hocs/OverlayTilingSprite";
 /** CYAN Filters */
 const CYAN = [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0];
 
@@ -25,6 +28,8 @@ interface AbstractContainerProps extends PixiBaseSpriteProps {
   isText?: boolean;
   isDragging?: boolean;
   isGif?: boolean;
+  onDoubleClick?: () => void;
+  isTextEditMode?: boolean;
 }
 
 const AbstractContainer = React.forwardRef<
@@ -35,7 +40,6 @@ const AbstractContainer = React.forwardRef<
   const [isMounted, setIsMounted] = React.useState(false);
   const [isTransformerDragging, setIsTransformerDragging] = useState(false);
   const [isMouseOverTransformer, setIsMouseOverTransformer] = useState(false);
-  const [pixiAlpha, setPixiAlpha] = useState<number>(props.initialAlpha);
 
   //// Refs
   const containerRef = useRef<PIXI.Container>(null);
@@ -62,6 +66,7 @@ const AbstractContainer = React.forwardRef<
       rotation = 0,
       animation,
       effect,
+      overlay,
     },
     applyTransformer,
     disabled,
@@ -72,6 +77,8 @@ const AbstractContainer = React.forwardRef<
     isText,
     isDragging,
     isGif,
+    onDoubleClick,
+    isTextEditMode,
   } = props;
 
   // log all props
@@ -91,7 +98,7 @@ const AbstractContainer = React.forwardRef<
   useCustomEventListener(Events.COMPLETE, () => {
     if (containerRef.current) {
       alphaRef.current = initialAlpha;
-      setPixiAlpha(initialAlpha);
+      // setPixiAlpha(initialAlpha);
     }
   });
 
@@ -121,19 +128,18 @@ const AbstractContainer = React.forwardRef<
   }, []);
 
   const gsapOnAlphaReverseComplete = () => {
-    console.log("reverse complete");
     alphaRef.current = initialAlpha;
-    setPixiAlpha(initialAlpha);
+    /// setPixiAlpha(initialAlpha);
   };
 
   const gsapOnAlphaStart = (params: { alpha: number }) => {
     alphaRef.current = params.alpha;
-    setPixiAlpha(params.alpha);
+    /// setPixiAlpha(params.alpha);
   };
 
   const gsapOnAlphaComplete = (params: { alpha: number }) => {
     alphaRef.current = params.alpha;
-    setPixiAlpha(params.alpha);
+    ///setPixiAlpha(params.alpha);
   };
 
   React.useEffect(() => {
@@ -155,73 +161,72 @@ const AbstractContainer = React.forwardRef<
       };
 
       const ease = getAnimByName(animation || "None");
+      console.log("easeing", ease);
       ctx = gsap.context(() => {
         // initial alpha and duration of timeline setup
 
-        // add ease animation effects
-        if (!isEmpty(ease.from)) {
-          tl.current
-            .from(containerRef.current, { ...ease.from }, startAt)
-            .to(
-              containerRef.current,
-              { alpha: 1, duration: 0.1, ...alphaStartParams },
-              startAt
-            )
-            .to(
-              containerRef.current,
-              { alpha: 0, duration: 0.1, ...alphaCompleteParams },
-              Number(endAt) - 0.09
-            );
-        } else if (!isEmpty(ease.to)) {
-          tl.current
-            .to(
-              containerRef.current,
-              { alpha: 1, duration: 0.1, ...ease.to, ...alphaStartParams },
-              startAt
-            )
-            .to(
-              containerRef.current,
-              { alpha: 0, duration: 0.1, ...alphaCompleteParams },
-              Number(endAt) - 0.09
-            );
-        } else if (!isEmpty(ease.fromTo)) {
-          tl.current
-            .fromTo(
-              containerRef.current,
-              ease.fromTo?.from,
-              { ...ease.fromTo?.to, ...alphaStartParams },
-              startAt
-            )
-            .to(
-              containerRef.current,
-              { alpha: 0, duration: 0.1, ...alphaCompleteParams },
-              Number(endAt) - 0.09
-            );
-        } else {
-          tl.current
-            .to(
-              containerRef.current,
-              { alpha: 1, duration: 0.1, ...alphaStartParams },
-              startAt
-            )
-            ///.from(containerRef.current, { ...data }, startAt)
-            .to(
-              containerRef.current,
-              { alpha: 0, duration: 0.1, ...alphaCompleteParams },
-              Number(endAt) - 0.09
-            ); // reset alpha on timeline reverse or complete.
-          // .eventCallback("onComplete", gsapResetAlpha, []);
-          // .eventCallback("onReverseComplete", gsapOnAlphaReverseComplete, []);
-        }
+        tl.current
+          .to(
+            containerRef.current,
+            { overwrite: "auto", alpha: 1, duration: 0.1, ...alphaStartParams },
+            startAt
+          )
+          .from(containerRef.current, { overwrite: "auto", ...data }, startAt)
+          .to(
+            containerRef.current,
+            {
+              overwrite: "auto",
+              alpha: 0,
+              duration: 0.1,
+              ...alphaCompleteParams,
+            },
+            Number(endAt) - 0.09
+          ); // reset alpha on timeline reverse or complete.
 
-        if (!ignoreTlForVideo) {
-          tl.current.from(containerRef.current, { ...data }, startAt);
-        }
+        // // add ease animation effects
+        // if (!isEmpty(ease.from)) {
+        //   tl.current
+        //     .from(containerRef.current, { ...ease.from }, startAt)
+        //     .to(
+        //       containerRef.current,
+        //       { alpha: 1, duration: 0.1, ...alphaStartParams },
+        //       startAt
+        //     )
+        //     .to(
+        //       containerRef.current,
+        //       { alpha: 0, duration: 0.1, ...alphaCompleteParams },
+        //       Number(endAt) - 0.09
+        //     );
+        // } else if (!isEmpty(ease.to)) {
+        //   tl.current
+        //     .to(
+        //       containerRef.current,
+        //       { alpha: 1, duration: 0.1, ...ease.to, ...alphaStartParams },
+        //       startAt
+        //     )
+        //     .to(
+        //       containerRef.current,
+        //       { alpha: 0, duration: 0.1, ...alphaCompleteParams },
+        //       Number(endAt) - 0.09
+        //     );
+        // } else if (!isEmpty(ease.fromTo)) {
+        //   tl.current
+        //     .fromTo(
+        //       containerRef.current,
+        //       ease.fromTo?.from,
+        //       { ...ease.fromTo?.to, ...alphaStartParams },
+        //       startAt
+        //     )
+        //     .to(
+        //       containerRef.current,
+        //       { alpha: 0, duration: 0.1, ...alphaCompleteParams },
+        //       Number(endAt) - 0.09
+        //     );
+        // }
       });
     }
     return () => {
       if (tl.current) {
-        // console.log("1001 kill timeline");
         tl.current.progress(0).kill();
         gsap.killTweensOf(tl.current);
       }
@@ -237,9 +242,7 @@ const AbstractContainer = React.forwardRef<
   // transformer to handle sprite transformation
   const handleOnTransformEnd = React.useCallback(
     (endData: TransformationEnd) => {
-      console.log("changeEnd", endData);
       if (props.onAnchorTransformationEnd) {
-        console.log("running onAnchorTransformationEnd");
         props.onAnchorTransformationEnd(endData);
       }
       setIsTransformerDragging(false);
@@ -251,9 +254,7 @@ const AbstractContainer = React.forwardRef<
     matrix: PIXI.filters.ColorMatrixFilter,
   });
 
-  console.log("abstraction props", props);
-  console.log("alphaRef", uniqueId, alphaRef.current, pixiAlpha, initialAlpha);
-  const alpha = alphaRef.current || pixiAlpha;
+  const alpha = alphaRef.current;
   // condition to disable pointer events when disabled or isDragging or alpha = 0
 
   return (
@@ -304,8 +305,19 @@ const AbstractContainer = React.forwardRef<
           </Filters>
         )}
         {isGif && <Container ref={imgGroupRef}>{props.children}</Container>}
+        {!isEmpty(overlay) &&
+          overlay !== OverlayTypes.NONE &&
+          overlay !== OverlayTypes.NORMAL && (
+            <PixiOverlayTilingSprite
+              overlay={overlay!}
+              width={width}
+              height={height}
+              x={x}
+              y={y}
+            />
+          )}
       </Container>
-      {applyTransformer && (
+      {applyTransformer && !isTextEditMode && (
         <PixiTransformer
           pixiTransformerRef={transformerRef}
           imageRef={containerRef}
@@ -315,6 +327,7 @@ const AbstractContainer = React.forwardRef<
           mouseoverEvent={handleMouseOverTransformer}
           uniqueId={uniqueId}
           isText={isText}
+          onDoubleClick={onDoubleClick}
         />
       )}
     </Container>

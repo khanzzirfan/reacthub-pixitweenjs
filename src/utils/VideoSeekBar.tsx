@@ -81,7 +81,7 @@ export const VideoSeekBar: React.FC = () => {
           data-testid="sliderthumb"
           value={playerTimeRef.current || 0}
           min={0}
-          max={10}
+          max={20}
           step={0.1}
           onChange={handleOnSliderChange}
           onChangeStart={handleOnSliderChangeStart}
@@ -94,10 +94,12 @@ export const VideoSeekBar: React.FC = () => {
         </Slider>
       </Flex>
       <Flex flexDir={"row"}>
-        <Text>
-          Gsap-CurrentTime: {Math.round((time + Number.EPSILON) * 100) / 100} /{" "}
-          {10}
+        <Text px={2}>Gsap-CurrentTime:</Text>
+        <Text ml={2} width={10}>
+          {Math.round((time + Number.EPSILON) * 100) / 100}
         </Text>
+        <Text ml={1}>{"/"}</Text>
+        <Text ml={1}>{timeline?.current?.duration() || 20}</Text>
       </Flex>
     </Flex>
   );

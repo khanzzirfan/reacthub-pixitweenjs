@@ -97,6 +97,7 @@ export interface PixiTextSpriteProps extends PixiBaseSpriteProps {
   applyTransformer?: boolean;
   onTextUpdate?: (data: any) => void;
   onAnchorTransformationEnd?: (endData: any) => void;
+  onExitQuillEditor?: () => void;
 }
 
 const PixiTextSprite = React.forwardRef<
@@ -105,20 +106,21 @@ const PixiTextSprite = React.forwardRef<
 >((props, ref) => {
   //// State
   const [isEditing, setIsEditing] = useState(false);
+  // State variables to track click events
+  const doubleClickDelay = 300; // Adjust this as needed
 
-  console.log("allProps", props);
   //// Refs
   const parentNode = useRef<PIXI.Container>(null);
-
+  const lastClickTimeRef = useRef<number>(0);
   /// refs
   const textRef = useRef<PIXI.Text>(null);
   const textInputGroupRef = useRef(null);
   const textInnerGroupRef = useRef(null);
   const textFontSize = useRef<number>(16);
   const textTransformDetailRef = useRef<any>(null);
+  const quillRef = useRef<Quill>(null);
 
   /// 1001
-  // console.log("contxt Values", tl);
   const {
     uniqueId,
     text,
@@ -126,6 +128,7 @@ const PixiTextSprite = React.forwardRef<
     transformation,
     onTextUpdate,
     pointerdown,
+    onExitQuillEditor,
   } = props;
 
   const {
@@ -136,7 +139,7 @@ const PixiTextSprite = React.forwardRef<
     fontWeight = "normal",
     fontStyle = "normal",
     fontSize = 16,
-
+    fontVariant = "normal",
     // fill
     fill = "black",
 
@@ -147,7 +150,8 @@ const PixiTextSprite = React.forwardRef<
     blurRadius = 0,
     blurEnabled = false,
     dropShadowColor: shadowColor = null,
-
+    dropShadow = false,
+    dropShadowBlur = 0,
     // multiline
     wordWrapWidth = 50000000,
     leading = 0,
@@ -174,9 +178,16 @@ const PixiTextSprite = React.forwardRef<
     ? fontStyle
     : undefined;
 
-  const nFontWeight = ["bold", "lighter", "100", "200", "300"].includes(
-    fontWeight
-  )
+  const nFontVariant = ["small-caps"].includes(fontVariant);
+
+  const nFontWeight = [
+    "bold",
+    "bolder",
+    "lighter",
+    "100",
+    "200",
+    "300",
+  ].includes(fontWeight)
     ? fontWeight
     : undefined;
 
@@ -195,6 +206,9 @@ const PixiTextSprite = React.forwardRef<
       ...(nFontStyle && {
         fontStyle: nFontStyle as unknown as PIXI.TextStyleFontStyle,
       }),
+      ...(nFontVariant && {
+        fontVariant: nFontVariant as unknown as PIXI.TextStyleFontVariant,
+      }),
       ...(nFontWeight && {
         fontWeight: nFontWeight as unknown as PIXI.TextStyleFontWeight,
       }),
@@ -203,8 +217,15 @@ const PixiTextSprite = React.forwardRef<
         dropShadow: true,
         dropShadowBlur: Number(blurRadius),
         dropShadowColor: shadowColor?.toString() || "black",
-        // / dropShadowAngle: Math.PI / 6,
-        dropShadowDistance: 0,
+        dropShadowAngle: 0.5235987755982988,
+        dropShadowDistance: 5,
+      }),
+      ...(dropShadow && {
+        dropShadow: true,
+        dropShadowBlur: Number(dropShadowBlur),
+        dropShadowColor: shadowColor?.toString() || "black",
+        dropShadowAngle: 0.5235987755982988,
+        dropShadowDistance: 5,
       }),
       wordWrap: true,
       breakWords: true,
@@ -218,14 +239,18 @@ const PixiTextSprite = React.forwardRef<
     fill,
     fontFamily,
     fontSize,
+    fontStyle,
     leading,
     nFontStyle,
     nFontWeight,
+    nFontVariant,
     nLetterSpacing,
     shadowColor,
     stroke,
     strokeThickness,
     wordWrapWidth,
+    dropShadow,
+    dropShadowBlur,
   ]);
 
   // let textMetrics = {};
@@ -242,8 +267,20 @@ const PixiTextSprite = React.forwardRef<
 
   // @ts-ignore
   const handleOnDoubleClickEditText = () => {
-    console.log("double click triggered");
     setIsEditing(true);
+  };
+
+  const handleOnPointerDown = () => {
+    const currentTime = new Date().getTime();
+    const clickTimeDiff = currentTime - lastClickTimeRef.current;
+    if (clickTimeDiff < doubleClickDelay) {
+      handleOnDoubleClickEditText();
+    } else {
+      if (pointerdown) {
+        pointerdown();
+      }
+    }
+    lastClickTimeRef.current = currentTime;
   };
 
   const handleTextChange = (e: string) => {
@@ -251,10 +288,11 @@ const PixiTextSprite = React.forwardRef<
       onTextUpdate({
         text: e,
         uniqueId: uniqueId,
-        droptype: "titles",
       });
     }
   };
+
+  // const handleOnMouseDown = (interactionData) => {
 
   // const handleOnMoveOver = (interactionData) => {
   //   if (!isDragging) {
@@ -268,18 +306,24 @@ const PixiTextSprite = React.forwardRef<
   //   }
   // };
 
+  const closeEditor = () => {
+    setIsEditing(false);
+    if (onExitQuillEditor) onExitQuillEditor();
+  };
+
   React.useEffect(() => {
     if (isEditing && textInputGroupRef.current) {
       let el = document.getElementById("note-editor");
       if (el) {
         el.style.position = "absolute";
+        el.style.display = "block";
         el.style.zIndex = "10";
         el.style.left = x + "px";
         el.style.top = y + "px";
         el.style.backgroundColor = "var(--chakra-color-darkShark)";
         el.style.transform = "scale(1.5)";
-        el.style.width = 300 + "px";
-        el.style.height = 100 + "px";
+        el.style.width = "300px";
+        el.style.height = "100px";
         el.style.color = "#fff";
         el.style.fontSize = "20px";
         el.style.border = "1px solid #CBCEE0";
@@ -289,20 +333,19 @@ const PixiTextSprite = React.forwardRef<
           esc: {
             key: 27,
             handler: function () {
-              setIsEditing(false);
-              /// onUnSelectKeyFrame();
+              closeEditor();
             },
           },
           enter: {
             key: 13,
             handler: function () {
-              setIsEditing(false);
-              /// onUnSelectKeyFrame();
+              closeEditor();
             },
           },
         };
 
-        var quill = new Quill("#note-editor", {
+        // @ts-ignore
+        quillRef.current = new Quill("#note-editor", {
           modules: {
             toolbar: false,
             keyboard: {
@@ -315,24 +358,81 @@ const PixiTextSprite = React.forwardRef<
           theme: "snow", // or 'bubble'
         });
 
-        quill.on("text-change", function () {
-          handleTextChange(quill.root.innerText);
-        });
+        if (quillRef.current) {
+          quillRef.current.on("text-change", function () {
+            if (quillRef.current)
+              handleTextChange(quillRef.current.root.innerText);
+          });
 
-        quill.setText(text);
-        quill.focus();
-        quill.off("text-change", () => {
-          console.log("removed");
-        });
-        if (!quill.hasFocus()) {
-          el.style.display = "none";
+          quillRef.current.setText(text);
+          quillRef.current.focus();
+          quillRef.current.off("text-change", () => {});
+
+          if (!quillRef.current.hasFocus()) {
+            el.style.display = "none";
+          }
+
+          // add the custom closing icon below the container
+          // Append the close icon button
+          const closeButton = document.createElement("button");
+          closeButton.innerHTML = "&#10006;"; // Close icon (you can customize)
+          closeButton.style.position = "absolute";
+          closeButton.style.bottom = "-14px";
+          closeButton.style.left = "-3px";
+          closeButton.style.cursor = "pointer";
+          closeButton.addEventListener("click", () => {
+            closeEditor();
+          });
+          closeButton.style.border = "none"; // Remove default border
+          closeButton.style.borderRadius = "50%"; // Apply rounded border
+          closeButton.style.width = "15px"; // Adjust button width
+          closeButton.style.height = "15px"; // Adjust button height
+          closeButton.style.backgroundColor = "#f8f8f8"; // Background color
+          closeButton.style.color = "#333"; // Text color
+          closeButton.style.fontSize = "10px"; // Text size
+
+          el.appendChild(closeButton);
         }
       }
+    } else {
+      if (quillRef.current) {
+        let quillParent = document.getElementById("note-editor");
+        if (quillParent && quillParent.hasChildNodes()) {
+          // @ts-ignore
+          quillParent.removeChild(quillParent.firstChild);
+          quillParent.removeAttribute("class");
+          quillParent.removeAttribute("style");
+        }
+        quillRef.current.off("text-change", () => {});
+      }
     }
+    return () => {
+      if (quillRef.current) {
+        quillRef.current.off("text-change", () => {});
+        // @ts-ignore
+        // quillRef.current = null;
+      }
+    };
   }, [x, y, isEditing]);
 
+  React.useEffect(() => {
+    // Cleanup Quill when isEditing is programmatically set to false
+    if (!isEditing) {
+      const el = document.getElementById("note-editor");
+      if (el) {
+        el.style.display = "none";
+      }
+    }
+  }, [isEditing]);
+
   return (
-    <AbstractContainer {...props} ref={ref} isText={true}>
+    <AbstractContainer
+      {...props}
+      ref={ref}
+      isText={true}
+      onDoubleClick={handleOnDoubleClickEditText}
+      isTextEditMode={isEditing}
+    >
       <Container ref={parentNode}>
         {/* @ts-ignore */}
         {isEditing && <Container ref={textInputGroupRef}></Container>}
@@ -348,7 +448,7 @@ const PixiTextSprite = React.forwardRef<
               !disabled && {
                 interactive: true,
                 buttonMode: true,
-                pointerdown: pointerdown,
+                pointerdown: handleOnPointerDown,
               })}
             ref={textRef}
             filters={[

@@ -1,6 +1,8 @@
 import * as React from "react";
 import useDeepEffect from "./useDeepEffect";
 import { TransformationEnd } from "../types/transformation";
+import { GsapPixieContext } from "../providers/GsapPixieContextProvider";
+import gsap from "gsap";
 
 interface AppState {
   transformation: {
@@ -12,7 +14,7 @@ interface AppStateContextProviderProps extends AppState {
   children: React.ReactNode;
 }
 
-export const AppStateContextProvider: React.FC<
+export const AppStateSequenceProvider: React.FC<
   AppStateContextProviderProps
 > = ({ children, ...props }) => {
   console.log("AppStateContextProvider", props);
@@ -20,8 +22,22 @@ export const AppStateContextProvider: React.FC<
 
   const appStateRef = React.useRef<AppState>(props);
 
+  //// Context
+  const { tl } = React.useContext(GsapPixieContext);
+
   useDeepEffect(() => {
     appStateRef.current = props;
+    // @ts-ignore
+    const { startAt, endAt } = props;
+    const duration = endAt - startAt;
+    console.log("AppStateContextProvider useDeepEffect", props);
+    const ctx = gsap.context(() => {
+      if (tl.current) {
+        // add tween to timeline
+        tl.current.to(appStateRef.current, { duration: duration }, 0);
+      }
+    });
+    return () => ctx.revert();
   }, [props]);
 
   const onAnchorTransformationEnd = React.useCallback(

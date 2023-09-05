@@ -1,4 +1,5 @@
 import { Effects } from "./Effects";
+import { OverlayTypes } from "../hocs/OverlayTilingSprite";
 
 export interface PixiBaseSpriteProps {
   children?: React.ReactNode;
@@ -46,6 +47,7 @@ export interface PixiBaseSpriteProps {
       scaleInput?: number;
     };
     effect?: Effects;
+    overlay?: OverlayTypes;
   };
   pointerdown?: () => void;
   pointerup?: () => void;

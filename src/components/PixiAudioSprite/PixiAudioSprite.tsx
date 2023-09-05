@@ -49,7 +49,6 @@ const PixiAudioSprite: React.FC<PixiAudioSpriteProps> = (props) => {
   };
   //// State
   const [, setIsMounted] = React.useState(false);
-  console.log("allProps", props);
   //// Refs
   const containerRef = useRef<PIXI.Container>(null);
   const audioStateRef = useRef<AudioState>(initialState);
@@ -131,7 +130,6 @@ const PixiAudioSprite: React.FC<PixiAudioSpriteProps> = (props) => {
 
   const gsapOnComplete = () => {
     if (containerRef.current) {
-      console.log("audio gsapOnStart", startAt);
       // @ts-ignore
       audioContainerRef.current?.stop();
       audioStateRef.current.isPlaying = false;
@@ -215,11 +213,9 @@ const PixiAudioSprite: React.FC<PixiAudioSpriteProps> = (props) => {
 
   React.useEffect(() => {
     if (containerRef.current && audioContainerRef.current) {
-      // console.log("soundref", audioContainerRef.current);
       // @ts-ignore
       audioStateRef.current.mute = mute;
       audioStateRef.current.speed = speed;
-      // console.log("containerAudio", audioContainerRef.current.volume);
       audioContainerRef.current.volume = mute ? 0 : 1;
     }
   }, [mute, speed]);

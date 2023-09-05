@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { PixiImageSprite } from ".";
 import { AppStateContextProvider } from "../../utils/AppStateProvider";
 import { Effects } from "../../types/Effects";
+import { OverlayTypes } from "../../hocs/OverlayTilingSprite";
 
 // More on how to set up stories at: https://storybook.js.org/docs/react/writing-stories/introduction
 const meta = {
@@ -406,6 +407,73 @@ export const FilterEffects: Story = {
   parameters: {
     controls: {
       include: ["effect"],
+    },
+  },
+};
+
+// More on writing stories with args: https://storybook.js.org/docs/react/writing-stories/args
+export const Overlays: Story = {
+  render: (args: any) => {
+    const initialProps = {
+      uniqueId: "image-overlay-filters001", // uniqueId of the sprite
+      src: "https://eyecastvideoeditorfiles.s3.ap-southeast-2.amazonaws.com/public%2Firfan%40trolio.com%2F6472d56e805c3bffc3cded33%2Fvideos%2Ff4gWXRxDXf%2FAnimChar.jpeg",
+      applyTransformer: false,
+      startAt: 0,
+      endAt: 5,
+      transformation: {
+        x: 200,
+        y: 200,
+        width: 300,
+        height: 300,
+        anchor: 0.5,
+        rotation: 0,
+        alpha: 1,
+        scale: 1,
+        tint: 0xffffff,
+        blendMode: 0,
+        overlay: args.overlay,
+      },
+      initialAlpha: 1,
+    };
+    return (
+      <AppStateContextProvider {...initialProps}>
+        <PixiImageSprite {...initialProps} />
+      </AppStateContextProvider>
+    );
+  },
+  args: {
+    uniqueId: "image-filtereffects001", // uniqueId of the sprite
+    src: "https://eyecastvideoeditorfiles.s3.ap-southeast-2.amazonaws.com/public%2Firfan%40trolio.com%2F6472d56e805c3bffc3cded33%2Fvideos%2Ff4gWXRxDXf%2FAnimChar.jpeg",
+    applyTransformer: false,
+    startAt: 0,
+    endAt: 5,
+    transformation: {
+      x: 200,
+      y: 200,
+      width: 150,
+      height: 150,
+      anchor: 0.5,
+      rotation: 0,
+      alpha: 1,
+      scale: 1,
+      tint: 0xffffff,
+      blendMode: 0,
+      overlay: OverlayTypes.LENSFLARE,
+    },
+    initialAlpha: 1,
+  },
+  argTypes: {
+    // @ts-ignore
+    overlay: {
+      control: "select",
+      options: Object.values(OverlayTypes),
+      description:
+        "overlay effects of the sprite. it is enum type supplied as prop to the transformation property in the props.",
+    },
+  },
+  parameters: {
+    controls: {
+      include: ["overlay"],
     },
   },
 };

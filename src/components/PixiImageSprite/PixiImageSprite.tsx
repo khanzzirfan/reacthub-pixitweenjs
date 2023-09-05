@@ -11,13 +11,14 @@ import {
   ForwardedRefResponse,
 } from "../../types/BaseProps";
 import { withFiltersHook } from "../../hooks/withFiltersHook";
+import { withEffectsHooks } from "../../hooks/withEffectsHook";
+import { Effects } from "../../types/Effects";
 
 const PixiImageSprite = React.forwardRef<
   ForwardedRefResponse | null,
   PixiBaseSpriteProps
 >((props, ref) => {
   //// State
-
   //// Refs
   const imageRef = useRef<PIXI.Sprite>(null);
   const imgGroupRef = useRef<PIXI.Container>(null);
@@ -25,10 +26,17 @@ const PixiImageSprite = React.forwardRef<
   //// Context
 
   /// 1001
-  // console.log("contxt Values", tl);
   const {
     src,
-    transformation: { x, y, width, height, anchor, colorCorrection = {} },
+    transformation: {
+      x,
+      y,
+      width,
+      height,
+      anchor,
+      colorCorrection = {},
+      effect,
+    },
     pointerdown,
   } = props;
 
@@ -41,6 +49,14 @@ const PixiImageSprite = React.forwardRef<
     blurFilter,
     adjustmentFilter,
   } = withFiltersHook(colorCorrection);
+
+  const { nightVisionFilter } = withEffectsHooks();
+
+  React.useEffect(() => {
+    return () => {
+      console.log("PixiImageSprite unmounting");
+    };
+  }, []);
 
   return (
     <AbstractContainer {...props} ref={ref}>
@@ -63,6 +79,8 @@ const PixiImageSprite = React.forwardRef<
             adjustmentFilter,
             // conditionally add blur filter
             ...(blurRadius > 0 ? [blurFilter] : []),
+            // conditionally add night vision filter
+            ...(effect === Effects.NightVision ? [nightVisionFilter] : []),
           ]}
         />
       </Container>
@@ -71,3 +89,9 @@ const PixiImageSprite = React.forwardRef<
 });
 
 export default PixiImageSprite;
+
+// @ts-ignore
+PixiImageSprite.whyDidYouRender = {
+  logOnDifferentValues: true,
+  customName: "ImageSprite",
+};

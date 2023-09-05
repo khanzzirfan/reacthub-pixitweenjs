@@ -12,7 +12,7 @@ type PixiTransformerProps = {
   transformCommit?: (data: any) => void;
   transformChange?: (data: any) => void;
   mouseoverEvent?: (flag: boolean) => void;
-  onDoubleClick?: (data: any) => void;
+  onDoubleClick?: () => void;
   uniqueId?: string;
   isText?: boolean;
 };
@@ -33,7 +33,7 @@ const PixiTransformer = ({
   transformCommit,
   transformChange,
   mouseoverEvent,
-  // onDoubleClick,
+  onDoubleClick,
   uniqueId = "",
   isText = false,
 }: PixiTransformerProps) => {
@@ -43,6 +43,10 @@ const PixiTransformer = ({
   const transformerState = React.useRef<PixiTransformerState>({
     isDragging: false,
   });
+
+  // State variables to track click events
+  const doubleClickDelay = 300; // Adjust this as needed
+  const lastClickTimeRef = React.useRef<number>(0);
 
   const handleOnMouseOver = React.useCallback(() => {
     if (mouseoverEvent && !transformerState.current.isDragging) {
@@ -59,6 +63,16 @@ const PixiTransformer = ({
   const handleOnMouseDown = React.useCallback(() => {
     // update transfomer state to is draggin.
     transformerState.current.isDragging = true;
+
+    const currentTime = new Date().getTime();
+    const clickTimeDiff = currentTime - lastClickTimeRef.current;
+    if (clickTimeDiff < doubleClickDelay) {
+      if (onDoubleClick) {
+        onDoubleClick();
+      }
+    } else {
+    }
+    lastClickTimeRef.current = currentTime;
   }, []);
 
   // const handleOnMouseUp = React.useCallback(() => {
@@ -72,7 +86,6 @@ const PixiTransformer = ({
   // }, []);
 
   // const handleOnDoubleClick = React.useCallback(() => {
-  //   console.log("dobule click in pixi transformer");
   //   if (onDoubleClick) onDoubleClick({ uniqueId });
   // }, [onDoubleClick]);
 
@@ -122,6 +135,7 @@ const PixiTransformer = ({
     transformerState.current.isDragging = false;
   }, [transformCommit]);
 
+  // add event listeners
   React.useEffect(() => {
     if (pixiTransformerRef.current) {
       pixiTransformerRef.current.on("mouseover", handleOnMouseOver);
