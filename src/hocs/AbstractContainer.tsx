@@ -82,7 +82,7 @@ const AbstractContainer = React.forwardRef<
   } = props;
 
   // log all props
-  // color corrections
+  console.log("AbstractContainer", props);
 
   /** dot config */
   // const dotConfig = {
@@ -180,7 +180,7 @@ const AbstractContainer = React.forwardRef<
               duration: 0.1,
               ...alphaCompleteParams,
             },
-            Number(endAt) - 0.09
+            Number(endAt) - 0.08
           ); // reset alpha on timeline reverse or complete.
 
         // // add ease animation effects
@@ -226,10 +226,11 @@ const AbstractContainer = React.forwardRef<
       });
     }
     return () => {
-      if (tl.current) {
-        tl.current.progress(0).kill();
-        gsap.killTweensOf(tl.current);
-      }
+      // if (tl.current) {
+      //   tl.current.progress(0).kill();
+      //   gsap.killTweensOf(tl.current);
+      // }
+      console.log("abstract container unmounting", uniqueId);
       ctx.revert(); // cleanup!
     };
   }, [animation, startAt, endAt, ignoreTlForVideo]);

@@ -3,11 +3,19 @@ import { PixiImageSprite } from ".";
 import { AppStateContextProvider } from "../../utils/AppStateProvider";
 import { Effects } from "../../types/Effects";
 import { OverlayTypes } from "../../hocs/OverlayTilingSprite";
+import { AppWrapper } from "../../utils/AppWrapper";
 
 // More on how to set up stories at: https://storybook.js.org/docs/react/writing-stories/introduction
 const meta = {
   title: "Components/ImageSprite",
   component: PixiImageSprite,
+  decorators: [
+    (Story: any) => (
+      <div style={{ width: "100%", height: "100%" }}>
+        <AppWrapper>{Story({ appState: "x" })}</AppWrapper>
+      </div>
+    ),
+  ],
 
   tags: ["autodocs"],
   argTypes: {

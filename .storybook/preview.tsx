@@ -19,8 +19,4 @@ const preview = {
   },
 };
 
-export const decorators = [
-  (Story) => <AppWrapper>{Story({ appState: "x" })}</AppWrapper>,
-];
-
 export default preview;

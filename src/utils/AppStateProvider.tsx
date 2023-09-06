@@ -17,11 +17,14 @@ export const AppStateContextProvider: React.FC<
 > = ({ children, ...props }) => {
   console.log("AppStateContextProvider", props);
   const [mouseOverSprite, setMouseOverSprite] = React.useState<boolean>(false);
+  const [counter, setCounter] = React.useState<number>(0);
 
   const appStateRef = React.useRef<AppState>(props);
 
   useDeepEffect(() => {
+    console.log("useDeepEffect", props);
     appStateRef.current = props;
+    setCounter((prev) => prev + 1);
   }, [props]);
 
   const onAnchorTransformationEnd = React.useCallback(
@@ -73,6 +76,7 @@ export const AppStateContextProvider: React.FC<
         mouseOverSprite,
         onTextUpdate,
         onExitQuillEditor,
+        datatestid: counter,
       })}
     </>
   );

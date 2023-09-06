@@ -4,7 +4,6 @@ import { PixiImageSprite } from "../../components/PixiImageSprite";
 import { PixiGifSprite } from "../../components/PixiGifSprite";
 import { PixiBaseSpriteProps } from "../../types";
 import { ImageProps, GifProps } from "./common.tests";
-import { GsapPixieContext } from "../../providers/GsapPixieContextProvider";
 
 export enum SpriteType {
   Image = "Image",
@@ -36,7 +35,6 @@ export const TimelineWithGif = (props: TimelineTestProps) => {
   const [selected, setSelected] = React.useState<string>("");
   const { startAt, endAt } = props;
   //// Context
-  const { tl } = React.useContext(GsapPixieContext);
 
   // use effect to invalidate the timeline when props changes
 

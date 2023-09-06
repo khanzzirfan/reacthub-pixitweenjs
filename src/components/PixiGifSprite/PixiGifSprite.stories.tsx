@@ -2,12 +2,19 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { PixiGifSprite } from ".";
 import { AppStateContextProvider } from "../../utils/AppStateProvider";
 import { Effects } from "../../types/Effects";
+import { AppWrapper } from "../../utils/AppWrapper";
 
 // More on how to set up stories at: https://storybook.js.org/docs/react/writing-stories/introduction
 const meta = {
   title: "Components/GifSprite",
   component: PixiGifSprite,
-
+  decorators: [
+    (Story: any) => (
+      <div style={{ width: "100%", height: "100%" }}>
+        <AppWrapper>{Story({ appState: "x" })}</AppWrapper>
+      </div>
+    ),
+  ],
   tags: ["autodocs"],
   argTypes: {
     uniqueId: {
@@ -119,7 +126,7 @@ export const Normal: Story = {
     loop: false,
     applyTransformer: false,
     startAt: 0,
-    endAt: 3,
+    endAt: 5,
     frameStartAt: 0,
     frameEndAt: 3,
     transformation: {

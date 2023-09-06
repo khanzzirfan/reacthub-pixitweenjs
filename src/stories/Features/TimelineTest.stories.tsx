@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { SpriteType, TimelineTest } from "./TimelineTest";
+import { TimelineTest } from "./TimelineTest";
+import { TimelineTestVideos } from "./TimelineTestWithVideos";
 import { TimelineWithGif } from "./TimelineWithGif";
-import { ImageProps } from "./common.tests";
 
 // More on how to set up stories at: https://storybook.js.org/docs/react/writing-stories/introduction
 const meta = {
@@ -10,27 +10,7 @@ const meta = {
 
   tags: ["autodocs"],
   argTypes: {
-    startAt: {
-      description: "The content of the component.",
-      control: {
-        type: "number",
-      },
-    },
-    endAt: {
-      description: "The content of the component.",
-      control: {
-        type: "number",
-      },
-    },
-    spriteType: {
-      description: "The content of the component.",
-      control: {
-        type: "select",
-        options: Object.values(SpriteType),
-        description: "filter effects of the sprite",
-      },
-    },
-    pixiBaseProps: {
+    sequences: {
       description: "The content of the component.",
       control: {
         type: "object",
@@ -46,35 +26,63 @@ type Story = StoryObj<typeof meta>;
 export const Normal: Story = {
   render: (args: any) => <TimelineTest {...args} />,
   args: {
-    startAt: 0,
-    endtAt: 5,
-    spriteType: SpriteType.Image,
-    pixiBaseProps: ImageProps,
-  },
-  argTypes: {
-    // @ts-ignore
-    spriteType: {
-      control: "select",
-      options: Object.values(SpriteType),
-      description: "Sprite Type for displaying on the canvas",
-    },
+    sequences: [
+      {
+        startAt: 0,
+        endAt: 5,
+      },
+      {
+        startAt: 4,
+        endAt: 9,
+      },
+      {
+        startAt: 6,
+        endAt: 8,
+      },
+    ],
   },
 };
 
 export const GifTest: Story = {
   render: (args: any) => <TimelineWithGif {...args} />,
   args: {
-    startAt: 0,
-    endtAt: 5,
-    spriteType: SpriteType.Image,
-    pixiBaseProps: ImageProps,
+    sequences: [
+      {
+        startAt: 0,
+        endAt: 5,
+      },
+      {
+        startAt: 0,
+        endAt: 5,
+      },
+      {
+        startAt: 0,
+        endAt: 5,
+      },
+    ],
   },
-  argTypes: {
-    // @ts-ignore
-    spriteType: {
-      control: "select",
-      options: Object.values(SpriteType),
-      description: "Sprite Type for displaying on the canvas",
-    },
+};
+
+export const VideoTest: Story = {
+  render: (args: any) => <TimelineTestVideos {...args} />,
+  args: {
+    sequences: [
+      {
+        startAt: 0,
+        endAt: 5,
+      },
+      {
+        startAt: 4,
+        endAt: 9,
+      },
+      {
+        startAt: 6,
+        endAt: 15,
+      },
+      {
+        startAt: 12,
+        endAt: 35,
+      },
+    ],
   },
 };

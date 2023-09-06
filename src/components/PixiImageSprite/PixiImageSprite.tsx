@@ -40,6 +40,9 @@ const PixiImageSprite = React.forwardRef<
     pointerdown,
   } = props;
 
+  // log all props
+  console.log("PixiImageSprite props", props);
+
   const { blurRadius = 0 } = colorCorrection;
   // use with filters hoooks to get the filters
   const {

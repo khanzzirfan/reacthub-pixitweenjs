@@ -1,12 +1,19 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { PixiAudioSprite } from ".";
 import { AppStateContextProvider } from "../../utils/AppStateProvider";
+import { AppWrapper } from "../../utils/AppWrapper";
 
 // More on how to set up stories at: https://storybook.js.org/docs/react/writing-stories/introduction
 const meta = {
   title: "Components/AudioSprite",
   component: PixiAudioSprite,
-
+  decorators: [
+    (Story: any) => (
+      <div style={{ width: "100%", height: "100%" }}>
+        <AppWrapper>{Story({ appState: "x" })}</AppWrapper>
+      </div>
+    ),
+  ],
   tags: ["autodocs"],
   argTypes: {
     uniqueId: {

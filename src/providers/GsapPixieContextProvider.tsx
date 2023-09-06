@@ -58,7 +58,6 @@ const GsapPixieContextProvider: React.FC<{ children: React.ReactNode }> = ({
   const tl = useRef<gsap.core.Timeline>();
   const gsapCtx = useRef<any>();
   const playerTimeRef = useRef<number>(0.001);
-  const playerProgressRef = useRef<number>(0);
 
   // const parentElementRef = useRef<any>();
   // передаем предка анимируемых элементов
@@ -177,13 +176,6 @@ const GsapPixieContextProvider: React.FC<{ children: React.ReactNode }> = ({
       timeline.restart();
     }
     // setPlay(true);
-  }, []);
-
-  const handleInvalidate = useCallback(() => {
-    if (tl.current) {
-      const timeline = tl.current;
-      timeline.invalidate();
-    }
   }, []);
 
   // /**

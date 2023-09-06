@@ -5,12 +5,19 @@ import { PixiImageSprite } from "../PixiImageSprite";
 import { PixiGifSprite } from "../PixiGifSprite";
 import { PixiVideoSprite } from "../PixiVideoSprite";
 import { AppStateSequenceProvider } from "../../utils/AppStateSequenceProvider";
+import { AppWrapper } from "../../utils/AppWrapper";
 
 // More on how to set up stories at: https://storybook.js.org/docs/react/writing-stories/introduction
 const meta = {
   title: "Components/PixiSequence",
   component: PixiSequence,
-
+  decorators: [
+    (Story: any) => (
+      <div style={{ width: "100%", height: "100%" }}>
+        <AppWrapper>{Story({ appState: "x" })}</AppWrapper>
+      </div>
+    ),
+  ],
   tags: ["autodocs"],
   argTypes: {
     children: {

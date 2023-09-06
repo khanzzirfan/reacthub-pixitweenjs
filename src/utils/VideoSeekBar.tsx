@@ -81,14 +81,14 @@ export const VideoSeekBar: React.FC = () => {
           data-testid="sliderthumb"
           value={playerTimeRef.current || 0}
           min={0}
-          max={20}
+          max={50}
           step={0.1}
           onChange={handleOnSliderChange}
           onChangeStart={handleOnSliderChangeStart}
           onChangeEnd={handleOnSliderChangeEnd}
         >
           <SliderTrack>
-            <SliderFilledTrack />
+            <SliderFilledTrack color="green.400" />
           </SliderTrack>
           <SliderThumb data-testid="sliderthumb" ref={sliderThumbRef} />
         </Slider>
