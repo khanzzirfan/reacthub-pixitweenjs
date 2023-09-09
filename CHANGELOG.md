@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.100](https://github.com/khanzzirfan/reacthub-pixitweenjs/compare/v0.2.99...v0.2.100) (2023-09-09)
+
+
+### Bug Fixes
+
+* reverse timeline mode for the audios ([7776674](https://github.com/khanzzirfan/reacthub-pixitweenjs/commit/7776674078cfff49f5f0ae450fdf3f9fc38b7fe9))
+
 ### [0.2.99](https://github.com/khanzzirfan/reacthub-pixitweenjs/compare/v0.2.98...v0.2.99) (2023-09-08)
 
 ### [0.2.98](https://github.com/khanzzirfan/reacthub-pixitweenjs/compare/v0.2.97...v0.2.98) (2023-09-08)
