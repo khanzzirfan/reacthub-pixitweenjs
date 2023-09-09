@@ -70,3 +70,14 @@ export const videoProps = {
   mute: false,
   locked: false,
 };
+
+export const audioProps = {
+  uniqueId: "audio001", // uniqueId of the sprite
+  src: "https://eyecastvideoeditorfiles.s3.ap-southeast-2.amazonaws.com/public%2Firfan%40trolio.com%2F6472d56e805c3bffc3cded33%2Fvideos%2F8Qq3DKrGnQ%2Fpiano2-CoolEdit.mp3",
+  startAt: 0,
+  endAt: 5,
+  audioStartAt: 0,
+  audioEndAt: 5,
+  mute: false,
+  speed: 1,
+};

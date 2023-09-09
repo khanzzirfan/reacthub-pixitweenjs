@@ -1,6 +1,5 @@
 import * as React from "react";
-import { useContext, useRef, useState } from "react";
-import gsap from "gsap";
+import { useRef, useState } from "react";
 import { Container, withFilters } from "@pixi/react";
 import * as PIXI from "pixi.js";
 import { Effects } from "../types/Effects";
@@ -8,11 +7,7 @@ import { Effects } from "../types/Effects";
 import PixiTransformer from "../components/PixiTransformer/PixiTransformer";
 import { PixiBaseSpriteProps, ForwardedRefResponse } from "../types/BaseProps";
 import { TransformationEnd } from "../types/transformation";
-import {
-  GsapPixieContext,
-  Events,
-} from "../providers/GsapPixieContextProvider";
-import { getAnimByName } from "../utils/GsapAnim";
+import { Events } from "../providers/GsapPixieContextProvider";
 // @ts-ignore
 import isEmpty from "lodash/isEmpty";
 import { useCustomEventListener } from "../events";
@@ -46,17 +41,13 @@ const AbstractContainer = React.forwardRef<
   const parentNode = useRef<PIXI.Container>(null);
   const imgGroupRef = useRef<PIXI.Container>(null);
   const transformerRef = useRef<PIXI.Container>(null);
-  const alphaRef = useRef<number>(props.initialAlpha);
 
   //// Context
-  const { tl } = useContext(GsapPixieContext);
+  // const { tl, reverseModeRef } = useContext(GsapPixieContext);
 
   // use props with useMemo
   const {
     uniqueId,
-    startAt,
-    endAt,
-    initialAlpha,
     transformation: {
       x,
       y,
@@ -64,13 +55,11 @@ const AbstractContainer = React.forwardRef<
       height,
       scale = [1, 1],
       rotation = 0,
-      animation,
       effect,
       overlay,
     },
     applyTransformer,
     disabled,
-    ignoreTlForVideo,
     pointerdown,
     pointerout,
     pointerover,
@@ -82,7 +71,6 @@ const AbstractContainer = React.forwardRef<
   } = props;
 
   // log all props
-  console.log("AbstractContainer", props);
 
   /** dot config */
   // const dotConfig = {
@@ -97,7 +85,7 @@ const AbstractContainer = React.forwardRef<
   /** Event Listeneres */
   useCustomEventListener(Events.COMPLETE, () => {
     if (containerRef.current) {
-      alphaRef.current = initialAlpha;
+      // alphaRef.current = initialAlpha;
       // setPixiAlpha(initialAlpha);
     }
   });
@@ -127,114 +115,6 @@ const AbstractContainer = React.forwardRef<
     if (pointerover) pointerover();
   }, []);
 
-  const gsapOnAlphaReverseComplete = () => {
-    alphaRef.current = initialAlpha;
-    /// setPixiAlpha(initialAlpha);
-  };
-
-  const gsapOnAlphaStart = (params: { alpha: number }) => {
-    alphaRef.current = params.alpha;
-    /// setPixiAlpha(params.alpha);
-  };
-
-  const gsapOnAlphaComplete = (params: { alpha: number }) => {
-    alphaRef.current = params.alpha;
-    ///setPixiAlpha(params.alpha);
-  };
-
-  React.useEffect(() => {
-    let ctx = gsap.context(() => {});
-    if (containerRef.current && tl.current) {
-      const data = {
-        duration: Number(endAt) - Number(startAt),
-      };
-
-      const alphaStartParams = {
-        onStart: gsapOnAlphaStart,
-        onReverseComplete: gsapOnAlphaReverseComplete,
-        onStartParams: [{ alpha: 1 }],
-      };
-
-      const alphaCompleteParams = {
-        onComplete: gsapOnAlphaComplete,
-        onCompleteParams: [{ alpha: 0 }],
-      };
-
-      const ease = getAnimByName(animation || "None");
-      console.log("easeing", ease);
-      ctx = gsap.context(() => {
-        // initial alpha and duration of timeline setup
-
-        tl.current
-          .to(
-            containerRef.current,
-            { overwrite: "auto", alpha: 1, duration: 0.1, ...alphaStartParams },
-            startAt
-          )
-          .from(containerRef.current, { overwrite: "auto", ...data }, startAt)
-          .to(
-            containerRef.current,
-            {
-              overwrite: "auto",
-              alpha: 0,
-              duration: 0.1,
-              ...alphaCompleteParams,
-            },
-            Number(endAt) - 0.08
-          ); // reset alpha on timeline reverse or complete.
-
-        // // add ease animation effects
-        // if (!isEmpty(ease.from)) {
-        //   tl.current
-        //     .from(containerRef.current, { ...ease.from }, startAt)
-        //     .to(
-        //       containerRef.current,
-        //       { alpha: 1, duration: 0.1, ...alphaStartParams },
-        //       startAt
-        //     )
-        //     .to(
-        //       containerRef.current,
-        //       { alpha: 0, duration: 0.1, ...alphaCompleteParams },
-        //       Number(endAt) - 0.09
-        //     );
-        // } else if (!isEmpty(ease.to)) {
-        //   tl.current
-        //     .to(
-        //       containerRef.current,
-        //       { alpha: 1, duration: 0.1, ...ease.to, ...alphaStartParams },
-        //       startAt
-        //     )
-        //     .to(
-        //       containerRef.current,
-        //       { alpha: 0, duration: 0.1, ...alphaCompleteParams },
-        //       Number(endAt) - 0.09
-        //     );
-        // } else if (!isEmpty(ease.fromTo)) {
-        //   tl.current
-        //     .fromTo(
-        //       containerRef.current,
-        //       ease.fromTo?.from,
-        //       { ...ease.fromTo?.to, ...alphaStartParams },
-        //       startAt
-        //     )
-        //     .to(
-        //       containerRef.current,
-        //       { alpha: 0, duration: 0.1, ...alphaCompleteParams },
-        //       Number(endAt) - 0.09
-        //     );
-        // }
-      });
-    }
-    return () => {
-      // if (tl.current) {
-      //   tl.current.progress(0).kill();
-      //   gsap.killTweensOf(tl.current);
-      // }
-      console.log("abstract container unmounting", uniqueId);
-      ctx.revert(); // cleanup!
-    };
-  }, [animation, startAt, endAt, ignoreTlForVideo]);
-
   /** handle on tranformer onchange */
   const handleOnTransformChange = React.useCallback(() => {
     setIsTransformerDragging(true);
@@ -255,14 +135,12 @@ const AbstractContainer = React.forwardRef<
     matrix: PIXI.filters.ColorMatrixFilter,
   });
 
-  const alpha = alphaRef.current;
   // condition to disable pointer events when disabled or isDragging or alpha = 0
 
   return (
     <Container ref={parentNode}>
       <Container
         ref={containerRef}
-        alpha={alpha}
         position={[x, y]}
         pivot={[x, y]}
         width={width}
@@ -271,8 +149,7 @@ const AbstractContainer = React.forwardRef<
         rotation={rotation}
         {...(!disabled &&
           !isTransformerDragging &&
-          !isDragging &&
-          alpha > 0 && {
+          !isDragging && {
             interactive: true,
             buttonMode: true,
             pointerdown: pointerdown,

@@ -13,6 +13,8 @@ import gsap from "gsap";
 import AbstractContainer from "../../hocs/AbstractContainer";
 // @ts-ignore
 import isEmpty from "lodash/isEmpty";
+// @ts-ignore
+import debounce from "lodash/debounce";
 import {
   PixiBaseSpriteProps,
   ForwardedRefResponse,
@@ -82,9 +84,8 @@ const PixiVideoSprite = React.forwardRef<
   const tweenRef = useRef<gsap.core.Tween>();
 
   //// Context
-  const { tl, isDragging: gsapDragging } = useContext(GsapPixieContext);
+  const { tl, dragModeRef } = useContext(GsapPixieContext);
 
-  // console log draggging
   /// 1001
   // console.log("contxt Values", tl);
   const {
@@ -136,20 +137,61 @@ const PixiVideoSprite = React.forwardRef<
     }
   });
 
+  /** Debounce pause video */
+  const pauseVideoDebounce = React.useCallback(
+    debounce(() => {
+      if (videoElement.current) {
+        const vid = videoElement.current;
+        const isVidPlaying =
+          vid.currentTime > 0 &&
+          !vid.paused &&
+          !vid.ended &&
+          vid.readyState > vid.HAVE_CURRENT_DATA;
+        if (isVidPlaying) videoElement.current.pause();
+        videoStateRef.current.isPlaying = false;
+      }
+    }, 400),
+    [videoElement]
+  );
+
+  // const playAndPauseDebounce = React.useCallback(
+  //   debounce(() => {
+  //     if (videoElement.current && tweenRef.current) {
+  //       const vid = videoElement.current;
+  //       const isVidPlaying =
+  //         vid.currentTime > 0 &&
+  //         !vid.paused &&
+  //         !vid.ended &&
+  //         vid.readyState > vid.HAVE_CURRENT_DATA;
+  //       videoElement.current.currentTime =
+  //         frameStartAt + Math.max(0, tweenRef?.current?.time());
+  //       /// Todo: remove this console
+  //       if (!isVidPlaying && videoElement.current) {
+  //         videoElement.current.play().then(() => {
+  //           videoStateRef.current.isPlaying = false;
+  //           if (videoElement.current) videoElement.current.pause();
+  //         });
+  //       }
+  //     }
+  //   }, 100),
+  //   [videoElement, frameStartAt]
+  // );
+
   // /** stop video playing when gsapDragging is true */
   React.useEffect(() => {
-    // console.log("current", videoElement.current, gsapDragging);
     if (videoElement.current) {
-      if (gsapDragging) {
-        videoElement.current.pause();
+      if (dragModeRef.current) {
+        pauseVideoDebounce();
         videoStateRef.current.isPlaying = false;
         videoStateRef.current.isDragging = true;
       } else {
         videoStateRef.current.isDragging = false;
       }
       videoElement.current.muted = mute;
+    } else {
+      videoStateRef.current.isDragging = false;
     }
-  }, [mute, gsapDragging]);
+  }, [mute, dragModeRef, pauseVideoDebounce, videoElement]);
 
   /** Gsap Start and Stop Events */
   const gsapOnStart = (frameStartAt: number) => {
@@ -158,16 +200,29 @@ const PixiVideoSprite = React.forwardRef<
       // const roundedPlayerTime = Number(Math.round(playerTimeRef.current));
       // check the start and end times are between the playerTimeRef.current to start video;
       videoElement.current.currentTime = Number(frameStartAt);
-      if (!gsapDragging) {
+      if (!dragModeRef.current) {
+        const vid = videoElement.current;
+        const isVidPlaying =
+          vid.currentTime > 0 &&
+          !vid.paused &&
+          !vid.ended &&
+          vid.readyState > vid.HAVE_CURRENT_DATA;
         videoElement.current.currentTime = Number(frameStartAt);
-        videoElement.current.play();
-        videoStateRef.current.isPlaying = true;
+        if (
+          tl.current &&
+          tl.current.isActive() &&
+          tweenRef.current &&
+          tweenRef.current.isActive()
+        ) {
+          if (!isVidPlaying) videoElement.current.play();
+          videoStateRef.current.isPlaying = true;
+        }
       }
+      videoStateRef.current.progress = 0;
     }
   };
 
   const gsapOnComplete = () => {
-    // console.log("onComplete triggered");
     if (videoElement.current) {
       const vid = videoElement.current;
       const isVidPlaying =
@@ -178,6 +233,9 @@ const PixiVideoSprite = React.forwardRef<
       ///if (!isVidPlaying) videoElement.current.play();
       if (isVidPlaying) videoElement.current.pause();
       videoStateRef.current.isPlaying = false;
+      if (tweenRef.current) {
+        videoStateRef.current.progress = tweenRef.current.progress();
+      }
     }
   };
 
@@ -186,13 +244,13 @@ const PixiVideoSprite = React.forwardRef<
   };
 
   const onUpdate = () => {
-    // console.log(
-    //   "gsap video onUpdate 10001",
-    //   playerTimeRef.current,
-    //   tweenRef.current.time()
-    // );
+    /// console.log("gsap video onUpdate 10001", tweenRef?.current?.time());
+    if (tweenRef.current) {
+      videoStateRef.current.progress = tweenRef.current.progress();
+    }
+
     if (videoElement.current && tweenRef.current) {
-      const currentTweenTime = frameStartAt + tweenRef.current?.time();
+      const currentTweenTime = frameStartAt + tweenRef?.current?.time();
       // console.log(
       //   "currenttime vs player reftime",
       //   videoElement.current.currentTime,
@@ -209,17 +267,23 @@ const PixiVideoSprite = React.forwardRef<
         !vid.ended &&
         vid.readyState > vid.HAVE_CURRENT_DATA;
 
-      if (videoStateRef.current.isDragging) {
-        // console.log("video updating 1002", playerTimeRef.current);
+      if (dragModeRef.current) {
+        /// console.log("is videoStateRef.current.isDragging state in drag mode");
         videoElement.current.currentTime = currentTweenTime;
-        videoElement.current.play();
         setTimeout(() => {
-          videoStateRef.current.isPlaying = false;
-          if (videoElement.current) videoElement.current.pause();
-        }, 300);
+          if (videoElement.current) {
+            videoElement.current.play().then(() => {
+              videoStateRef.current.isPlaying = false;
+              if (videoElement.current) videoElement.current.pause();
+            });
+          }
+        }, 100);
         videoStateRef.current.isPlaying = false;
-      } else if (!videoStateRef.current.isPlaying) {
-        // console.log("video updating 1003", playerTimeRef.current);
+      } else if (
+        !videoStateRef.current.isPlaying &&
+        videoStateRef.current.progress > 0.01 &&
+        videoStateRef.current.progress < 0.99
+      ) {
         if (
           tl.current?.isActive() &&
           tweenRef.current &&
@@ -228,7 +292,11 @@ const PixiVideoSprite = React.forwardRef<
           if (!isVidPlaying) videoElement.current.play();
           videoStateRef.current.isPlaying = true;
         }
-      } else if (absDiff > 0.3) {
+      } else if (
+        absDiff > 0.3 &&
+        videoStateRef.current.progress > 0.01 &&
+        videoStateRef.current.progress < 0.99
+      ) {
         // videoElement.current.currentTime = playerTimeRef.current;
         // if (!isVidPlaying) videoElement.current.play();
         // videoStateRef.current.isPlaying = true;
@@ -251,9 +319,6 @@ const PixiVideoSprite = React.forwardRef<
       };
 
       // kill tween before adding it.
-      if (tweenRef.current) {
-        tweenRef.current.kill();
-      }
       ctx = gsap.context(() => {
         tweenRef.current = gsap.from(
           containerRef.current,
@@ -285,21 +350,23 @@ const PixiVideoSprite = React.forwardRef<
     }
   }, [mute]);
 
-  // stop playing video while isDragging and gsapDragging
-  React.useEffect(() => {
-    if (videoElement.current) {
-      const vid = videoElement.current;
-      const isVidPlaying =
-        vid.currentTime > 0 &&
-        !vid.paused &&
-        !vid.ended &&
-        vid.readyState > vid.HAVE_CURRENT_DATA;
-      if (isVidPlaying && gsapDragging) {
-        videoElement.current.pause();
-        videoStateRef.current.isPlaying = false;
-      }
-    }
-  }, [gsapDragging]);
+  // // stop playing video while isDragging and gsapDragging
+  // React.useEffect(() => {
+  //   if (videoElement.current) {
+  //     const vid = videoElement.current;
+  //     const isVidPlaying =
+  //       vid.currentTime > 0 &&
+  //       !vid.paused &&
+  //       !vid.ended &&
+  //       vid.readyState > vid.HAVE_CURRENT_DATA;
+  //     if (isVidPlaying && gsapDragging) {
+  //       videoElement.current.pause();
+  //       videoStateRef.current.isPlaying = false;
+  //     } else {
+  //       playAndPauseDebounce();
+  //     }
+  //   }
+  // }, [gsapDragging, playAndPauseDebounce, videoElement]);
 
   // load // load meta // load seek through
   React.useEffect(() => {
@@ -359,7 +426,6 @@ const PixiVideoSprite = React.forwardRef<
     const urlWithTimestamp = `${videoUrl}#t=${stAt},${endAt}`;
     /// const urlWithQuery = `${videoUrl}?t=${stAt},${endAt}`;
 
-    console.log("urlTimestap", urlWithTimestamp);
     /// const texture =
     PIXI.Texture.fromLoader(videoSrcElement, urlWithTimestamp, uniqueId, {
       pixiIdPrefix: uniqueId,
@@ -390,8 +456,6 @@ const PixiVideoSprite = React.forwardRef<
     });
 
     return () => {
-      console.log("unmounting video sprite", uniqueId, videoElement.current);
-      console.log("spriteref", imageRef.current);
       if (videoElement.current) {
         videoElement.current.pause();
         videoElement.current.removeEventListener("loadedmetadata", onload);

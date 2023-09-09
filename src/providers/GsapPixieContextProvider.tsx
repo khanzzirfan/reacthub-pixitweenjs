@@ -12,7 +12,6 @@ import { emitCustomEvent, useCustomEventListener } from "../events";
 interface GsapPixieContextProps {
   gsapCtx: React.MutableRefObject<any>;
   tl: React.MutableRefObject<any>;
-  isDragging: boolean;
   handlePlay: () => void;
   handlePause: () => void;
   handleReset: () => void;
@@ -22,6 +21,10 @@ interface GsapPixieContextProps {
   handleRepeat: () => void;
   playerTimeRef: React.MutableRefObject<number>;
   getTimelineDuration: () => number;
+  totalDuration?: number;
+  setTotalDuration?: React.Dispatch<React.SetStateAction<number>>;
+  reverseModeRef: React.MutableRefObject<boolean>;
+  dragModeRef: React.MutableRefObject<boolean>;
 }
 
 // Context has been created
@@ -46,6 +49,8 @@ const Events = {
   SCRUBBER_PAUSE: "GSAP_SCRUBBER_PAUSE",
   TRANSFORMER_DRAG_START: "TRANSFORMER_DRAG_START",
   TRANSFORMER_DRAG_END: "TRANSFORMER_DRAG_END",
+  REVERSE_MODE_START: "REVERSE_MODE_START",
+  REVERSE_MODE_END: "REVERSE_MODE_END",
 };
 
 // Provider
@@ -53,11 +58,12 @@ const GsapPixieContextProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   /// const [play, setPlay] = useState<boolean>(false);
-  const [isDragging, setIsDragging] = useState<boolean>(false);
-
+  const [totalDuration, setTotalDuration] = useState<number>(0);
   const tl = useRef<gsap.core.Timeline>();
   const gsapCtx = useRef<any>();
   const playerTimeRef = useRef<number>(0.001);
+  const reverseModeRef = useRef<boolean>(false);
+  const dragModeRef = useRef<boolean>(false);
 
   // const parentElementRef = useRef<any>();
   // передаем предка анимируемых элементов
@@ -105,6 +111,11 @@ const GsapPixieContextProvider: React.FC<{ children: React.ReactNode }> = ({
       //   `elapseTime :${elapsedTime} now:${now} playerTime:${playerTimeRef.current}`
       // );
       //time = now;
+      if (now < playerTimeRef.current) {
+        reverseModeRef.current = true; // Set reverse mode to true
+      } else {
+        reverseModeRef.current = false; // Set reverse mode to false when not in reverse
+      }
       playerTimeRef.current = now;
     }
   }, []);
@@ -252,7 +263,7 @@ const GsapPixieContextProvider: React.FC<{ children: React.ReactNode }> = ({
 
   /** Event listener dragging */
   useCustomEventListener(Events.SEEK_START, () => {
-    setIsDragging(true);
+    dragModeRef.current = true;
   });
 
   useCustomEventListener(Events.SCRUBBER_PLAY, () => {
@@ -268,7 +279,15 @@ const GsapPixieContextProvider: React.FC<{ children: React.ReactNode }> = ({
   });
 
   useCustomEventListener(Events.SEEK_END, () => {
-    setIsDragging(false);
+    dragModeRef.current = false;
+  });
+
+  useCustomEventListener(Events.REVERSE_MODE_START, () => {
+    reverseModeRef.current = true;
+  });
+
+  useCustomEventListener(Events.REVERSE_MODE_END, () => {
+    reverseModeRef.current = false;
   });
 
   useCustomEventListener(
@@ -292,8 +311,11 @@ const GsapPixieContextProvider: React.FC<{ children: React.ReactNode }> = ({
         handleRestart,
         handleRepeat,
         playerTimeRef,
-        isDragging,
         getTimelineDuration,
+        totalDuration,
+        setTotalDuration,
+        reverseModeRef,
+        dragModeRef,
       }}
     >
       {children}

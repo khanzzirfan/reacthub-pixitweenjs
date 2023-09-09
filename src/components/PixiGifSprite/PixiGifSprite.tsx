@@ -87,7 +87,7 @@ const PixiGifSprite = React.forwardRef<
   const tweenRef = useRef<gsap.core.Tween>();
 
   //// Context
-  const { tl, isDragging: gsapDragging } = useContext(GsapPixieContext);
+  const { tl, dragModeRef } = useContext(GsapPixieContext);
 
   /// 1001
   const { frames: gifFrames, delays: gifDelays } = gifState;
@@ -140,7 +140,7 @@ const PixiGifSprite = React.forwardRef<
   // /** stop video playing when gsapDragging is true */
   React.useEffect(() => {
     if (gifStateRef.current && animatedSpriteRef.current) {
-      if (gsapDragging) {
+      if (dragModeRef.current) {
         animatedSpriteRef.current.stop();
         gifStateRef.current.isPlaying = false;
         gifStateRef.current.isDragging = true;
@@ -148,7 +148,7 @@ const PixiGifSprite = React.forwardRef<
         gifStateRef.current.isDragging = false;
       }
     }
-  }, [gsapDragging]);
+  }, [dragModeRef]);
 
   React.useEffect(() => {
     if (!isEmpty(gifFrames)) {
@@ -239,7 +239,7 @@ const PixiGifSprite = React.forwardRef<
   const onUpdate = (startAt: number) => {
     // @ts-ignore
     const currentTweenTime = startAt + tweenRef.current?.time();
-    if (animatedSpriteRef.current && gifStateRef.current.isDragging) {
+    if (animatedSpriteRef.current && dragModeRef.current) {
       debGifStart(currentTweenTime);
       debGifStop();
       gifStateRef.current.isPlaying = false;

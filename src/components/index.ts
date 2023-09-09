@@ -5,3 +5,4 @@ export * from "./PixiGifSprite";
 export * from "./PixiTextSprite";
 export * from "./PixiVideoSprite";
 export * from "./PixiAnimatedSprite";
+export * from "./PixiSequence";

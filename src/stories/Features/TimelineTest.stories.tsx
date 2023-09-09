@@ -52,12 +52,12 @@ export const GifTest: Story = {
         endAt: 5,
       },
       {
-        startAt: 0,
-        endAt: 5,
+        startAt: 4,
+        endAt: 9,
       },
       {
-        startAt: 0,
-        endAt: 5,
+        startAt: 6,
+        endAt: 15,
       },
     ],
   },
@@ -80,8 +80,12 @@ export const VideoTest: Story = {
         endAt: 15,
       },
       {
+        startAt: 8,
+        endAt: 12,
+      },
+      {
         startAt: 12,
-        endAt: 35,
+        endAt: 19,
       },
     ],
   },

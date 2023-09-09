@@ -44,7 +44,11 @@ export const VideoSeekBar: React.FC = () => {
   }, []); // Make sure the effect runs only once
 
   const handleOnSliderChange = (value: number) => {
-    playerTimeRef.current = value;
+    if (value < playerTimeRef.current) {
+      playerTimeRef.current = Math.max(0, value + 0.1);
+    } else {
+      playerTimeRef.current = value;
+    }
     timeline && timeline.current.time(value);
     ///timeline && timeline.current.progress(progress);
   };
@@ -81,7 +85,7 @@ export const VideoSeekBar: React.FC = () => {
           data-testid="sliderthumb"
           value={playerTimeRef.current || 0}
           min={0}
-          max={50}
+          max={35}
           step={0.1}
           onChange={handleOnSliderChange}
           onChangeStart={handleOnSliderChangeStart}
