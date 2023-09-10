@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.103](https://github.com/khanzzirfan/reacthub-pixitweenjs/compare/v0.2.102...v0.2.103) (2023-09-10)
+
+
+### Bug Fixes
+
+* updated sprite onclick events ([18524d7](https://github.com/khanzzirfan/reacthub-pixitweenjs/commit/18524d70ba91f77539c7ec58996d26671362b20a))
+* updated sprite onclick events ([fd56a7b](https://github.com/khanzzirfan/reacthub-pixitweenjs/commit/fd56a7b0e3298f9c1f2c4f5edaf314556bb23d94))
+
 ### [0.2.102](https://github.com/khanzzirfan/reacthub-pixitweenjs/compare/v0.2.101...v0.2.102) (2023-09-10)
 
 ### [0.2.101](https://github.com/khanzzirfan/reacthub-pixitweenjs/compare/v0.2.100...v0.2.101) (2023-09-09)
