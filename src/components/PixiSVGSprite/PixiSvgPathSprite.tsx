@@ -22,7 +22,6 @@ export interface PixiSvgPathSpriteProps extends PixiBaseSpriteProps {
   path: string;
   startAt: number;
   endAt: number;
-  initialAlpha: number;
   transformation: {
     x: number;
     y: number;
@@ -93,6 +92,7 @@ const PixiSvgPathSprite = React.forwardRef<
   // console.log("contxt Values", tl);
   const {
     path,
+    visible,
     transformation: {
       x,
       y,
@@ -155,10 +155,12 @@ const PixiSvgPathSprite = React.forwardRef<
               ref={imageRef}
               x={x}
               y={y}
-              // @ts-ignore
-              interactive={true}
-              pointerdown={pointerdown}
-              pointerup={pointerup}
+              alpha={visible ? 1 : 0}
+              {...(visible && {
+                interactive: true,
+                pointerdown: pointerdown,
+                pointerup: pointerup,
+              })}
               filters={[
                 temperatureFilter,
                 sharpnessFilter,

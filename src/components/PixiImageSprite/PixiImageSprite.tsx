@@ -28,6 +28,7 @@ const PixiImageSprite = React.forwardRef<
   /// 1001
   const {
     src,
+    visible,
     transformation: {
       x,
       y,
@@ -71,12 +72,10 @@ const PixiImageSprite = React.forwardRef<
           height={height}
           anchor={anchor}
           ref={imageRef}
+          alpha={visible ? 1 : 0}
           x={x}
           y={y}
-          alpha={alpha}
-          // @ts-ignore
-          interactive={true}
-          pointerdown={pointerdown}
+          {...(visible && { interactive: true, pointerdown: pointerdown })}
           filters={[
             temperatureFilter,
             sharpnessFilter,

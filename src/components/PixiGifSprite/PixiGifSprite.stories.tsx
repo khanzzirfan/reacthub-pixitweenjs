@@ -63,11 +63,9 @@ const meta = {
     endAt: { control: "number", description: "endAt" },
     frameStartAt: { control: "number", description: "frameStartAt" },
     frameEndAt: { control: "number", description: "frameEndAt" },
-    initialAlpha: {
-      control: "number",
-      min: 0,
-      max: 1,
-      description: "sprite initial alpha value (default  1)",
+    visible: {
+      control: "boolean",
+      description: "element to be visible on pixi stage and interactive",
     },
     onAnchorTransformationEnd: {
       action: "onAnchorTransformationEnd",
@@ -142,7 +140,7 @@ export const Normal: Story = {
       blendMode: 0,
       colorCorrection: {},
     },
-    initialAlpha: 1,
+    visible: true,
   },
 };
 
@@ -177,7 +175,7 @@ export const FadeIn: Story = {
       animation: "FADE_IN",
       colorCorrection: {},
     },
-    initialAlpha: 0,
+    visible: true,
   },
 };
 
@@ -216,7 +214,7 @@ export const Filters: Story = {
         blurRadius: 1,
       },
     },
-    initialAlpha: 1,
+    visible: true,
   },
 };
 
@@ -250,7 +248,7 @@ export const SplitPosition: Story = {
       blendMode: 0,
       colorCorrection: {},
     },
-    initialAlpha: 1,
+    visible: true,
   },
 };
 
@@ -283,7 +281,7 @@ export const SplitStartPos: Story = {
       blendMode: 0,
       colorCorrection: {},
     },
-    initialAlpha: 1,
+    visible: true,
   },
 };
 
@@ -317,6 +315,6 @@ export const StipopGif: Story = {
       blendMode: 0,
       colorCorrection: {},
     },
-    initialAlpha: 1,
+    visible: true,
   },
 };

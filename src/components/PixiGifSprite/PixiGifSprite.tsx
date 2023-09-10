@@ -30,7 +30,6 @@ export interface PixiGifSpriteProps extends PixiBaseSpriteProps {
   endAt: number;
   frameStartAt: number;
   frameEndAt: number;
-  initialAlpha: number;
   locked: boolean;
   loop: boolean;
 }
@@ -99,6 +98,7 @@ const PixiGifSprite = React.forwardRef<
     frameStartAt,
     frameEndAt,
     loop,
+    visible,
     transformation: {
       width = 0,
       height = 0,
@@ -315,6 +315,7 @@ const PixiGifSprite = React.forwardRef<
             width={width}
             height={height}
             animationSpeed={1}
+            alpha={visible ? 1 : 0}
             loop={loop}
             // isPlaying={!!tlPlay}
             // @ts-ignore
@@ -322,9 +323,7 @@ const PixiGifSprite = React.forwardRef<
             onComplete={handleComplete}
             anchor={0.5}
             forwardRef={animatedSpriteRef}
-            // @ts-ignore
-            interactive={true}
-            pointerdown={pointerdown}
+            {...(visible && { interactive: true, pointerdown: pointerdown })}
             filters={[
               temperatureFilter,
               sharpnessFilter,

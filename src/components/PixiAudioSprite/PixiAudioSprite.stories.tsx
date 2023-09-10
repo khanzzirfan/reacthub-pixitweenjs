@@ -38,6 +38,10 @@ const meta = {
     },
     mute: { control: "boolean", description: "mute" },
     speed: { control: "number", description: "speed" },
+    visible: {
+      control: "boolean",
+      description: "element to be visible on pixi stage and interactive",
+    },
   },
 } satisfies Meta<typeof PixiAudioSprite>;
 
@@ -60,6 +64,7 @@ export const Normal: Story = {
     audioEndAt: 5,
     mute: false,
     speed: 1,
+    visible: true,
   },
 };
 
@@ -79,6 +84,7 @@ export const Speech: Story = {
     audioEndAt: 5,
     mute: false,
     speed: 1,
+    visible: true,
   },
 };
 
@@ -93,8 +99,11 @@ export const Customized: Story = {
     src: "https://eyecastvideoeditorfiles.s3.ap-southeast-2.amazonaws.com/public%2Firfan%40trolio.com%2F6472d56e805c3bffc3cded33%2Fvideos%2F8Qq3DKrGnQ%2Fpiano2-CoolEdit.mp3",
     startAt: 0,
     endAt: 5,
+    audioStartAt: 3,
+    audioEndAt: 5,
     mute: true,
     speed: 1,
+    visible: true,
   },
 };
 
@@ -114,5 +123,6 @@ export const SplitPosition: Story = {
     audioEndAt: 8,
     mute: false,
     speed: 1,
+    visible: true,
   },
 };

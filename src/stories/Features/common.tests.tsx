@@ -16,7 +16,7 @@ export const ImageProps = {
     tint: 0xffffff,
     blendMode: 0,
   },
-  initialAlpha: 1,
+  visible: true,
 };
 
 export const GifProps = {
@@ -42,7 +42,7 @@ export const GifProps = {
     blendMode: 0,
     colorCorrection: {},
   },
-  initialAlpha: 1,
+  visible: true,
 };
 
 export const videoProps = {
@@ -66,7 +66,7 @@ export const videoProps = {
   endAt: 10,
   frameStartAt: 0,
   frameEndAt: 10,
-  initialAlpha: 1,
+  visible: true,
   mute: false,
   locked: false,
 };

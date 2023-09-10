@@ -72,12 +72,7 @@ const meta = {
     applyTransformer: { control: "boolean", description: "applyTransformer" },
     startAt: { control: "number", description: "startAt" },
     endAt: { control: "number", description: "endAt" },
-    initialAlpha: {
-      control: "number",
-      min: 0,
-      max: 1,
-      description: "sprite initial alpha value (default  1)",
-    },
+    visible: { control: "boolean", description: "visible" },
     onAnchorTransformationEnd: {
       action: "onAnchorTransformationEnd",
       description:
@@ -134,7 +129,7 @@ export const Normal: Story = {
         blurRadius: 0,
       },
     },
-    initialAlpha: 1,
+    visible: true,
   },
 };
 
@@ -165,7 +160,7 @@ export const FadeIn: Story = {
       animation: "FADE_IN",
       colorCorrection: {},
     },
-    initialAlpha: 0,
+    visible: true,
   },
 };
 
@@ -207,7 +202,7 @@ export const Filters: Story = {
           ...args,
         },
       },
-      initialAlpha: 1,
+      visible: true,
     };
     return (
       <AppStateContextProvider {...initialProps}>
@@ -374,7 +369,7 @@ export const FilterEffects: Story = {
         blendMode: 0,
         effect: args.effect,
       },
-      initialAlpha: 1,
+      visible: true,
     };
     return (
       <AppStateContextProvider {...initialProps}>
@@ -401,7 +396,7 @@ export const FilterEffects: Story = {
       blendMode: 0,
       effect: Effects.BlackAndWhite,
     },
-    initialAlpha: 1,
+    visible: true,
   },
   argTypes: {
     // @ts-ignore
@@ -441,7 +436,7 @@ export const Overlays: Story = {
         blendMode: 0,
         overlay: args.overlay,
       },
-      initialAlpha: 1,
+      visible: true,
     };
     return (
       <AppStateContextProvider {...initialProps}>
@@ -468,7 +463,7 @@ export const Overlays: Story = {
       blendMode: 0,
       overlay: OverlayTypes.LENSFLARE,
     },
-    initialAlpha: 1,
+    visible: true,
   },
   argTypes: {
     // @ts-ignore
@@ -530,6 +525,6 @@ export const PointerTests: Story = {
         blurRadius: 0,
       },
     },
-    initialAlpha: 1,
+    visible: true,
   },
 };

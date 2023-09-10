@@ -22,7 +22,6 @@ export interface PixiTextSpriteProps extends PixiBaseSpriteProps {
   text: string;
   startAt: number;
   endAt: number;
-  initialAlpha: number;
   disabled?: boolean;
   transformation: {
     x: number;
@@ -123,6 +122,7 @@ const PixiTextSprite = React.forwardRef<
   /// 1001
   const {
     uniqueId,
+    visible,
     text,
     disabled,
     transformation,
@@ -452,7 +452,9 @@ const PixiTextSprite = React.forwardRef<
     >
       <Container ref={parentNode}>
         {/* @ts-ignore */}
-        {isEditing && <Container ref={textInputGroupRef}></Container>}
+        {isEditing && visible && (
+          <Container ref={textInputGroupRef}></Container>
+        )}
         {/* @ts-ignore */}
         <Container alpha={isEditing ? 0 : 1} ref={textInnerGroupRef}>
           <Text
@@ -461,7 +463,9 @@ const PixiTextSprite = React.forwardRef<
             y={y}
             anchor={0.5}
             text={text}
-            {...(!isEditing &&
+            alpha={visible ? 1 : 0}
+            {...(visible &&
+              !isEditing &&
               !disabled && {
                 interactive: true,
                 buttonMode: true,

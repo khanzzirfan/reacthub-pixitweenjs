@@ -66,7 +66,7 @@ export const Normal: Story = {
         blendMode: 0,
         overlay: args.overlay,
       },
-      initialAlpha: 1,
+      visible: true,
     };
     return (
       <AppStateSequenceProvider {...initialProps}>
@@ -108,7 +108,7 @@ export const GifSequence: Story = {
         blendMode: 0,
         overlay: args.overlay,
       },
-      initialAlpha: 1,
+      visible: true,
       locked: false,
       loop: false,
     };
@@ -157,7 +157,7 @@ export const VideoSequence: Story = {
       endAt: 10,
       frameStartAt: 0,
       frameEndAt: 10,
-      initialAlpha: 1,
+      visible: true,
       mute: false,
       locked: false,
     };

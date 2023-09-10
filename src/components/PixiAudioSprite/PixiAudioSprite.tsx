@@ -23,6 +23,7 @@ type PixiAudioSpriteProps = {
   audioEndAt?: number;
   mute: boolean;
   speed: number;
+  visible: boolean;
 };
 interface AudioState {
   isPlaying: boolean;
@@ -69,6 +70,7 @@ const PixiAudioSprite: React.FC<PixiAudioSpriteProps> = (props) => {
     speed,
     audioStartAt,
     audioEndAt,
+    visible,
   } = props;
 
   const audioContainerRef = React.useRef<Sound>(null);
@@ -99,7 +101,7 @@ const PixiAudioSprite: React.FC<PixiAudioSpriteProps> = (props) => {
   const gsapOnStart = (startAt: number, endAt: number) => {
     if (containerRef.current) {
       audioContainerRef.current?.play({
-        volume: mute ? 0 : 1,
+        volume: !mute && visible ? 1 : 0,
         start: startAt,
         end: endAt,
         speed: speed || 1,
@@ -120,7 +122,7 @@ const PixiAudioSprite: React.FC<PixiAudioSpriteProps> = (props) => {
   const debAudioTimeUpdate = debounce((startAt: number, endAt: number) => {
     if (audioContainerRef.current) {
       audioContainerRef.current?.play({
-        volume: mute ? 0 : 1,
+        volume: !mute && visible ? 1 : 0,
         start: startAt,
         end: endAt,
         speed: speed || 1,
@@ -220,11 +222,11 @@ const PixiAudioSprite: React.FC<PixiAudioSpriteProps> = (props) => {
   React.useEffect(() => {
     if (containerRef.current && audioContainerRef.current) {
       // @ts-ignore
-      audioStateRef.current.mute = mute;
+      audioStateRef.current.mute = !mute && visible ? 1 : 0;
       audioStateRef.current.speed = speed;
       audioContainerRef.current.volume = mute ? 0 : 1;
     }
-  }, [mute, speed]);
+  }, [visible, mute, speed]);
 
   React.useEffect(() => {
     if (!isEmpty(src)) {

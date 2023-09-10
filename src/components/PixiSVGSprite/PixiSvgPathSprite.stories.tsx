@@ -60,12 +60,7 @@ const meta = {
     applyTransformer: { control: "boolean", description: "applyTransformer" },
     startAt: { control: "number", description: "startAt" },
     endAt: { control: "number", description: "endAt" },
-    initialAlpha: {
-      control: "number",
-      min: 0,
-      max: 1,
-      description: "sprite initial alpha value (default  1)",
-    },
+    visible: { control: "boolean", description: "visible" },
     onAnchorTransformationEnd: {
       action: "onAnchorTransformationEnd",
       description:
@@ -116,7 +111,7 @@ export const Normal: Story = {
       colorCorrection: {},
       fill: "#FFC0CB",
     },
-    initialAlpha: 1,
+    visible: true,
   },
 };
 
@@ -147,7 +142,7 @@ export const FadeIn: Story = {
       colorCorrection: {},
       fill: "#fe2c54",
     },
-    initialAlpha: 0,
+    visible: true,
   },
 };
 
@@ -184,6 +179,6 @@ export const Filters: Story = {
       },
       fill: "#FFC0CB",
     },
-    initialAlpha: 1,
+    visible: true,
   },
 };

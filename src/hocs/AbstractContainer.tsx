@@ -48,6 +48,7 @@ const AbstractContainer = React.forwardRef<
   // use props with useMemo
   const {
     uniqueId,
+    visible,
     transformation: {
       x,
       y,
@@ -148,6 +149,7 @@ const AbstractContainer = React.forwardRef<
         scale={scale}
         rotation={rotation}
         {...(!disabled &&
+          visible &&
           !isTransformerDragging &&
           !isDragging && {
             interactive: true,
@@ -195,7 +197,7 @@ const AbstractContainer = React.forwardRef<
             />
           )}
       </Container>
-      {applyTransformer && !isTextEditMode && (
+      {applyTransformer && visible && !isTextEditMode && (
         <PixiTransformer
           pixiTransformerRef={transformerRef}
           imageRef={containerRef}

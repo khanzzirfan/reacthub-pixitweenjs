@@ -29,7 +29,6 @@ export interface PixiVideoSpriteProps extends PixiBaseSpriteProps {
   frameEndAt: number;
   mute: boolean;
   locked: boolean;
-  initialAlpha: number;
   pointerdown?: () => void;
   pointerup?: () => void;
   mousedown?: () => void;
@@ -94,11 +93,13 @@ const PixiVideoSprite = React.forwardRef<
     endAt,
     frameStartAt,
     frameEndAt,
+    visible,
     transformation: { x, y, width, height, animation, colorCorrection = {} },
     pointerdown = () => void 0,
     pointerout = () => void 0,
     pointerover = () => void 0,
   } = props;
+
   //// Context
   const { tl, dragModeRef } = useContext(GsapPixieContext);
 
@@ -478,9 +479,8 @@ const PixiVideoSprite = React.forwardRef<
             x={x}
             y={y}
             ref={imageRef}
-            // @ts-ignore
-            interactive={true}
-            pointerdown={onPointerDown}
+            alpha={visible ? 1 : 0}
+            {...(visible && { interactive: true, pointerdown: pointerdown })}
             filters={[
               temperatureFilter,
               sharpnessFilter,

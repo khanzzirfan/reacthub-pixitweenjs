@@ -9,7 +9,7 @@ export interface PixiBaseSpriteProps {
   text?: string;
   startAt: number;
   endAt: number;
-  initialAlpha: number;
+  visible: boolean;
   disabled?: boolean;
   isDragging?: boolean;
   transformation: {
