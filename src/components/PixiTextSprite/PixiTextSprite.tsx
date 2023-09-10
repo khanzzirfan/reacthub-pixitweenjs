@@ -286,7 +286,7 @@ const PixiTextSprite = React.forwardRef<
   const handleTextChange = (e: string) => {
     if (onTextUpdate) {
       onTextUpdate({
-        text: e,
+        text: e && e.replace(/\n+/g, "\n"),
         uniqueId: uniqueId,
       });
     }
@@ -309,6 +309,13 @@ const PixiTextSprite = React.forwardRef<
   const closeEditor = () => {
     setIsEditing(false);
     if (onExitQuillEditor) onExitQuillEditor();
+  };
+
+  // copy paste ignore event
+  const handleOnCopyPaste = (e: any) => {
+    if (!e) return;
+    e.preventDefault();
+    e.stopPropagation();
   };
 
   React.useEffect(() => {
@@ -336,12 +343,12 @@ const PixiTextSprite = React.forwardRef<
               closeEditor();
             },
           },
-          enter: {
-            key: 13,
-            handler: function () {
-              closeEditor();
-            },
-          },
+          // enter: {
+          //   key: 13,
+          //   handler: function () {
+          //     closeEditor();
+          //   },
+          // },
         };
 
         // @ts-ignore
@@ -363,6 +370,11 @@ const PixiTextSprite = React.forwardRef<
             if (quillRef.current)
               handleTextChange(quillRef.current.root.innerText);
           });
+          // @ts-ignore
+          quillRef.current?.container?.addEventListener(
+            "paste",
+            handleOnCopyPaste
+          );
 
           quillRef.current.setText(text);
           quillRef.current.focus();
@@ -409,6 +421,11 @@ const PixiTextSprite = React.forwardRef<
     return () => {
       if (quillRef.current) {
         quillRef.current.off("text-change", () => {});
+        // @ts-ignore
+        quillRef.current?.container?.removeEventListener(
+          "paste",
+          handleOnCopyPaste
+        );
         // @ts-ignore
         // quillRef.current = null;
       }

@@ -91,6 +91,10 @@ const meta = {
       action: "pointerover",
       description: "pointerover event",
     },
+    onExitQuillEditor: {
+      action: "onExitQuillEditor",
+      description: "onExitQuillEditor event",
+    },
   },
 } satisfies Meta<typeof PixiTextSprite>;
 

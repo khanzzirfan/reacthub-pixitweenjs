@@ -36,6 +36,7 @@ const PixiImageSprite = React.forwardRef<
       anchor,
       colorCorrection = {},
       effect,
+      alpha = 1,
     },
     pointerdown,
   } = props;
@@ -72,6 +73,7 @@ const PixiImageSprite = React.forwardRef<
           ref={imageRef}
           x={x}
           y={y}
+          alpha={alpha}
           // @ts-ignore
           interactive={true}
           pointerdown={pointerdown}

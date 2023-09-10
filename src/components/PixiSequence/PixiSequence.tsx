@@ -19,7 +19,7 @@ export interface PixiSequenceProps {
 }
 
 export const PixiSequence = (props: PixiSequenceProps) => {
-  const { startAt, endAt, uniqueId } = props;
+  const { startAt, endAt } = props;
   const [active, setActive] = React.useState<boolean>(false);
   //// Refs
   const containerRef = useRef<PIXI.Container>(null);

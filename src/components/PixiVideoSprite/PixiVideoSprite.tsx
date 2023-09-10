@@ -20,6 +20,7 @@ import {
   ForwardedRefResponse,
 } from "../../types/BaseProps";
 import { withFiltersHook } from "../../hooks/withFiltersHook";
+import useDebouncedPointerEvents from "../../hooks/useDebouncePointerEvents";
 
 export interface PixiVideoSpriteProps extends PixiBaseSpriteProps {
   uniqueId: string;
@@ -83,9 +84,6 @@ const PixiVideoSprite = React.forwardRef<
   const videoStateRef = useRef<VideoState>(initialState);
   const tweenRef = useRef<gsap.core.Tween>();
 
-  //// Context
-  const { tl, dragModeRef } = useContext(GsapPixieContext);
-
   /// 1001
   // console.log("contxt Values", tl);
   const {
@@ -97,8 +95,16 @@ const PixiVideoSprite = React.forwardRef<
     frameStartAt,
     frameEndAt,
     transformation: { x, y, width, height, animation, colorCorrection = {} },
-    pointerdown,
+    pointerdown = () => void 0,
+    pointerout = () => void 0,
+    pointerover = () => void 0,
   } = props;
+  //// Context
+  const { tl, dragModeRef } = useContext(GsapPixieContext);
+
+  /// hooks;
+  const { onPointerDown, onPointerOut, onPointerOver } =
+    useDebouncedPointerEvents(pointerover, pointerdown, pointerout, 1);
 
   const { blurRadius = 0 } = colorCorrection;
   // use with filters hoooks to get the filters
@@ -153,29 +159,6 @@ const PixiVideoSprite = React.forwardRef<
     }, 400),
     [videoElement]
   );
-
-  // const playAndPauseDebounce = React.useCallback(
-  //   debounce(() => {
-  //     if (videoElement.current && tweenRef.current) {
-  //       const vid = videoElement.current;
-  //       const isVidPlaying =
-  //         vid.currentTime > 0 &&
-  //         !vid.paused &&
-  //         !vid.ended &&
-  //         vid.readyState > vid.HAVE_CURRENT_DATA;
-  //       videoElement.current.currentTime =
-  //         frameStartAt + Math.max(0, tweenRef?.current?.time());
-  //       /// Todo: remove this console
-  //       if (!isVidPlaying && videoElement.current) {
-  //         videoElement.current.play().then(() => {
-  //           videoStateRef.current.isPlaying = false;
-  //           if (videoElement.current) videoElement.current.pause();
-  //         });
-  //       }
-  //     }
-  //   }, 100),
-  //   [videoElement, frameStartAt]
-  // );
 
   // /** stop video playing when gsapDragging is true */
   React.useEffect(() => {
@@ -476,7 +459,14 @@ const PixiVideoSprite = React.forwardRef<
   }, [videoUrl, uniqueId, frameStartAt, frameEndAt, videoSrcElement]);
 
   return (
-    <AbstractContainer {...props} ref={ref} ignoreTlForVideo={true}>
+    <AbstractContainer
+      {...props}
+      ref={ref}
+      ignoreTlForVideo={true}
+      pointerdown={onPointerDown}
+      pointerover={onPointerOver}
+      pointerout={onPointerOut}
+    >
       {/* @ts-ignore */}
       <Container ref={containerRef}>
         {videoTexture && (
@@ -488,7 +478,9 @@ const PixiVideoSprite = React.forwardRef<
             x={x}
             y={y}
             ref={imageRef}
-            pointerdown={pointerdown}
+            // @ts-ignore
+            interactive={true}
+            pointerdown={onPointerDown}
             filters={[
               temperatureFilter,
               sharpnessFilter,
