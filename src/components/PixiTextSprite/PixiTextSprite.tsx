@@ -110,7 +110,6 @@ const PixiTextSprite = React.forwardRef<
   const lastClickTimeRef = useRef<number>(0);
   /// refs
   const textRef = useRef<PIXI.Text>(null);
-  const textInputGroupRef = useRef(null);
   const textInnerGroupRef = useRef(null);
   const textFontSize = useRef<number>(16);
   const textTransformDetailRef = useRef<any>(null);
@@ -285,11 +284,7 @@ const PixiTextSprite = React.forwardRef<
     >
       <Container ref={parentNode}>
         {/* @ts-ignore */}
-        {isEditing && visible && (
-          <Container ref={textInputGroupRef}></Container>
-        )}
-        {/* @ts-ignore */}
-        <Container alpha={isEditing ? 0 : 1} ref={textInnerGroupRef}>
+        <Container alpha={1} ref={textInnerGroupRef}>
           <Text
             style={pixiStyles}
             x={x}
