@@ -50,7 +50,6 @@ export function useGsapEffect(
 
   useEffect(() => {
     if (gsap.effects[effect] && target.current) {
-      console.log("applying animation effect to ", target.current);
       setAnimation(gsap.effects[effect](target.current, vars));
     }
   }, [effect, target, vars]);

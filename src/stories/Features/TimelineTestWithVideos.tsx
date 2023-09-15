@@ -70,7 +70,7 @@ export const TimelineTestVideos = (props: TimelineProps) => {
             // options={{ background: backgroundColor }}
             options={{ backgroundColor: backgroundColorx, resolution: 2 }}
           >
-            <PixiSequenceWrapper startAt={0} endAt={20}>
+            <PixiSequenceWrapper startAt={0} endAt={25}>
               <PixiSequence
                 startAt={sequences[0].startAt}
                 endAt={sequences[0].endAt}
@@ -117,6 +117,30 @@ export const TimelineTestVideos = (props: TimelineProps) => {
               <PixiSequence
                 startAt={sequences[2].startAt}
                 endAt={sequences[2].endAt}
+                uniqueId="video-001"
+              >
+                <PixiVideoSprite
+                  {...videoProps}
+                  pointerdown={() => {
+                    setSelected(randomIds.image3);
+                  }}
+                  src="https://eyecastvideoeditorfiles.s3.ap-southeast-2.amazonaws.com/public%2Firfan%40trolio.com%2F6472d56e805c3bffc3cded33%2Fvideos%2FYra_kbKljX%2Fbig_buck_bunny_720p_1mb.mp4"
+                  applyTransformer={selected === randomIds.image3}
+                  startAt={sequences[2].startAt}
+                  endAt={sequences[2].endAt}
+                  transformation={{
+                    ...videoProps.transformation,
+                    x: 100,
+                    y: 350,
+                    width: 250,
+                    height: 240,
+                  }}
+                />
+              </PixiSequence>
+
+              <PixiSequence
+                startAt={sequences[3].startAt}
+                endAt={sequences[3].endAt}
                 uniqueId="video-1"
               >
                 <PixiVideoSprite
@@ -125,41 +149,68 @@ export const TimelineTestVideos = (props: TimelineProps) => {
                     setSelected(randomIds.image3);
                   }}
                   applyTransformer={selected === randomIds.image3}
-                  startAt={sequences[2].startAt}
-                  endAt={sequences[2].endAt}
+                  startAt={sequences[3].startAt}
+                  endAt={sequences[3].endAt}
                   transformation={{
                     ...videoProps.transformation,
-                    x: 300,
-                    y: 400,
+                    x: 100,
+                    y: 100,
+                    width: 300,
+                    height: 300,
                   }}
                 />
               </PixiSequence>
               <PixiSequence
                 startAt={sequences[3].startAt}
                 endAt={sequences[3].endAt}
+                uniqueId="video-1"
+              >
+                <PixiVideoSprite
+                  {...videoProps}
+                  pointerdown={() => {
+                    setSelected(randomIds.image3);
+                  }}
+                  applyTransformer={selected === randomIds.image3}
+                  startAt={sequences[4].startAt}
+                  endAt={sequences[4].endAt}
+                  src="https://eyecastvideoeditorfiles.s3.ap-southeast-2.amazonaws.com/public%2Firfan%40trolio.com%2F6472d56e805c3bffc3cded33%2Fvideos%2FnnS18Ov5PM%2Fdwsample+mov+360p.mov"
+                  transformation={{
+                    ...videoProps.transformation,
+                    x: 450,
+                    y: 100,
+                    width: 250,
+                    height: 250,
+                  }}
+                />
+              </PixiSequence>
+              <PixiSequence
+                startAt={sequences[5].startAt}
+                endAt={sequences[5].endAt}
                 uniqueId="audiosprite-2"
               >
                 <PixiAudioSprite
                   {...audioProps}
-                  startAt={sequences[3].startAt}
-                  endAt={sequences[3].endAt}
+                  startAt={sequences[5].startAt}
+                  endAt={sequences[5].endAt}
                   audioStartAt={0}
                   audioEndAt={5}
+                  visible={true}
                 />
               </PixiSequence>
               <PixiSequence
-                startAt={sequences[4].startAt}
-                endAt={sequences[4].endAt}
+                startAt={sequences[5].startAt}
+                endAt={sequences[5].endAt}
               >
                 <PixiImageSprite
                   {...ImageProps}
                   pointerdown={() => {
                     setSelected(randomIds!?.image);
                   }}
+                  src="https://eyecastvideoeditorfiles.s3.ap-southeast-2.amazonaws.com/public%2Firfan%40trolio.com%2F64b6738988f3e366d955cebd%2Fvideos%2FMXlcGUL5Ws%2Fanim-mercury.jpg"
                   applyTransformer={selected === randomIds?.image}
                   uniqueId={randomIds?.image}
-                  startAt={sequences[4].startAt}
-                  endAt={sequences[4].endAt}
+                  startAt={sequences[5].startAt}
+                  endAt={sequences[5].endAt}
                   transformation={{
                     ...ImageProps.transformation,
                     x: 150,

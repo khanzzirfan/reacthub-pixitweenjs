@@ -60,7 +60,6 @@ const PixiAudioSprite: React.FC<PixiAudioSpriteProps> = (props) => {
 
   /// 1001
   // console.log("contxt Values", tl);
-  console.log("audio props", props);
   const {
     uniqueId,
     src,

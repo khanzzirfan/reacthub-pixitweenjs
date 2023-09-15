@@ -18,6 +18,10 @@ import { emitCustomEvent } from "../events";
 export const VideoSeekBar: React.FC = () => {
   const rafRef = React.useRef<number>();
   const sliderThumbRef = React.useRef<HTMLDivElement>(null);
+  // const seekBarRef = React.useRef<HTMLInputElement>(null);
+  const sliderIsMovingRef = React.useRef<boolean>(false);
+  const seekBarDraggedDurationRef = React.useRef<number>(0);
+
   const {
     tl: timeline,
     playerTimeRef,
@@ -29,6 +33,8 @@ export const VideoSeekBar: React.FC = () => {
 
   /// state
   const [time, setTime] = React.useState<number>(0);
+  // const [seekValue, setSeekValue] = React.useState<number>(0);
+  const sliderValueRef = React.useRef<number>(0);
 
   const animate = () => {
     /// console.log("totalDuration", timeline.current.totalDuration());
@@ -44,13 +50,15 @@ export const VideoSeekBar: React.FC = () => {
   }, []); // Make sure the effect runs only once
 
   const handleOnSliderChange = (value: number) => {
+    console.log("handle Slider Change", value);
+    sliderValueRef.current = value;
+    // get total duration
     if (value < playerTimeRef.current) {
       playerTimeRef.current = Math.max(0, value + 0.1);
     } else {
       playerTimeRef.current = value;
     }
     timeline && timeline.current.time(value);
-    ///timeline && timeline.current.progress(progress);
   };
 
   /** on slider start
@@ -58,15 +66,33 @@ export const VideoSeekBar: React.FC = () => {
    * 2. trigger custom event isDraggingStart
    */
   const handleOnSliderChangeStart = () => {
+    console.log("handle Slider Change handleOnSliderChangeStart");
     // trigger custom event and pause the timeline
     emitCustomEvent(Events.SEEK_START);
     timeline && timeline.current.pause();
+    // slider is moving
+    sliderIsMovingRef.current = true;
+    seekBarDraggedDurationRef.current = Date.now(); // Record the start timestamp
   };
 
   const handleOnSliderChangeEnd = () => {
+    console.log("handle Slider Change handleOnSliderChangeEnd");
     // trigger custom event and pause the timeline
     emitCustomEvent(Events.SEEK_END);
     timeline && timeline.current.pause();
+    emitCustomEvent(Events.PAUSE);
+    // slider is moving
+    sliderIsMovingRef.current = false;
+    // Record the end timestamp
+    const onChangeStartTimestamp = seekBarDraggedDurationRef.current;
+    if (onChangeStartTimestamp) {
+      const onChangeEndTimestamp = Date.now();
+      const duration = (onChangeEndTimestamp - onChangeStartTimestamp) / 1000; // Convert to seconds
+      console.log("duration in sigle click", duration);
+      if (duration < 0.15) {
+        emitCustomEvent(Events.SCRUBBER_CLICKED, playerTimeRef.current);
+      }
+    }
   };
 
   /** Create Draggable for the Gsap Player */
@@ -82,17 +108,20 @@ export const VideoSeekBar: React.FC = () => {
       <Flex px={1} mt={2}>
         <Slider
           aria-label="slider-ex-1"
-          data-testid="sliderthumb"
+          data-testid="sliderwrapper"
           value={playerTimeRef.current || 0}
           min={0}
-          max={35}
+          max={timeline?.current?.totalDuration() || 20}
           step={0.1}
           onChange={handleOnSliderChange}
           onChangeStart={handleOnSliderChangeStart}
           onChangeEnd={handleOnSliderChangeEnd}
         >
-          <SliderTrack>
-            <SliderFilledTrack color="green.400" />
+          <SliderTrack data-testid="slider-track">
+            <SliderFilledTrack
+              color="green.400"
+              data-testid="slider-filled-track"
+            />
           </SliderTrack>
           <SliderThumb data-testid="sliderthumb" ref={sliderThumbRef} />
         </Slider>

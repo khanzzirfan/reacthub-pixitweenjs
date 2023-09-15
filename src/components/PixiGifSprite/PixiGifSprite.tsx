@@ -137,6 +137,20 @@ const PixiGifSprite = React.forwardRef<
     }
   });
 
+  useCustomEventListener(Events.SEEK_END, () => {
+    if (animatedSpriteRef.current) {
+      animatedSpriteRef.current.stop();
+      gifStateRef.current.isPlaying = false;
+    }
+  });
+
+  useCustomEventListener(Events.SCRUBBER_CLICKED, () => {
+    if (animatedSpriteRef.current) {
+      animatedSpriteRef.current.stop();
+      gifStateRef.current.isPlaying = false;
+    }
+  });
+
   // /** stop video playing when gsapDragging is true */
   React.useEffect(() => {
     if (gifStateRef.current && animatedSpriteRef.current) {
@@ -291,7 +305,6 @@ const PixiGifSprite = React.forwardRef<
       });
     }
     return () => {
-      console.log("PixiGif Sprite Component cleanup");
       if (tweenRef.current) {
         tweenRef.current.kill();
         gsap.killTweensOf(tweenRef.current);

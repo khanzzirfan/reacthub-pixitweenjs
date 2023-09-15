@@ -71,8 +71,7 @@ const PixiVideoSprite = React.forwardRef<
   PixiVideoSpriteProps
 >((props, ref) => {
   //// State
-  const [, setIsMounted] = React.useState(false);
-
+  const [updater, setUpdater] = React.useState<number>(0);
   const [videoTexture, setVideoTexture] =
     React.useState<PIXI.Texture<PIXI.Resource>>();
 
@@ -133,13 +132,14 @@ const PixiVideoSprite = React.forwardRef<
   /** Event Listeneres */
   useCustomEventListener(Events.PAUSE, () => {
     if (videoElement.current) {
-      const vid = videoElement.current;
-      const isVidPlaying =
-        vid.currentTime > 0 &&
-        !vid.paused &&
-        !vid.ended &&
-        vid.readyState > vid.HAVE_CURRENT_DATA;
-      if (isVidPlaying) videoElement.current.pause();
+      videoElement.current.pause();
+      videoStateRef.current.isPlaying = false;
+    }
+  });
+
+  useCustomEventListener(Events.SCRUBBER_CLICKED, () => {
+    if (videoElement.current) {
+      videoElement.current.pause();
       videoStateRef.current.isPlaying = false;
     }
   });
@@ -191,7 +191,6 @@ const PixiVideoSprite = React.forwardRef<
           !vid.paused &&
           !vid.ended &&
           vid.readyState > vid.HAVE_CURRENT_DATA;
-        videoElement.current.currentTime = Number(frameStartAt);
         if (
           tl.current &&
           tl.current.isActive() &&
@@ -200,6 +199,7 @@ const PixiVideoSprite = React.forwardRef<
         ) {
           if (!isVidPlaying) videoElement.current.play();
           videoStateRef.current.isPlaying = true;
+          setUpdater((prev) => prev + 1);
         }
       }
       videoStateRef.current.progress = 0;
@@ -228,7 +228,6 @@ const PixiVideoSprite = React.forwardRef<
   };
 
   const onUpdate = () => {
-    /// console.log("gsap video onUpdate 10001", tweenRef?.current?.time());
     if (tweenRef.current) {
       videoStateRef.current.progress = tweenRef.current.progress();
     }
@@ -264,7 +263,7 @@ const PixiVideoSprite = React.forwardRef<
         }, 100);
         videoStateRef.current.isPlaying = false;
       } else if (
-        !videoStateRef.current.isPlaying &&
+        (isVidPlaying !== videoStateRef.current.isPlaying || !isVidPlaying) &&
         videoStateRef.current.progress > 0.01 &&
         videoStateRef.current.progress < 0.99
       ) {
@@ -281,7 +280,7 @@ const PixiVideoSprite = React.forwardRef<
         videoStateRef.current.progress > 0.01 &&
         videoStateRef.current.progress < 0.99
       ) {
-        // videoElement.current.currentTime = playerTimeRef.current;
+        videoElement.current.currentTime = currentTweenTime;
         // if (!isVidPlaying) videoElement.current.play();
         // videoStateRef.current.isPlaying = true;
       }
@@ -323,34 +322,10 @@ const PixiVideoSprite = React.forwardRef<
   }, [animation, startAt, endAt, frameStartAt, frameEndAt]);
 
   React.useEffect(() => {
-    if (containerRef.current) {
-      setIsMounted(true);
-    }
-  }, []);
-
-  React.useEffect(() => {
     if (videoElement.current) {
       videoElement.current.muted = mute;
     }
   }, [mute]);
-
-  // // stop playing video while isDragging and gsapDragging
-  // React.useEffect(() => {
-  //   if (videoElement.current) {
-  //     const vid = videoElement.current;
-  //     const isVidPlaying =
-  //       vid.currentTime > 0 &&
-  //       !vid.paused &&
-  //       !vid.ended &&
-  //       vid.readyState > vid.HAVE_CURRENT_DATA;
-  //     if (isVidPlaying && gsapDragging) {
-  //       videoElement.current.pause();
-  //       videoStateRef.current.isPlaying = false;
-  //     } else {
-  //       playAndPauseDebounce();
-  //     }
-  //   }
-  // }, [gsapDragging, playAndPauseDebounce, videoElement]);
 
   // load // load meta // load seek through
   React.useEffect(() => {
@@ -450,7 +425,6 @@ const PixiVideoSprite = React.forwardRef<
           onCanPlayThrough
         );
         videoElement.current.removeEventListener("stalled", onStalled);
-
         /** unmount it completely */
         // Stop and remove the video element when the component unmounts
       }
@@ -458,6 +432,66 @@ const PixiVideoSprite = React.forwardRef<
     // create a new Sprite using the video texture (yes it's that easy)
     // const videoSprite = new PIXI.Sprite(texture);
   }, [videoUrl, uniqueId, frameStartAt, frameEndAt, videoSrcElement]);
+
+  // Add use effect when the video texture is loaded for the first time
+  React.useEffect(() => {
+    /// run the timeout for checking it all below logic
+    const timeoutId = setTimeout(() => {
+      if (videoTexture && tweenRef.current && tl.current) {
+        const tweenCurrentProgress = tweenRef.current.progress();
+        if (
+          tweenCurrentProgress < 0.1 &&
+          videoElement.current &&
+          !tweenRef.current.isActive()
+        ) {
+          videoElement.current.play().then(() => {
+            videoStateRef.current.isPlaying = false;
+            if (videoElement.current) videoElement.current.pause();
+          });
+        }
+      }
+    }, 30);
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [videoTexture]);
+
+  /** ON start use effect to check if the timeline is really in progress else stop playing */
+  React.useEffect(() => {
+    // inactivate if timeline is inactive
+    if (tl.current && !tl.current.isActive()) {
+      videoStateRef.current.isPlaying = false;
+      if (videoElement.current) videoElement.current.pause();
+    }
+
+    const timeoutId = setTimeout(() => {
+      if (videoTexture && tl.current && updater > 0) {
+        if (!tl.current.isActive()) {
+          videoStateRef.current.isPlaying = false;
+          if (videoElement.current) videoElement.current.pause();
+        }
+        const vid = videoElement.current;
+        if (
+          vid &&
+          tl.current.isActive() &&
+          tweenRef.current &&
+          tweenRef.current.isActive()
+        ) {
+          const isVidPlaying =
+            vid.currentTime > 0 &&
+            !vid.paused &&
+            !vid.ended &&
+            vid.readyState > vid.HAVE_CURRENT_DATA;
+          if (!isVidPlaying) videoElement.current.play();
+          videoStateRef.current.isPlaying = true;
+        }
+        /// videoStateRef.current.progress = tweenRef.current.progress();
+      }
+    }, 10);
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [updater, videoTexture]);
 
   return (
     <AbstractContainer

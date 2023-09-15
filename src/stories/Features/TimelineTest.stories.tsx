@@ -77,15 +77,19 @@ export const VideoTest: Story = {
       },
       {
         startAt: 6,
-        endAt: 15,
+        endAt: 10,
+      },
+      {
+        startAt: 11,
+        endAt: 18,
       },
       {
         startAt: 8,
-        endAt: 12,
+        endAt: 16,
       },
       {
-        startAt: 12,
-        endAt: 19,
+        startAt: 21,
+        endAt: 25,
       },
     ],
   },

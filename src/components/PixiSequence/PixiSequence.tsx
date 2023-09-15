@@ -27,6 +27,11 @@ export const PixiSequence = (props: PixiSequenceProps) => {
   const dataRef = useRef<PIXI.Container>(null);
   const dataTweenRef = useRef<gsap.core.Tween>(null);
   const childTweenRef = useRef<gsap.core.Tween>(null);
+
+  // active refs
+  const activeRef = useRef<boolean>(false);
+  const wasInReverseModeRef = useRef<boolean>(false);
+
   //// Context
   const {
     tl,
@@ -35,27 +40,31 @@ export const PixiSequence = (props: PixiSequenceProps) => {
   } = useContext(GsapPixieContext);
 
   const gsapOnAlphaStart = () => {
-    /// console.log("gsapOnAlphaStart params p ", params, props);
-    setActive(true);
-    /// setPixiAlpha(params.alpha);
+    if (!activeRef.current) {
+      activeRef.current = true;
+      setActive(true);
+    }
   };
 
   const gsapOnAlphaComplete = () => {
-    /// console.log("gsapOnAlphaComplete params p", params, props);
     setActive(false);
-    ///setPixiAlpha(params.alpha);
+    activeRef.current = false;
   };
 
   const gsapOnUpdateAlpha = () => {
-    /// setPixiAlpha(params.alpha);
     if (reverseModeRef.current && dataTweenRef.current && tl.current) {
+      wasInReverseModeRef.current = true;
       const currentTime = tl.current.time();
       if (currentTime > startAt && currentTime < endAt) {
         setActive(() => true);
+        activeRef.current = true;
         if (childRef.current) childRef.current.alpha = 1;
+      } else {
+        setActive(() => false);
+        activeRef.current = false;
+        if (childRef.current) childRef.current.alpha = 0;
       }
     }
-    /// if (childRef.current) childRef.current.alpha = 1;
   };
 
   // react to a global timeline oncomplete event and setactive state
@@ -63,8 +72,10 @@ export const PixiSequence = (props: PixiSequenceProps) => {
     // console.log("gsapGlobalOnComplete set the initial alpha value");
     if (startAt < 0.2) {
       setActive(true);
+      activeRef.current = true;
     } else {
       setActive(false);
+      activeRef.current = false;
     }
   };
 
@@ -108,7 +119,10 @@ export const PixiSequence = (props: PixiSequenceProps) => {
         );
 
         // add less one second to active true;
-        if (startAt < 0.2) setActive(true);
+        if (startAt < 0.2) {
+          setActive(true);
+          activeRef.current = true;
+        }
 
         // // set data duration to timeline
         // @ts-ignore
@@ -119,12 +133,15 @@ export const PixiSequence = (props: PixiSequenceProps) => {
             alpha: 1,
             overwrite: "auto",
             duration: Number(endAt) - Number(startAt),
+            onStart: gsapOnAlphaStart,
+            onStartParams: [{ alpha: 1 }],
             onUpdate: gsapOnUpdateAlpha,
+            onComplete: gsapOnAlphaComplete,
+            onCompleteParams: [{ alpha: startAt > 0 ? 0 : 1 }],
           },
           startAt
         );
         tl.current.add(dataTweenRef.current, startAt);
-
         // total duration of the timeline
         if (totalDuration > 0.2) {
           tl.current.call(gsapGlobalOnComplete, [startAt], totalDuration - 0.3);
@@ -138,6 +155,7 @@ export const PixiSequence = (props: PixiSequenceProps) => {
   }, [startAt, endAt, totalDuration]);
 
   React.useEffect(() => {
+    activeRef.current = active;
     const ctx = gsap.context(() => {
       if (childRef.current && tl.current) {
         if (childTweenRef.current) childTweenRef.current.kill();
@@ -152,9 +170,25 @@ export const PixiSequence = (props: PixiSequenceProps) => {
       }
     });
 
+    // add a timeout of few seconds if the childref is not already actively running. make it to progress
+    const timeoutId = setTimeout(() => {
+      if (childTweenRef.current && tl.current && dataTweenRef.current) {
+        if (
+          !childTweenRef.current?.isActive() &&
+          childTweenRef.current?.time() < 0.2
+        ) {
+          // current time of dataTweenRef
+          const currentTime = dataTweenRef.current?.time();
+          // set it in the childTweenRef
+          childTweenRef.current?.time(currentTime);
+        }
+      }
+    }, 50); // TODO: make this a variable
+
     return () => {
       if (childTweenRef.current) childTweenRef.current.kill();
       ctx.revert();
+      clearInterval(timeoutId);
     };
   }, [active, startAt]);
 
@@ -162,7 +196,6 @@ export const PixiSequence = (props: PixiSequenceProps) => {
   // const totalTimelineDuration = tl.current.totalDuration();
   // console.log("totalDuration", totalDuration, totalTimelineDuration);
   // /console.log("acitve", uniqueId, active, startAt, endAt);
-
   return (
     <Container ref={containerRef} alpha={1}>
       <Container ref={dataRef}>

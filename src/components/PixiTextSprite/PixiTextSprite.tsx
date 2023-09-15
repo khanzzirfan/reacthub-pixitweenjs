@@ -1,9 +1,7 @@
 import * as React from "react";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { Container, Text } from "@pixi/react";
 import * as PIXI from "pixi.js";
-import Quill from "quill";
-import "quill/dist/quill.snow.css";
 // @ts-ignore
 import isEmpty from "lodash/isEmpty";
 // @ts-ignore
@@ -96,7 +94,7 @@ export interface PixiTextSpriteProps extends PixiBaseSpriteProps {
   applyTransformer?: boolean;
   onTextUpdate?: (data: any) => void;
   onAnchorTransformationEnd?: (endData: any) => void;
-  onExitQuillEditor?: () => void;
+  onDobuleClick?: () => void;
 }
 
 const PixiTextSprite = React.forwardRef<
@@ -104,7 +102,6 @@ const PixiTextSprite = React.forwardRef<
   PixiTextSpriteProps
 >((props, ref) => {
   //// State
-  const [isEditing, setIsEditing] = useState(false);
   // State variables to track click events
   const doubleClickDelay = 300; // Adjust this as needed
 
@@ -117,18 +114,15 @@ const PixiTextSprite = React.forwardRef<
   const textInnerGroupRef = useRef(null);
   const textFontSize = useRef<number>(16);
   const textTransformDetailRef = useRef<any>(null);
-  const quillRef = useRef<Quill>(null);
 
   /// 1001
   const {
-    uniqueId,
     visible,
     text,
     disabled,
     transformation,
-    onTextUpdate,
     pointerdown,
-    onExitQuillEditor,
+    onDobuleClick,
   } = props;
 
   const {
@@ -265,16 +259,11 @@ const PixiTextSprite = React.forwardRef<
     };
   }, [transformation]);
 
-  // @ts-ignore
-  const handleOnDoubleClickEditText = () => {
-    setIsEditing(true);
-  };
-
   const handleOnPointerDown = () => {
     const currentTime = new Date().getTime();
     const clickTimeDiff = currentTime - lastClickTimeRef.current;
-    if (clickTimeDiff < doubleClickDelay) {
-      handleOnDoubleClickEditText();
+    if (clickTimeDiff < doubleClickDelay && onDobuleClick) {
+      onDobuleClick();
     } else {
       if (pointerdown) {
         pointerdown();
@@ -283,172 +272,16 @@ const PixiTextSprite = React.forwardRef<
     lastClickTimeRef.current = currentTime;
   };
 
-  const handleTextChange = (e: string) => {
-    if (onTextUpdate) {
-      onTextUpdate({
-        text: e && e.replace(/\n+/g, "\n"),
-        uniqueId: uniqueId,
-      });
-    }
+  const handleOnDoubleClick = () => {
+    if (onDobuleClick) onDobuleClick();
   };
-
-  // const handleOnMouseDown = (interactionData) => {
-
-  // const handleOnMoveOver = (interactionData) => {
-  //   if (!isDragging) {
-  //     setMouseOverSprite(true);
-  //   }
-  // };
-
-  // const handleOnMoveOut = () => {
-  //   if (!isDragging) {
-  //     setMouseOverSprite(false);
-  //   }
-  // };
-
-  const closeEditor = () => {
-    setIsEditing(false);
-    if (onExitQuillEditor) onExitQuillEditor();
-  };
-
-  // copy paste ignore event
-  const handleOnCopyPaste = (e: any) => {
-    if (!e) return;
-    e.preventDefault();
-    e.stopPropagation();
-  };
-
-  React.useEffect(() => {
-    if (isEditing && textInputGroupRef.current) {
-      let el = document.getElementById("note-editor");
-      if (el) {
-        el.style.position = "absolute";
-        el.style.display = "block";
-        el.style.zIndex = "10";
-        el.style.left = x + "px";
-        el.style.top = y + "px";
-        el.style.backgroundColor = "var(--chakra-color-darkShark)";
-        el.style.transform = "scale(1.5)";
-        el.style.width = "300px";
-        el.style.height = "100px";
-        el.style.color = "#fff";
-        el.style.fontSize = "20px";
-        el.style.border = "1px solid #CBCEE0";
-
-        const keyboardbindings = {
-          // This will overwrite the default binding also named 'tab'
-          esc: {
-            key: 27,
-            handler: function () {
-              closeEditor();
-            },
-          },
-          // enter: {
-          //   key: 13,
-          //   handler: function () {
-          //     closeEditor();
-          //   },
-          // },
-        };
-
-        // @ts-ignore
-        quillRef.current = new Quill("#note-editor", {
-          modules: {
-            toolbar: false,
-            keyboard: {
-              bindings: {
-                ...keyboardbindings,
-              },
-            },
-          },
-          placeholder: "Compose your text here...",
-          theme: "snow", // or 'bubble'
-        });
-
-        if (quillRef.current) {
-          quillRef.current.on("text-change", function () {
-            if (quillRef.current)
-              handleTextChange(quillRef.current.root.innerText);
-          });
-          // @ts-ignore
-          quillRef.current?.container?.addEventListener(
-            "paste",
-            handleOnCopyPaste
-          );
-
-          quillRef.current.setText(text);
-          quillRef.current.focus();
-          quillRef.current.off("text-change", () => {});
-
-          if (!quillRef.current.hasFocus()) {
-            el.style.display = "none";
-          }
-
-          // add the custom closing icon below the container
-          // Append the close icon button
-          const closeButton = document.createElement("button");
-          closeButton.innerHTML = "&#10006;"; // Close icon (you can customize)
-          closeButton.style.position = "absolute";
-          closeButton.style.bottom = "-14px";
-          closeButton.style.left = "-3px";
-          closeButton.style.cursor = "pointer";
-          closeButton.addEventListener("click", () => {
-            closeEditor();
-          });
-          closeButton.style.border = "none"; // Remove default border
-          closeButton.style.borderRadius = "50%"; // Apply rounded border
-          closeButton.style.width = "15px"; // Adjust button width
-          closeButton.style.height = "15px"; // Adjust button height
-          closeButton.style.backgroundColor = "#f8f8f8"; // Background color
-          closeButton.style.color = "#333"; // Text color
-          closeButton.style.fontSize = "10px"; // Text size
-
-          el.appendChild(closeButton);
-        }
-      }
-    } else {
-      if (quillRef.current) {
-        let quillParent = document.getElementById("note-editor");
-        if (quillParent && quillParent.hasChildNodes()) {
-          // @ts-ignore
-          quillParent.removeChild(quillParent.firstChild);
-          quillParent.removeAttribute("class");
-          quillParent.removeAttribute("style");
-        }
-        quillRef.current.off("text-change", () => {});
-      }
-    }
-    return () => {
-      if (quillRef.current) {
-        quillRef.current.off("text-change", () => {});
-        // @ts-ignore
-        quillRef.current?.container?.removeEventListener(
-          "paste",
-          handleOnCopyPaste
-        );
-        // @ts-ignore
-        // quillRef.current = null;
-      }
-    };
-  }, [x, y, isEditing]);
-
-  React.useEffect(() => {
-    // Cleanup Quill when isEditing is programmatically set to false
-    if (!isEditing) {
-      const el = document.getElementById("note-editor");
-      if (el) {
-        el.style.display = "none";
-      }
-    }
-  }, [isEditing]);
 
   return (
     <AbstractContainer
       {...props}
       ref={ref}
       isText={true}
-      onDoubleClick={handleOnDoubleClickEditText}
-      isTextEditMode={isEditing}
+      onDoubleClick={handleOnDoubleClick}
     >
       <Container ref={parentNode}>
         {/* @ts-ignore */}
@@ -465,7 +298,6 @@ const PixiTextSprite = React.forwardRef<
             text={text}
             alpha={visible ? 1 : 0}
             {...(visible &&
-              !isEditing &&
               !disabled && {
                 interactive: true,
                 buttonMode: true,
