@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-## [](https://github.com/khanzzirfan/reacthub-pixitweenjs/compare/v0.2.104...v) (2023-09-15)
+### [0.2.105-alpha.0](https://github.com/khanzzirfan/reacthub-pixitweenjs/compare/v0.2.104...v0.2.105-alpha.0) (2023-09-15)
 
 
 ### Bug Fixes
