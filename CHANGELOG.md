@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## [](https://github.com/khanzzirfan/reacthub-pixitweenjs/compare/v0.2.104...v) (2023-09-15)
 
+
+### Bug Fixes
+
+* updated timeline sequence mapping and removed quill editor ([b570d29](https://github.com/khanzzirfan/reacthub-pixitweenjs/commit/b570d2933220145bbc055cf1a795f92ec0e590e2))
+
 ### [0.2.104](https://github.com/khanzzirfan/reacthub-pixitweenjs/compare/v0.2.103...v0.2.104) (2023-09-10)
 
 ### [0.2.103](https://github.com/khanzzirfan/reacthub-pixitweenjs/compare/v0.2.102...v0.2.103) (2023-09-10)
