@@ -38,7 +38,8 @@
     "start": "npm run storybook",
     "build-storybook": "storybook build",
     "init-msw": "msw init public/",
-    "release": "standard-version --prerelease alpha &&npm publish",
+    "release": "standard-version --release-as patch &&npm publish",
+    "release:alpha": "standard-version --prerelease alpha &&npm publish",
     "chromatic": "env-cmd -f .env.dev chromatic"
   },
   "devDependencies": {
