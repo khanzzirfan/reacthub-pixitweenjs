@@ -3,7 +3,11 @@ import { useRef, useContext } from "react";
 import { Container } from "@pixi/react";
 import gsap from "gsap";
 import * as PIXI from "pixi.js";
-import { GsapPixieContext } from "../../providers/GsapPixieContextProvider";
+import { useCustomEventListener } from "../../events";
+import {
+  GsapPixieContext,
+  Events,
+} from "../../providers/GsapPixieContextProvider";
 // @ts-ignore
 import debounce from "lodash/debounce";
 
@@ -19,7 +23,7 @@ export interface PixiSequenceProps {
 }
 
 export const PixiSequence = (props: PixiSequenceProps) => {
-  const { startAt, endAt } = props;
+  const { startAt, endAt, uniqueId } = props;
   const [active, setActive] = React.useState<boolean>(false);
   //// Refs
   const containerRef = useRef<PIXI.Container>(null);
@@ -38,6 +42,19 @@ export const PixiSequence = (props: PixiSequenceProps) => {
     totalDuration = 0,
     reverseModeRef,
   } = useContext(GsapPixieContext);
+
+  // reset timeline when reverse mode end.
+  useCustomEventListener(Events.REVERSE_MODE_END, () => {
+    if (tl.current) {
+      const currentTime = tl.current.time();
+      if (currentTime < Math.max(0, startAt - 1)) {
+        setActive(() => false);
+        activeRef.current = false;
+        if (dataTweenRef.current) dataTweenRef.current.revert();
+        if (childTweenRef.current) childTweenRef.current.revert();
+      }
+    }
+  });
 
   const gsapOnAlphaStart = () => {
     if (!activeRef.current) {
@@ -188,14 +205,10 @@ export const PixiSequence = (props: PixiSequenceProps) => {
     return () => {
       if (childTweenRef.current) childTweenRef.current.kill();
       ctx.revert();
-      clearInterval(timeoutId);
+      clearTimeout(timeoutId);
     };
   }, [active, startAt]);
 
-  // add global oncomplete event minus 1 second
-  // const totalTimelineDuration = tl.current.totalDuration();
-  // console.log("totalDuration", totalDuration, totalTimelineDuration);
-  // /console.log("acitve", uniqueId, active, startAt, endAt);
   return (
     <Container ref={containerRef} alpha={1}>
       <Container ref={dataRef}>

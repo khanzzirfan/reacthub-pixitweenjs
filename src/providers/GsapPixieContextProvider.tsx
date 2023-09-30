@@ -152,14 +152,12 @@ const GsapPixieContextProvider: React.FC<{ children: React.ReactNode }> = ({
           // );
           onUpdate();
         })
-        // .eventCallback("onRepeat", function () {
-        //   /// console.log("onrepeat", timeline.progress());
-        //   onUpdate();
-        // })
-        // .eventCallback("onReverseComplete", function () {
-        //   /// console.log("onReverseComplete", timeline.progress());
-        //   onUpdate();
-        // })
+        .eventCallback("onRepeat", function () {
+          console.log("onrepeat", timeline.progress());
+        })
+        .eventCallback("onReverseComplete", function () {
+          console.log("onReverseComplete", timeline.progress());
+        })
         // write a pause event
         .eventCallback("onComplete", function () {
           timeline.pause();

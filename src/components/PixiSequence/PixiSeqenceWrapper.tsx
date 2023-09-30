@@ -17,7 +17,8 @@ export const PixiSequenceWrapper = (props: PixiSequenceWrapperProps) => {
   const { setTotalDuration } = useContext(GsapPixieContext);
   React.useEffect(() => {
     if (setTotalDuration) {
-      setTotalDuration(endAt);
+      // add some buffer to the end
+      setTotalDuration(Number(endAt) + 0.2);
     }
   }, [startAt, endAt]);
 

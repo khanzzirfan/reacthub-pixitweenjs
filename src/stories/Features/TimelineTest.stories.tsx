@@ -2,6 +2,8 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { TimelineTest } from "./TimelineTest";
 import { TimelineTestVideos } from "./TimelineTestWithVideos";
 import { TimelineWithGif } from "./TimelineWithGif";
+import { TimelineTestAudios } from "./TimelineTestAudios";
+import TestAudioFiles from "./TestHowlerAudioFiles";
 
 // More on how to set up stories at: https://storybook.js.org/docs/react/writing-stories/introduction
 const meta = {
@@ -68,6 +70,38 @@ export const VideoTest: Story = {
   args: {
     sequences: [
       {
+        startAt: 3,
+        endAt: 8,
+      },
+      {
+        startAt: 1,
+        endAt: 15,
+      },
+      {
+        startAt: 2,
+        endAt: 12,
+      },
+      {
+        startAt: 5,
+        endAt: 15,
+      },
+      {
+        startAt: 8,
+        endAt: 19,
+      },
+      {
+        startAt: 21,
+        endAt: 25,
+      },
+    ],
+  },
+};
+
+export const AudioTest: Story = {
+  render: (args: any) => <TimelineTestAudios {...args} />,
+  args: {
+    sequences: [
+      {
         startAt: 0,
         endAt: 5,
       },
@@ -77,19 +111,27 @@ export const VideoTest: Story = {
       },
       {
         startAt: 6,
-        endAt: 10,
+        endAt: 20,
+      },
+    ],
+  },
+};
+
+export const HowlerAudioTest: Story = {
+  render: (args: any) => <TestAudioFiles {...args} />,
+  args: {
+    sequences: [
+      {
+        startAt: 0,
+        endAt: 5,
       },
       {
-        startAt: 11,
-        endAt: 18,
+        startAt: 4,
+        endAt: 9,
       },
       {
-        startAt: 8,
-        endAt: 16,
-      },
-      {
-        startAt: 21,
-        endAt: 25,
+        startAt: 6,
+        endAt: 20,
       },
     ],
   },

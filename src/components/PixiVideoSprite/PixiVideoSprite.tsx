@@ -144,6 +144,14 @@ const PixiVideoSprite = React.forwardRef<
     }
   });
 
+  // reset timeline when reverse mode end.
+  useCustomEventListener(Events.REVERSE_MODE_END, () => {
+    if (videoElement.current) {
+      videoElement.current.pause();
+      videoStateRef.current.isPlaying = false;
+    }
+  });
+
   /** Debounce pause video */
   const pauseVideoDebounce = React.useCallback(
     debounce(() => {
@@ -299,6 +307,21 @@ const PixiVideoSprite = React.forwardRef<
         onInterrupt: onInterrupt,
         onUpdate: onUpdate,
         onUpdateParams: [frameStartAt, frameEndAt],
+        onPause: () => {
+          console.log("onPause video sprite pause", uniqueId);
+        },
+        onResume: () => {
+          console.log("onResume video sprite resume", uniqueId);
+        },
+        onReverseComplete: () => {
+          console.log(
+            "onReverseComplete video sprite reverse complete",
+            uniqueId
+          );
+        },
+        onKill: () => {
+          console.log("onKill video sprite kill", uniqueId);
+        },
       };
 
       // kill tween before adding it.
