@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.107-alpha.14](https://github.com/khanzzirfan/reacthub-pixitweenjs/compare/v0.2.107-alpha.13...v0.2.107-alpha.14) (2023-10-01)
+
+
+### Bug Fixes
+
+* updated pixi sprites and sequencing ([97284a1](https://github.com/khanzzirfan/reacthub-pixitweenjs/commit/97284a1d24ad85dbc7cd8c588658725c244921a3))
+
 ### [0.2.107-alpha.13](https://github.com/khanzzirfan/reacthub-pixitweenjs/compare/v0.2.107-alpha.12...v0.2.107-alpha.13) (2023-09-30)
 
 ### [0.2.107-alpha.12](https://github.com/khanzzirfan/reacthub-pixitweenjs/compare/v0.2.107-alpha.11...v0.2.107-alpha.12) (2023-09-30)
