@@ -29,6 +29,7 @@ const PixiImageSprite = React.forwardRef<
   const {
     src,
     visible,
+    disabled,
     transformation: {
       x,
       y,
@@ -43,7 +44,7 @@ const PixiImageSprite = React.forwardRef<
 
   // log all props
 
-  const { blurRadius = 0 } = colorCorrection;
+  const { blurRadius = 0, vignette = 0, noise = 0 } = colorCorrection;
   // use with filters hoooks to get the filters
   const {
     temperatureFilter,
@@ -51,6 +52,8 @@ const PixiImageSprite = React.forwardRef<
     hueFilter,
     blurFilter,
     adjustmentFilter,
+    vignetteFilter,
+    noiseFilter,
   } = withFiltersHook(colorCorrection);
 
   const { nightVisionFilter } = withEffectsHooks();
@@ -73,7 +76,8 @@ const PixiImageSprite = React.forwardRef<
           alpha={visible ? 1 : 0}
           x={x}
           y={y}
-          {...(visible && { interactive: true, pointerdown: pointerdown })}
+          {...(!disabled &&
+            visible && { interactive: true, pointerdown: pointerdown })}
           filters={[
             temperatureFilter,
             sharpnessFilter,
@@ -83,6 +87,10 @@ const PixiImageSprite = React.forwardRef<
             ...(blurRadius > 0 ? [blurFilter] : []),
             // conditionally add night vision filter
             ...(effect === Effects.NightVision ? [nightVisionFilter] : []),
+            // conditionally add vignette filter
+            ...(vignette > 0 ? [vignetteFilter] : []),
+            // conditionally add noise filter
+            ...(noise > 0 ? [noiseFilter] : []),
           ]}
         />
       </Container>

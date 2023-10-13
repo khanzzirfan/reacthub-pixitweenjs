@@ -70,18 +70,22 @@ export const VideoTest: Story = {
   args: {
     sequences: [
       {
+        // image sprite
         startAt: 3,
         endAt: 8,
       },
       {
-        startAt: 1,
-        endAt: 15,
+        // image sprite
+        startAt: 0,
+        endAt: 6,
       },
       {
+        // video sprite
         startAt: 2,
-        endAt: 12,
+        endAt: 7,
       },
       {
+        // video sprite
         startAt: 5,
         endAt: 15,
       },

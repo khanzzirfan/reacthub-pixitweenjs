@@ -99,6 +99,7 @@ const PixiGifSprite = React.forwardRef<
     frameEndAt,
     loop,
     visible,
+    disabled,
     transformation: {
       width = 0,
       height = 0,
@@ -117,9 +118,11 @@ const PixiGifSprite = React.forwardRef<
     hueFilter,
     blurFilter,
     adjustmentFilter,
+    vignetteFilter,
+    noiseFilter,
   } = withFiltersHook(colorCorrection);
 
-  const { blurRadius = 0 } = colorCorrection;
+  const { blurRadius = 0, vignette = 0, noise = 0 } = colorCorrection;
 
   const frameDelay = 0.1;
   //  load and parse gif
@@ -336,7 +339,8 @@ const PixiGifSprite = React.forwardRef<
             onComplete={handleComplete}
             anchor={0.5}
             forwardRef={animatedSpriteRef}
-            {...(visible && { interactive: true, pointerdown: pointerdown })}
+            {...(!disabled &&
+              visible && { interactive: true, pointerdown: pointerdown })}
             filters={[
               temperatureFilter,
               sharpnessFilter,
@@ -344,6 +348,10 @@ const PixiGifSprite = React.forwardRef<
               adjustmentFilter,
               // conditionally add blur filter
               ...(blurRadius > 0 ? [blurFilter] : []),
+              // conditionally add vignette filter
+              ...(vignette > 0 ? [vignetteFilter] : []),
+              // conditionally add noise filter
+              ...(noise > 0 ? [noiseFilter] : []),
             ]}
           />
         )}

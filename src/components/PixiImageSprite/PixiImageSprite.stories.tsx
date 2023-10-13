@@ -199,6 +199,8 @@ export const Filters: Story = {
           red: 1,
           green: 1,
           blue: 1,
+          vignette: 0,
+          noise: 0,
           ...args,
         },
       },
@@ -226,103 +228,79 @@ export const Filters: Story = {
     saturation: 1,
     exposure: 1,
     blurRadius: 0,
+    vignette: 0,
+    noise: 0,
   },
   argTypes: {
     // @ts-ignore
     alpha: {
-      control: "range",
-      min: 0,
-      max: 1,
-      step: 0.2,
+      control: { type: "range", min: 0, max: 1, step: 0.2 },
       description: "alpha of the sprite",
     },
     hue: {
-      control: "range",
-      min: 1,
-      max: 360,
-      step: 50,
+      control: { type: "range", min: 1, max: 360, step: 50 },
       description:
         "hue of the sprite filter supplied to transformation property in the props.",
     },
     sharpness: {
-      control: "range",
-      min: 0,
-      max: 10,
-      step: 1,
+      control: { type: "range", min: 0, max: 10, step: 1 },
       description:
         "sharpness of the sprite filter supplied to transformation property in the props.",
     },
     brightness: {
-      control: "range",
-      min: 0,
-      max: 10,
-      step: 1,
+      control: { type: "range", min: 0, max: 10, step: 1 },
       description:
         "brightness of the sprite filter supplied to transformation property in the props.",
     },
     contrast: {
-      control: "range",
-      min: 0,
-      max: 10,
-      step: 1,
+      control: { type: "range", min: 0, max: 10, step: 1 },
       description:
         "contrast of the sprite filter supplied to transformation property in the props.",
     },
     saturation: {
-      control: "range",
-      min: 0,
-      max: 10,
-      step: 1,
+      control: { type: "range", min: 0, max: 10, step: 1 },
       description:
         "saturation of the sprite filter supplied to transformation property in the props.",
     },
     exposure: {
-      control: "range",
-      min: 0,
-      max: 10,
-      step: 1,
+      control: { type: "range", min: 0, max: 10, step: 1 },
       description:
         "exposure of the sprite filter supplied to transformation property in the props.",
     },
     blurRadius: {
-      control: "range",
-      min: 0,
-      max: 10,
-      step: 1,
+      control: { type: "range", min: 0, max: 10, step: 1 },
       description:
         "blurRadius of the sprite filter supplied to transformation property in the props.",
     },
     red: {
-      control: "range",
-      min: 1,
-      max: 255,
-      step: 10,
+      control: { type: "range", min: 1, max: 255, step: 10 },
       description:
         "red of the sprite filter supplied to transformation property in the props.",
     },
     green: {
-      control: "range",
-      min: 1,
-      max: 255,
-      step: 10,
+      control: { type: "range", min: 1, max: 255, step: 10 },
       description:
         "green of the sprite filter supplied to transformation property in the props.",
     },
     blue: {
-      control: "range",
-      min: 1,
-      max: 255,
-      step: 10,
+      control: { type: "range", min: 1, max: 255, step: 10 },
       description:
         "blue of the sprite filter supplied to transformation property in the props.",
     },
     gamma: {
-      control: "range",
-      min: 0,
-      max: 10,
-      step: 0.5,
+      control: { type: "range", min: 0, max: 10, step: 0.5 },
       description:
         "gamma of the sprite filter supplied to transformation property in the props.",
+    },
+    vignette: {
+      control: { type: "range", min: 0, max: 1, step: 0.1 },
+      description:
+        "vignette of the sprite filter supplied to transformation property in the props.",
+    },
+    noise: {
+      control: { type: "range", min: 0, max: 1, step: 0.1 },
+      description:
+        "noise of the sprite filter supplied to transformation property in the props.",
     },
   },
   parameters: {
@@ -342,6 +320,8 @@ export const Filters: Story = {
         "temperature",
         "sharpness",
         "blurRadius",
+        "vignette",
+        "noise",
       ],
     },
   },

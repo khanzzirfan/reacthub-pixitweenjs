@@ -272,7 +272,7 @@ const PixiTextSprite = React.forwardRef<
   };
 
   const handleOnDoubleClick = () => {
-    if (onDobuleClick) onDobuleClick();
+    if (!disabled && onDobuleClick) onDobuleClick();
   };
 
   return (

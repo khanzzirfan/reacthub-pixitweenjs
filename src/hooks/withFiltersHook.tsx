@@ -14,6 +14,8 @@ export interface FiltersProps {
   temperature?: number;
   hue?: number;
   sharpness?: number;
+  vignette?: number;
+  noise?: number;
 }
 
 export const withFiltersHook = (props: FiltersProps) => {
@@ -30,6 +32,8 @@ export const withFiltersHook = (props: FiltersProps) => {
     temperature = 0,
     hue = 0,
     sharpness = 0,
+    vignette = 0,
+    noise = 0,
   } = props || {};
 
   // Create a temperature filter
@@ -72,6 +76,14 @@ export const withFiltersHook = (props: FiltersProps) => {
   // create a blur filter
   const blurFilter = new PixiFilters.KawaseBlurFilter(blurRadius, 1, true);
 
+  // create a vignette filter
+  const vignetteFilter = new PixiFilters.OldFilmFilter({
+    vignetting: vignette,
+  });
+
+  // create a noise filter
+  const noiseFilter = new PIXI.filters.NoiseFilter(noise);
+
   // create a adjustment filter
   const adjustmentFilter = new PixiFilters.AdjustmentFilter({
     ...(gamma && { gamma: gamma }),
@@ -90,5 +102,7 @@ export const withFiltersHook = (props: FiltersProps) => {
     hueFilter,
     sharpnessFilter,
     temperatureFilter,
+    vignetteFilter,
+    noiseFilter,
   };
 };

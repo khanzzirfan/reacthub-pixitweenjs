@@ -93,6 +93,7 @@ const PixiVideoSprite = React.forwardRef<
     frameStartAt,
     frameEndAt,
     visible,
+    disabled,
     transformation: { x, y, width, height, animation, colorCorrection = {} },
     pointerdown = () => void 0,
     pointerout = () => void 0,
@@ -106,7 +107,7 @@ const PixiVideoSprite = React.forwardRef<
   const { onPointerDown, onPointerOut, onPointerOver } =
     useDebouncedPointerEvents(pointerover, pointerdown, pointerout, 1);
 
-  const { blurRadius = 0 } = colorCorrection;
+  const { blurRadius = 0, vignette = 0, noise = 0 } = colorCorrection;
   // use with filters hoooks to get the filters
   const {
     temperatureFilter,
@@ -114,6 +115,8 @@ const PixiVideoSprite = React.forwardRef<
     hueFilter,
     blurFilter,
     adjustmentFilter,
+    vignetteFilter,
+    noiseFilter,
   } = withFiltersHook(colorCorrection);
 
   const videoUrl = src || "";
@@ -537,7 +540,8 @@ const PixiVideoSprite = React.forwardRef<
             y={y}
             ref={imageRef}
             alpha={visible ? 1 : 0}
-            {...(visible && { interactive: true, pointerdown: pointerdown })}
+            {...(!disabled &&
+              visible && { interactive: true, pointerdown: pointerdown })}
             filters={[
               temperatureFilter,
               sharpnessFilter,
@@ -545,6 +549,10 @@ const PixiVideoSprite = React.forwardRef<
               adjustmentFilter,
               // conditionally add blur filter
               ...(blurRadius > 0 ? [blurFilter] : []),
+              // conditionally add vignette filter
+              ...(vignette > 0 ? [vignetteFilter] : []),
+              // conditionally add noise filter
+              ...(noise > 0 ? [noiseFilter] : []),
             ]}
           />
         )}

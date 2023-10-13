@@ -60,6 +60,8 @@ export interface PixiSvgPathSpriteProps extends PixiBaseSpriteProps {
       blue?: number;
       alpha?: number;
       scaleInput?: number;
+      vignette?: number;
+      noise?: number;
     };
     effect?: Effects;
   };
@@ -93,6 +95,7 @@ const PixiSvgPathSprite = React.forwardRef<
   const {
     path,
     visible,
+    disabled,
     transformation: {
       x,
       y,
@@ -119,9 +122,11 @@ const PixiSvgPathSprite = React.forwardRef<
     hueFilter,
     blurFilter,
     adjustmentFilter,
+    vignetteFilter,
+    noiseFilter,
   } = withFiltersHook(colorCorrection);
 
-  const { blurRadius = 0 } = colorCorrection;
+  const { blurRadius = 0, vignette = 0, noise = 0 } = colorCorrection;
 
   React.useEffect(() => {
     const transformedPath = svgpath(path).scale(5).translate(0, 0).toString();
@@ -156,11 +161,12 @@ const PixiSvgPathSprite = React.forwardRef<
               x={x}
               y={y}
               alpha={visible ? 1 : 0}
-              {...(visible && {
-                interactive: true,
-                pointerdown: pointerdown,
-                pointerup: pointerup,
-              })}
+              {...(!disabled &&
+                visible && {
+                  interactive: true,
+                  pointerdown: pointerdown,
+                  pointerup: pointerup,
+                })}
               filters={[
                 temperatureFilter,
                 sharpnessFilter,
@@ -168,6 +174,10 @@ const PixiSvgPathSprite = React.forwardRef<
                 adjustmentFilter,
                 // conditionally add blur filter
                 ...(blurRadius > 0 ? [blurFilter] : []),
+                // conditionally add vignette filter
+                ...(vignette > 0 ? [vignetteFilter] : []),
+                // conditionally add noise filter
+                ...(noise > 0 ? [noiseFilter] : []),
               ]}
             />
           )}

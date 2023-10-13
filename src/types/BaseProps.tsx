@@ -45,6 +45,8 @@ export interface PixiBaseSpriteProps {
       alpha?: number;
       gamma?: number;
       scaleInput?: number;
+      vignette?: number;
+      noise?: number;
     };
     effect?: Effects;
     overlay?: OverlayTypes;

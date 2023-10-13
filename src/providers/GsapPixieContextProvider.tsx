@@ -84,8 +84,7 @@ const GsapPixieContextProvider: React.FC<{ children: React.ReactNode }> = ({
     });
     return () => {
       if (tl.current) {
-        tl.current.progress(0).kill();
-        gsap.killTweensOf(tl.current);
+        tl.current.revert();
       }
       gsapCtx.current.revert();
     };

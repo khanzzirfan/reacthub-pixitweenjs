@@ -84,6 +84,12 @@ const PixiAudioSprite: React.FC<PixiAudioSpriteProps> = (props) => {
     }
   });
 
+  useCustomEventListener(Events.COMPLETE, () => {
+    if (audioStartAt > 0 && audioContainerRef.current) {
+      audioContainerRef.current.seek(audioStartAt);
+    }
+  });
+
   useCustomEventListener(Events.SCRUBBER_CLICKED, () => {
     if (containerRef.current && audioContainerRef.current) {
       // @ts-ignore
