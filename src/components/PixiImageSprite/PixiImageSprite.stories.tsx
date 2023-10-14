@@ -201,6 +201,7 @@ export const Filters: Story = {
           blue: 1,
           vignette: 0,
           noise: 0,
+          outline: 0,
           ...args,
         },
       },
@@ -230,6 +231,7 @@ export const Filters: Story = {
     blurRadius: 0,
     vignette: 0,
     noise: 0,
+    outline: 0,
   },
   argTypes: {
     // @ts-ignore
@@ -302,6 +304,11 @@ export const Filters: Story = {
       description:
         "noise of the sprite filter supplied to transformation property in the props.",
     },
+    outline: {
+      control: { type: "range", min: 0, max: 5, step: 0.5 },
+      description:
+        "outline of the sprite filter supplied to transformation property in the props.",
+    },
   },
   parameters: {
     controls: {
@@ -322,6 +329,7 @@ export const Filters: Story = {
         "blurRadius",
         "vignette",
         "noise",
+        "outline",
       ],
     },
   },

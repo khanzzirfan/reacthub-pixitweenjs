@@ -22,7 +22,6 @@ const PixiImageSprite = React.forwardRef<
   //// Refs
   const imageRef = useRef<PIXI.Sprite>(null);
   const imgGroupRef = useRef<PIXI.Container>(null);
-
   //// Context
 
   /// 1001
@@ -44,7 +43,12 @@ const PixiImageSprite = React.forwardRef<
 
   // log all props
 
-  const { blurRadius = 0, vignette = 0, noise = 0 } = colorCorrection;
+  const {
+    blurRadius = 0,
+    vignette = 0,
+    noise = 0,
+    outline = 0,
+  } = colorCorrection;
   // use with filters hoooks to get the filters
   const {
     temperatureFilter,
@@ -54,6 +58,7 @@ const PixiImageSprite = React.forwardRef<
     adjustmentFilter,
     vignetteFilter,
     noiseFilter,
+    outlineFilter,
   } = withFiltersHook(colorCorrection);
 
   const { nightVisionFilter } = withEffectsHooks();
@@ -91,6 +96,8 @@ const PixiImageSprite = React.forwardRef<
             ...(vignette > 0 ? [vignetteFilter] : []),
             // conditionally add noise filter
             ...(noise > 0 ? [noiseFilter] : []),
+            // conditionally add outline filter
+            ...(outline > 0 ? [outlineFilter] : []),
           ]}
         />
       </Container>
