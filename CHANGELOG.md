@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.107-alpha.19](https://github.com/khanzzirfan/reacthub-pixitweenjs/compare/v0.2.107-alpha.18...v0.2.107-alpha.19) (2023-10-24)
+
+
+### Bug Fixes
+
+* outline added to the images ([5199374](https://github.com/khanzzirfan/reacthub-pixitweenjs/commit/5199374f5f0ebf534b67d2ef4c217c27cafcb2ed))
+* updated new filters ([63ac11b](https://github.com/khanzzirfan/reacthub-pixitweenjs/commit/63ac11bb6414df8415f699d297bbbaccff4e093a))
+
 ### [0.2.107-alpha.18](https://github.com/khanzzirfan/reacthub-pixitweenjs/compare/v0.2.107-alpha.17...v0.2.107-alpha.18) (2023-10-13)
 
 ### [0.2.107-alpha.17](https://github.com/khanzzirfan/reacthub-pixitweenjs/compare/v0.2.107-alpha.16...v0.2.107-alpha.17) (2023-10-11)
