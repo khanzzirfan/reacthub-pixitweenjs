@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.107-alpha.25](https://github.com/khanzzirfan/reacthub-pixitweenjs/compare/v0.2.107-alpha.24...v0.2.107-alpha.25) (2023-10-28)
+
+
+### Bug Fixes
+
+* updated pixi video canvas sync ([ed7c20c](https://github.com/khanzzirfan/reacthub-pixitweenjs/commit/ed7c20c234e3875c7e8608f93b0c9e59337e1aa6))
+
 ### [0.2.107-alpha.24](https://github.com/khanzzirfan/reacthub-pixitweenjs/compare/v0.2.107-alpha.23...v0.2.107-alpha.24) (2023-10-24)
 
 ### [0.2.107-alpha.23](https://github.com/khanzzirfan/reacthub-pixitweenjs/compare/v0.2.107-alpha.22...v0.2.107-alpha.23) (2023-10-24)
