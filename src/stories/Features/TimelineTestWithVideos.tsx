@@ -215,7 +215,7 @@ export const TimelineTestVideos = (props: TimelineProps) => {
                     ...ImageProps.transformation,
                     x: 150,
                     y: 150,
-                  }}
+                  }}  
                 />
               </PixiSequence>
             </PixiSequenceWrapper>

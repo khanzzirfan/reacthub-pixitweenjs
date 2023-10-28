@@ -25,6 +25,8 @@ interface GsapPixieContextProps {
   setTotalDuration?: React.Dispatch<React.SetStateAction<number>>;
   reverseModeRef: React.MutableRefObject<boolean>;
   dragModeRef: React.MutableRefObject<boolean>;
+  isRemotion: boolean;
+  setIsRemotion: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 // Context has been created
@@ -65,6 +67,7 @@ const GsapPixieContextProvider: React.FC<{ children: React.ReactNode }> = ({
   const playerTimeRef = useRef<number>(0.001);
   const reverseModeRef = useRef<boolean>(false);
   const dragModeRef = useRef<boolean>(false);
+  const [isRemotion, setIsRemotion] = useState<boolean>(false);
 
   // const parentElementRef = useRef<any>();
   // передаем предка анимируемых элементов
@@ -314,6 +317,8 @@ const GsapPixieContextProvider: React.FC<{ children: React.ReactNode }> = ({
         setTotalDuration,
         reverseModeRef,
         dragModeRef,
+        isRemotion,
+        setIsRemotion,
       }}
     >
       {children}

@@ -101,7 +101,7 @@ const PixiVideoSprite = React.forwardRef<
   } = props;
 
   //// Context
-  const { tl, dragModeRef } = useContext(GsapPixieContext);
+  const { tl, dragModeRef, isRemotion } = useContext(GsapPixieContext);
 
   /// hooks;
   const { onPointerDown, onPointerOut, onPointerOver } =
@@ -174,7 +174,7 @@ const PixiVideoSprite = React.forwardRef<
 
   // /** stop video playing when gsapDragging is true */
   React.useEffect(() => {
-    if (videoElement.current) {
+    if (videoElement.current && !isRemotion) {
       if (dragModeRef.current) {
         pauseVideoDebounce();
         videoStateRef.current.isPlaying = false;
@@ -468,7 +468,8 @@ const PixiVideoSprite = React.forwardRef<
         if (
           tweenCurrentProgress < 0.1 &&
           videoElement.current &&
-          !tweenRef.current.isActive()
+          !tweenRef.current.isActive() &&
+          !isRemotion
         ) {
           videoElement.current.play().then(() => {
             videoStateRef.current.isPlaying = false;
@@ -485,13 +486,13 @@ const PixiVideoSprite = React.forwardRef<
   /** ON start use effect to check if the timeline is really in progress else stop playing */
   React.useEffect(() => {
     // inactivate if timeline is inactive
-    if (tl.current && !tl.current.isActive()) {
+    if (tl.current && !tl.current.isActive() && !isRemotion) {
       videoStateRef.current.isPlaying = false;
       if (videoElement.current) videoElement.current.pause();
     }
 
     const timeoutId = setTimeout(() => {
-      if (videoTexture && tl.current && updater > 0) {
+      if (videoTexture && tl.current && updater > 0 && !isRemotion) {
         if (!tl.current.isActive()) {
           videoStateRef.current.isPlaying = false;
           if (videoElement.current) videoElement.current.pause();

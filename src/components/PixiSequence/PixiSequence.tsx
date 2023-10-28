@@ -42,6 +42,8 @@ export const PixiSequence = (props: PixiSequenceProps) => {
 
   const initialEventMode = startAt < 0.2 ? "static" : "none";
 
+  const alphaRef = useRef<number>(1);
+
   useCustomEventListener(Events.COMPLETE, () => {
     // reset the eventmode.
     if (containerRef.current) {
@@ -108,6 +110,7 @@ export const PixiSequence = (props: PixiSequenceProps) => {
               containerRef.current.alpha = 1;
               // @ts-ignore
               containerRef.current.eventMode = "static";
+              alphaRef.current = 1;
             }
           },
           onUpdate: gsapOnUpdateAlpha,
@@ -116,6 +119,7 @@ export const PixiSequence = (props: PixiSequenceProps) => {
               containerRef.current.alpha = 0;
               // @ts-ignore
               containerRef.current.eventMode = "none";
+              alphaRef.current = 0;
             }
           },
         });
@@ -131,6 +135,8 @@ export const PixiSequence = (props: PixiSequenceProps) => {
       ctx.revert();
     };
   }, [startAt, endAt, totalDuration, uniqueId]);
+
+  console.log("current alpha with time", containerRef?.current?.alpha);
 
   return (
     <Container

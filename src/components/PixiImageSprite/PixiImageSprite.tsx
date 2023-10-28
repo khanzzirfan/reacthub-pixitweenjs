@@ -47,7 +47,7 @@ const PixiImageSprite = React.forwardRef<
     blurRadius = 0,
     vignette = 0,
     noise = 0,
-    outline = 0,
+    // outline = 0,
   } = colorCorrection;
   // use with filters hoooks to get the filters
   const {
@@ -58,7 +58,7 @@ const PixiImageSprite = React.forwardRef<
     adjustmentFilter,
     vignetteFilter,
     noiseFilter,
-    outlineFilter,
+    // outlineFilter,
   } = withFiltersHook(colorCorrection);
 
   const { nightVisionFilter } = withEffectsHooks();
@@ -97,7 +97,7 @@ const PixiImageSprite = React.forwardRef<
             // conditionally add noise filter
             ...(noise > 0 ? [noiseFilter] : []),
             // conditionally add outline filter
-            ...(outline > 0 ? [outlineFilter] : []),
+            // ...(outline > 0 ? [outlineFilter] : []),
           ]}
         />
       </Container>

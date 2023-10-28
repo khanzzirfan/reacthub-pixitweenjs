@@ -17,6 +17,7 @@ export interface FiltersProps {
   vignette?: number;
   noise?: number;
   outline?: number;
+  outlineColor?: number;
 }
 
 export const withFiltersHook = (props: FiltersProps) => {
@@ -35,8 +36,8 @@ export const withFiltersHook = (props: FiltersProps) => {
     sharpness = 0,
     vignette = 0,
     noise = 0,
-    outline = 0,
-    outlineColor = 0x000000,
+    // outline = 0,
+    // outlineColor = 0x000000,
   } = props || {};
 
   // Create a temperature filter
@@ -88,7 +89,7 @@ export const withFiltersHook = (props: FiltersProps) => {
   const noiseFilter = new PIXI.filters.NoiseFilter(noise);
 
   // create a outline filter
-  const outlineFilter = new PixiFilters.OutlineFilter(outline, outlineColor);
+  /// const outlineFilter = new PixiFilters.OutlineFilter(outline, outlineColor);
 
   // create a adjustment filter
   const adjustmentFilter = new PixiFilters.AdjustmentFilter({
@@ -110,6 +111,6 @@ export const withFiltersHook = (props: FiltersProps) => {
     temperatureFilter,
     vignetteFilter,
     noiseFilter,
-    outlineFilter,
+    // outlineFilter,
   };
 };
