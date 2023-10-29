@@ -316,6 +316,8 @@ const PixiGifSprite = React.forwardRef<
     };
   }, [animation, startAt, endAt, frameStartAt, frameEndAt]);
 
+  console.log("gif render", animatedSpriteRef.current?.currentFrame);
+
   return (
     <AbstractContainer
       {...props}

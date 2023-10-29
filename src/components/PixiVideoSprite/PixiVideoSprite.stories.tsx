@@ -74,6 +74,10 @@ const meta = {
       action: "pointerdown",
       description: "pointerdown event",
     },
+    fps: {
+      control: "number",
+      description: "fps of the video",
+    },
   },
 } satisfies Meta<typeof PixiVideoSprite>;
 
@@ -248,5 +252,38 @@ export const SplitStartPos: Story = {
     visible: true,
     mute: false,
     locked: false,
+  },
+};
+
+export const VideoFps: Story = {
+  render: (args: any) => (
+    <AppStateContextProvider {...args}>
+      <PixiVideoSprite {...args} />
+    </AppStateContextProvider>
+  ),
+  args: {
+    uniqueId: "videofiterfps002", // uniqueId of the sprite
+    src: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+    transformation: {
+      x: 290,
+      y: 250,
+      width: 550,
+      height: 400,
+      anchor: 0.5,
+      rotation: 0,
+      alpha: 1,
+      scale: 1,
+      tint: 0xffffff,
+      blendMode: 0,
+    },
+    applyTransformer: false,
+    startAt: 0,
+    endAt: 15,
+    frameStartAt: 0,
+    frameEndAt: 15,
+    visible: true,
+    mute: false,
+    locked: false,
+    fps: 30,
   },
 };

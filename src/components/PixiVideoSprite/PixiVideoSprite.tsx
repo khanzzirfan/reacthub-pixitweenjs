@@ -98,6 +98,7 @@ const PixiVideoSprite = React.forwardRef<
     pointerdown = () => void 0,
     pointerout = () => void 0,
     pointerover = () => void 0,
+    fps = 0,
   } = props;
 
   //// Context
@@ -417,7 +418,7 @@ const PixiVideoSprite = React.forwardRef<
       resourceOptions: {
         autoPlay: false,
         crossorigin: "Anonymus",
-        updateFPS: 30,
+        updateFPS: fps ? Math.max(120, Number(fps)) : 30,
       },
     }).then((texture) => {
       if (!texture) return;

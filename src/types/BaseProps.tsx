@@ -63,6 +63,7 @@ export interface PixiBaseSpriteProps {
   mouseout?: () => void;
   applyTransformer?: boolean;
   onAnchorTransformationEnd?: (endData: any) => void;
+  fps?: number;
 }
 
 export interface ForwardedRefResponse {
