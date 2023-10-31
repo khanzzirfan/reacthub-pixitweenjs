@@ -4,6 +4,9 @@ import { AppStateContextProvider } from "../../utils/AppStateProvider";
 import { Effects } from "../../types/Effects";
 import { OverlayTypes } from "../../hocs/OverlayTilingSprite";
 import { AppWrapper } from "../../utils/AppWrapper";
+import { PixiSequenceWrapper } from "../../components/PixiSequence/PixiSeqenceWrapper";
+import { PixiSequence } from "../../components/PixiSequence";
+import { Animations } from "../../types";
 
 // More on how to set up stories at: https://storybook.js.org/docs/react/writing-stories/introduction
 const meta = {
@@ -100,7 +103,11 @@ type Story = StoryObj<typeof meta>;
 export const Normal: Story = {
   render: (args: any) => (
     <AppStateContextProvider {...args}>
-      <PixiImageSprite {...args} />
+      <PixiSequenceWrapper startAt={0} endAt={16}>
+        <PixiSequence startAt={args.startAt} endAt={args.endAt}>
+          <PixiImageSprite {...args} />
+        </PixiSequence>
+      </PixiSequenceWrapper>
     </AppStateContextProvider>
   ),
   args: {
@@ -136,7 +143,11 @@ export const Normal: Story = {
 export const FadeIn: Story = {
   render: (args: any) => (
     <AppStateContextProvider {...args}>
-      <PixiImageSprite {...args} />
+      <PixiSequenceWrapper startAt={0} endAt={16}>
+        <PixiSequence startAt={args.startAt} endAt={args.endAt}>
+          <PixiImageSprite {...args} />
+        </PixiSequence>
+      </PixiSequenceWrapper>
     </AppStateContextProvider>
   ),
   args: {
@@ -209,7 +220,14 @@ export const Filters: Story = {
     };
     return (
       <AppStateContextProvider {...initialProps}>
-        <PixiImageSprite {...initialProps} />
+        <PixiSequenceWrapper startAt={0} endAt={16}>
+          <PixiSequence
+            startAt={initialProps.startAt}
+            endAt={initialProps.endAt}
+          >
+            <PixiImageSprite {...initialProps} />
+          </PixiSequence>
+        </PixiSequenceWrapper>
       </AppStateContextProvider>
     );
   },
@@ -361,7 +379,14 @@ export const FilterEffects: Story = {
     };
     return (
       <AppStateContextProvider {...initialProps}>
-        <PixiImageSprite {...initialProps} />
+        <PixiSequenceWrapper startAt={0} endAt={16}>
+          <PixiSequence
+            startAt={initialProps.startAt}
+            endAt={initialProps.endAt}
+          >
+            <PixiImageSprite {...initialProps} />
+          </PixiSequence>
+        </PixiSequenceWrapper>
       </AppStateContextProvider>
     );
   },
@@ -428,7 +453,14 @@ export const Overlays: Story = {
     };
     return (
       <AppStateContextProvider {...initialProps}>
-        <PixiImageSprite {...initialProps} />
+        <PixiSequenceWrapper startAt={0} endAt={16}>
+          <PixiSequence
+            startAt={initialProps.startAt}
+            endAt={initialProps.endAt}
+          >
+            <PixiImageSprite {...initialProps} />
+          </PixiSequence>
+        </PixiSequenceWrapper>
       </AppStateContextProvider>
     );
   },
@@ -474,7 +506,11 @@ export const PointerTests: Story = {
   render: (args: any) => (
     <>
       <AppStateContextProvider {...args}>
-        <PixiImageSprite {...args} />
+        <PixiSequenceWrapper startAt={0} endAt={16}>
+          <PixiSequence startAt={args.startAt} endAt={args.endAt}>
+            <PixiImageSprite {...args} />
+          </PixiSequence>
+        </PixiSequenceWrapper>
       </AppStateContextProvider>
       <AppStateContextProvider {...args} x={10} y={300}>
         <PixiImageSprite {...args} x={10} y={100} />
@@ -514,5 +550,79 @@ export const PointerTests: Story = {
       },
     },
     visible: true,
+  },
+};
+
+export const Animation: Story = {
+  render: (inArgs: any) => {
+    const args = {
+      uniqueId: "surya002", // uniqueId of the sprite
+      src: "https://assets.codepen.io/693612/surya.svg",
+      applyTransformer: false,
+      startAt: 0,
+      endAt: 5,
+      transformation: {
+        x: 100,
+        y: 100,
+        width: 150,
+        height: 150,
+        anchor: 0.5,
+        rotation: 0,
+        alpha: 1,
+        scale: 1,
+        tint: 0xffffff,
+        blendMode: 0,
+        effect: Effects.None,
+        animation: inArgs.animation,
+        colorCorrection: {},
+      },
+      visible: true,
+    };
+    return (
+      <AppStateContextProvider {...args}>
+        <PixiSequenceWrapper startAt={0} endAt={16}>
+          <PixiSequence startAt={args.startAt} endAt={args.endAt}>
+            <PixiImageSprite {...args} />
+          </PixiSequence>
+        </PixiSequenceWrapper>
+      </AppStateContextProvider>
+    );
+  },
+  args: {
+    uniqueId: "surya002", // uniqueId of the sprite
+    src: "https://assets.codepen.io/693612/surya.svg",
+    applyTransformer: false,
+    startAt: 0,
+    endAt: 5,
+    transformation: {
+      x: 100,
+      y: 100,
+      width: 150,
+      height: 150,
+      anchor: 0.5,
+      rotation: 0,
+      alpha: 1,
+      scale: 1,
+      tint: 0xffffff,
+      blendMode: 0,
+      effect: Effects.None,
+      animation: Animations.BOUNCE_IN,
+      colorCorrection: {},
+    },
+    visible: true,
+  },
+  argTypes: {
+    // @ts-ignore
+    animation: {
+      control: "select",
+      options: Object.values(Animations),
+      description:
+        "Animations effects of the sprite. it is enum type supplied as prop to the transformation property in the props.",
+    },
+  },
+  parameters: {
+    controls: {
+      include: ["animation"],
+    },
   },
 };

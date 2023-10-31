@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useRef, useState } from "react";
+import { useRef, useState, useContext } from "react";
 import { Container, withFilters } from "@pixi/react";
 import * as PIXI from "pixi.js";
 import { Effects } from "../types/Effects";
@@ -7,7 +7,10 @@ import { Effects } from "../types/Effects";
 import PixiTransformer from "../components/PixiTransformer/PixiTransformer";
 import { PixiBaseSpriteProps, ForwardedRefResponse } from "../types/BaseProps";
 import { TransformationEnd } from "../types/transformation";
-import { Events } from "../providers/GsapPixieContextProvider";
+import {
+  GsapPixieContext,
+  Events,
+} from "../providers/GsapPixieContextProvider";
 // @ts-ignore
 import isEmpty from "lodash/isEmpty";
 import { useCustomEventListener } from "../events";
@@ -15,6 +18,9 @@ import {
   PixiOverlayTilingSprite,
   OverlayTypes,
 } from "../hocs/OverlayTilingSprite";
+import { useGsapEffect } from "../hooks/useGsapEffect";
+import { Animations } from "../types/Animations";
+
 /** CYAN Filters */
 const CYAN = [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0];
 
@@ -41,14 +47,16 @@ const AbstractContainer = React.forwardRef<
   const parentNode = useRef<PIXI.Container>(null);
   const imgGroupRef = useRef<PIXI.Container>(null);
   const transformerRef = useRef<PIXI.Container>(null);
+  const animTweenRef = useRef<gsap.core.Tween>(null);
 
   //// Context
-  // const { tl, reverseModeRef } = useContext(GsapPixieContext);
+  const { tl } = useContext(GsapPixieContext);
 
   // use props with useMemo
   const {
     uniqueId,
     visible,
+    startAt,
     transformation: {
       x,
       y,
@@ -58,6 +66,7 @@ const AbstractContainer = React.forwardRef<
       rotation = 0,
       effect,
       overlay,
+      animation = Animations.NONE,
     },
     applyTransformer,
     disabled,
@@ -71,6 +80,13 @@ const AbstractContainer = React.forwardRef<
     isTextEditMode,
   } = props;
 
+  const animTween = useGsapEffect(containerRef, animation, {
+    x,
+    y,
+    width,
+    height,
+  });
+  console.log("genAnimation", animTween);
   // log all props
 
   /** dot config */
@@ -110,6 +126,23 @@ const AbstractContainer = React.forwardRef<
       setIsMounted(true);
     }
   }, []);
+
+  // setup animation to run at eeffect
+  React.useEffect(() => {
+    if (tl.current) {
+      // recycle and remove old tweens
+      if (animTweenRef.current) tl.current.remove(animTweenRef.current);
+      tl.current.add(animTween, startAt);
+      //@ts-ignore
+      animTweenRef.current = animTween;
+    }
+    return () => {
+      if (tl.current) {
+        tl.current.remove(animTween);
+        animTween.progress(0).kill();
+      }
+    };
+  }, [startAt, , animTween]);
 
   const handleMouseOverTransformer = React.useCallback(() => {
     setIsMouseOverTransformer(true);
@@ -215,6 +248,7 @@ const AbstractContainer = React.forwardRef<
 });
 
 export default AbstractContainer;
+
 // @ts-ignore
 AbstractContainer.whyDidYouRender = {
   logOnDifferentValues: true,

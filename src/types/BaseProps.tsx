@@ -1,5 +1,6 @@
 import { Effects } from "./Effects";
 import { OverlayTypes } from "../hocs/OverlayTilingSprite";
+import { Animations } from "./Animations";
 
 export interface PixiBaseSpriteProps {
   children?: React.ReactNode;
@@ -23,7 +24,7 @@ export interface PixiBaseSpriteProps {
     scale?: number | [number, number];
     tint?: number;
     blendMode?: number;
-    animation?: string;
+    animation?: Animations;
     colorCorrection?: {
       enabled?: boolean;
       temperature?: number;
