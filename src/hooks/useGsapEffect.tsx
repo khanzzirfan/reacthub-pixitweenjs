@@ -24,9 +24,7 @@ gsap.registerEffect({
           width: vars?.width * 1.1,
           height: vars?.height * 1.1,
           duration: 0.5,
-          repeat: 1,
-          ease: "bounce",
-          yoyoEase: "power3",
+          ease: "slow",
         }
       )
       .to(target, { ...vars, duration: 0.5 });
@@ -39,19 +37,63 @@ gsap.registerEffect({
   effect(target: PIXI.Container, vars: any) {
     return gsap
       .timeline()
-      .fromTo(
-        target,
-        { width: vars?.width * 0.9, height: vars?.height * 0.9 },
-        {
-          width: vars?.width * 1.1,
-          height: vars?.height * 1.1,
-          duration: 0.5,
-          repeat: 1,
-          ease: "bounce",
-          yoyoEase: "power3",
-        }
-      )
+      .to(target, { duration: 0.1, x: "+=5" })
+      .to(target, { duration: 0.1, x: "-=10" })
+      .to(target, { duration: 0.1, x: "+=10" })
+      .to(target, { duration: 0.1, x: "-=10" })
+      .to(target, { duration: 0.1, x: "+=5" })
       .to(target, { ...vars, duration: 0.5 });
+  },
+});
+
+/** GSAP Effect = SWING */
+gsap.registerEffect({
+  name: "SWING",
+  effect(target: PIXI.Container, vars: any) {
+    return gsap
+      .timeline()
+      .to(target, { duration: 0.5, rotation: 1 })
+      .to(target, { duration: 0.5, rotation: -1 })
+      .to(target, { rotation: 0, ...vars, duration: 0.5 });
+  },
+});
+
+/** GSAP Effect = JELLO */
+gsap.registerEffect({
+  name: "JELLO",
+  effect(target: PIXI.Container, vars: any) {
+    return gsap
+      .timeline()
+      .to(target, { duration: 0.3, width: vars.width * 0.5, rotation: -1 })
+      .to(target, { duration: 0.4, width: vars.width * 1.2, rotation: 1 })
+      .to(target, { duration: 0.3, width: vars.width, rotation: 0 })
+      .to(target, { rotation: 0, ...vars, duration: 0.5 });
+  },
+});
+
+/** GSAP Effect = JELLO */
+gsap.registerEffect({
+  name: "WOOBLE",
+  effect(target: PIXI.Container, vars: any) {
+    return gsap
+      .timeline()
+      .to(target, {
+        duration: 0.3,
+        width: vars.width * 0.5,
+        x: vars.x * -0.5,
+      })
+      .to(target, {
+        duration: 0.3,
+        width: vars.width * 1.5,
+        x: vars.x * 1.5,
+      })
+      .to(target, {
+        duration: 0.3,
+        width: vars.width * 0.5,
+        x: vars.x * -0.01,
+      })
+      .to(target, { duration: 0.3, width: vars.width, x: vars.x })
+      .to(target, { rotation: 0, ...vars, duration: 0.5 });
   },
 });
 
