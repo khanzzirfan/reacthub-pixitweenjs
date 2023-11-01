@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.107-alpha.27](https://github.com/khanzzirfan/reacthub-pixitweenjs/compare/v0.2.107-alpha.26...v0.2.107-alpha.27) (2023-11-01)
+
+
+### Bug Fixes
+
+* added animations to the sprites ([9332535](https://github.com/khanzzirfan/reacthub-pixitweenjs/commit/9332535faad66713c592be0b85e1e3d5e02154f0))
+* updated anaimations ([8ee9bb6](https://github.com/khanzzirfan/reacthub-pixitweenjs/commit/8ee9bb6b4b2011fb9a633ed432f0a5512e6cb0ce))
+* updated remotion sprite sync with canvas ([8f2150c](https://github.com/khanzzirfan/reacthub-pixitweenjs/commit/8f2150cef4f7577cd3036a03efd5304dbef99f61))
+
 ### [0.2.107-alpha.26](https://github.com/khanzzirfan/reacthub-pixitweenjs/compare/v0.2.107-alpha.25...v0.2.107-alpha.26) (2023-10-28)
 
 ### [0.2.107-alpha.25](https://github.com/khanzzirfan/reacthub-pixitweenjs/compare/v0.2.107-alpha.24...v0.2.107-alpha.25) (2023-10-28)
