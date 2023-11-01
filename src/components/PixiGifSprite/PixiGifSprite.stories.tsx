@@ -3,6 +3,7 @@ import { PixiGifSprite } from ".";
 import { AppStateContextProvider } from "../../utils/AppStateProvider";
 import { Effects } from "../../types/Effects";
 import { AppWrapper } from "../../utils/AppWrapper";
+import { Animations } from "../../types";
 
 // More on how to set up stories at: https://storybook.js.org/docs/react/writing-stories/introduction
 const meta = {
@@ -172,7 +173,7 @@ export const FadeIn: Story = {
       tint: 0xffffff,
       blendMode: 0,
       effect: Effects.None,
-      animation: "FADE_IN",
+      animation: Animations.FADE_IN,
       colorCorrection: {},
     },
     visible: true,

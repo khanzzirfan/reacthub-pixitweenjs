@@ -99,10 +99,10 @@ gsap.registerEffect({
 
 /** GSAP Effect = NONE */
 gsap.registerEffect({
-  name: "NONE",
+  name: "NONE", // @ts-ignore
   effect(target: PIXI.Container, vars: any) {
-    return gsap.from(target, {
-      ...vars,
+    return gsap.to(target, {
+      duration: 0,
     });
   },
 });
@@ -197,6 +197,7 @@ gsap.registerEffect({
   name: "BOUNCE_OUT",
   effect(target: PIXI.Container, vars: any) {
     return gsap.from(target, {
+      ...vars,
       ease: "bounce.in",
       y: 2000,
       duration: 1.5,

@@ -15,6 +15,7 @@ import {
 import AbstractContainer from "../../hocs/AbstractContainer";
 import { Effects } from "../../types/Effects";
 import { withFiltersHook } from "../../hooks/withFiltersHook";
+import { Animations } from "../../types";
 
 export interface PixiTextSpriteProps extends PixiBaseSpriteProps {
   text: string;
@@ -32,7 +33,7 @@ export interface PixiTextSpriteProps extends PixiBaseSpriteProps {
     scale?: number | [number, number];
     tint?: number;
     blendMode?: number;
-    animation?: string;
+    animation?: Animations;
     fontWeight?: string;
     fontSize?: number;
     fontFamily?: string;

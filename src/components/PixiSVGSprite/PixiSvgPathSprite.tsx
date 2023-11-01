@@ -16,6 +16,7 @@ import {
 import AbstractContainer from "../../hocs/AbstractContainer";
 import { Effects } from "../../types/Effects";
 import { withFiltersHook } from "../../hooks/withFiltersHook";
+import { Animations } from "../../types";
 
 export interface PixiSvgPathSpriteProps extends PixiBaseSpriteProps {
   uniqueId: string;
@@ -33,7 +34,7 @@ export interface PixiSvgPathSpriteProps extends PixiBaseSpriteProps {
     scale?: number | [number, number];
     tint?: number;
     blendMode?: number;
-    animation?: string;
+    animation?: Animations;
     hexColor?: string;
     fill?: string;
     fontWeight?: string;

@@ -100,14 +100,7 @@ const PixiGifSprite = React.forwardRef<
     loop,
     visible,
     disabled,
-    transformation: {
-      width = 0,
-      height = 0,
-      x,
-      y,
-      animation,
-      colorCorrection = {},
-    },
+    transformation: { width = 0, height = 0, x, y, colorCorrection = {} },
     pointerdown,
   } = props;
 
@@ -314,7 +307,7 @@ const PixiGifSprite = React.forwardRef<
       }
       ctx.revert(); // cleanup!
     };
-  }, [animation, startAt, endAt, frameStartAt, frameEndAt]);
+  }, [startAt, endAt, frameStartAt, frameEndAt]);
 
   console.log("gif render", animatedSpriteRef.current?.currentFrame);
 

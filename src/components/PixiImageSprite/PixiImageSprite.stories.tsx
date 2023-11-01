@@ -168,7 +168,7 @@ export const FadeIn: Story = {
       tint: 0xffffff,
       blendMode: 0,
       effect: Effects.None,
-      animation: "FADE_IN",
+      animation: Animations.FADE_IN,
       colorCorrection: {},
     },
     visible: true,
