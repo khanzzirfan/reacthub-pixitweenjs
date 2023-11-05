@@ -136,8 +136,6 @@ export const PixiSequence = (props: PixiSequenceProps) => {
     };
   }, [startAt, endAt, totalDuration, uniqueId]);
 
-  console.log("current alpha with time", containerRef?.current?.alpha);
-
   return (
     <Container
       ref={containerRef}

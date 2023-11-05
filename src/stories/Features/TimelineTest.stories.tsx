@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { TimelineTest } from "./TimelineTest";
 import { TimelineTestVideos } from "./TimelineTestWithVideos";
 import { TimelineWithGif } from "./TimelineWithGif";
+import { TimelineAnimationTest } from "./TimelineAnimations";
 import { TimelineTestAudios } from "./TimelineTestAudios";
 import TestAudioFiles from "./TestHowlerAudioFiles";
 
@@ -136,6 +137,30 @@ export const HowlerAudioTest: Story = {
       {
         startAt: 6,
         endAt: 20,
+      },
+    ],
+  },
+};
+
+export const Animations: Story = {
+  render: (args: any) => <TimelineAnimationTest {...args} />,
+  args: {
+    sequences: [
+      {
+        startAt: 0,
+        endAt: 4,
+      },
+      {
+        startAt: 2,
+        endAt: 6,
+      },
+      {
+        startAt: 3,
+        endAt: 10,
+      },
+      {
+        startAt: 6,
+        endAt: 12,
       },
     ],
   },

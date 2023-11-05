@@ -1,8 +1,8 @@
 import * as React from "react";
 import { Flex, Box } from "@chakra-ui/react";
 import { PixiSequence } from "../../components/PixiSequence";
-import { PixiImageSprite } from "../../components/PixiImageSprite";
-import { ImageProps } from "./common.tests";
+import { PixiVideoSprite, PixiImageSprite } from "../../components";
+import { ImageProps, videoProps } from "./common.tests";
 import { VideoSeekBar } from "../../utils/VideoSeekBar";
 import { GsapPixieContextProvider } from "../../providers/GsapPixieContextProvider";
 import { ChakraProvider } from "@chakra-ui/react";
@@ -41,7 +41,7 @@ export interface TimelineProps {
   sequences: TimelineTestProps[];
 }
 
-export const TimelineTest = (props: TimelineProps) => {
+export const TimelineAnimationTest = (props: TimelineProps) => {
   const [selected, setSelected] = React.useState<string>("");
   const backgroundColorx = PIXI.utils.string2hex("#2D2E3C");
   const width = 600;
@@ -93,13 +93,56 @@ export const TimelineTest = (props: TimelineProps) => {
               <PixiImageSprite
                 {...ImageProps}
                 pointerdown={() => {
+                  setSelected(randomIds!?.image);
+                }}
+                applyTransformer={selected === randomIds?.image}
+                uniqueId={randomIds?.image}
+                startAt={sequences[1].startAt}
+                endAt={sequences[1].endAt}
+                transformation={{
+                  ...ImageProps.transformation,
+                  x: 150,
+                  y: 150,
+                }}
+              />
+            </PixiSequence>
+            <PixiSequence
+              startAt={sequences[2].startAt}
+              endAt={sequences[2].endAt}
+              uniqueId="video-001"
+            >
+              <PixiVideoSprite
+                {...videoProps}
+                pointerdown={() => {
+                  setSelected(randomIds.image3);
+                }}
+                src="https://eyecastvideoeditorfiles.s3.ap-southeast-2.amazonaws.com/public%2Firfan%40trolio.com%2F6472d56e805c3bffc3cded33%2Fvideos%2FnnS18Ov5PM%2Fdwsample+mov+360p.mov"
+                applyTransformer={selected === randomIds.image3}
+                startAt={sequences[2].startAt}
+                endAt={sequences[2].endAt}
+                transformation={{
+                  ...videoProps.transformation,
+                  x: 100,
+                  y: 350,
+                  width: 250,
+                  height: 240,
+                }}
+              />
+            </PixiSequence>
+            <PixiSequence
+              startAt={sequences[2].startAt}
+              endAt={sequences[2].endAt}
+            >
+              <PixiImageSprite
+                {...ImageProps}
+                pointerdown={() => {
                   setSelected(randomIds.image2);
                 }}
                 uniqueId={randomIds.image2}
                 src="https://eyecastvideoeditorfiles.s3.ap-southeast-2.amazonaws.com/public%2Firfan%40trolio.com%2F64b6738988f3e366d955cebd%2Fvideos%2FMXlcGUL5Ws%2Fanim-mercury.jpg"
                 applyTransformer={selected === randomIds.image2}
-                startAt={sequences[1].startAt}
-                endAt={sequences[1].endAt}
+                startAt={sequences[2].startAt}
+                endAt={sequences[2].endAt}
                 transformation={{
                   ...ImageProps.transformation,
                   x: 500,
@@ -111,8 +154,8 @@ export const TimelineTest = (props: TimelineProps) => {
               />
             </PixiSequence>
             <PixiSequence
-              startAt={sequences[2].startAt}
-              endAt={sequences[2].endAt}
+              startAt={sequences[3].startAt}
+              endAt={sequences[3].endAt}
             >
               <PixiImageSprite
                 {...ImageProps}
@@ -122,8 +165,8 @@ export const TimelineTest = (props: TimelineProps) => {
                 uniqueId={randomIds.image3}
                 src="https://eyecastvideoeditorfiles.s3.ap-southeast-2.amazonaws.com/public%2Firfan%40trolio.com%2F64b6738988f3e366d955cebd%2Fvideos%2Fm-TrPlwQHj%2Fantoine-petit-screen-wip-02.jpg"
                 applyTransformer={selected === randomIds.image3}
-                startAt={sequences[2].startAt}
-                endAt={sequences[2].endAt}
+                startAt={sequences[3].startAt}
+                endAt={sequences[3].endAt}
                 transformation={{
                   ...ImageProps.transformation,
                   x: 300,

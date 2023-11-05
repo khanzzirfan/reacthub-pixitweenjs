@@ -162,8 +162,8 @@ const GsapPixieContextProvider: React.FC<{ children: React.ReactNode }> = ({
         })
         // write a pause event
         .eventCallback("onComplete", function () {
+          timeline.seek(0);
           timeline.pause();
-          timeline.revert();
           // emit event timeline complete
           emitCustomEvent(Events.COMPLETE, { uniqueId: "timeline" });
           console.log("Emitted events");

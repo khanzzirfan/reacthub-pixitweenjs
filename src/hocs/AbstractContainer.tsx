@@ -86,7 +86,6 @@ const AbstractContainer = React.forwardRef<
     width,
     height,
   });
-  console.log("genAnimation", animTween);
   // log all props
 
   /** dot config */
