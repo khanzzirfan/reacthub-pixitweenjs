@@ -1,6 +1,6 @@
 {
   "name": "reacthub-pixitweenjs",
-  "version": "0.2.107-alpha.40",
+  "version": "0.2.107-alpha.41",
   "description": "reacthub-pixitweenjs is a library that provides a powerful combination of React, PixiJS, GSAP, and image manipulation capabilities in a timeline sequence. With this library, you can easily create stunning animations and interactive graphics for your React applications",
   "author": "khanzzirfan <reacthub.ai@gmail.com>",
   "main": "dist/index.es.js",
