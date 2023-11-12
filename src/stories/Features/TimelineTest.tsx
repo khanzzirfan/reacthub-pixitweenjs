@@ -96,7 +96,7 @@ export const TimelineTest = (props: TimelineProps) => {
                   setSelected(randomIds.image2);
                 }}
                 uniqueId={randomIds.image2}
-                src="https://eyecastvideoeditorfiles.s3.ap-southeast-2.amazonaws.com/public%2Firfan%40trolio.com%2F64b6738988f3e366d955cebd%2Fvideos%2FMXlcGUL5Ws%2Fanim-mercury.jpg"
+                src="https://d1r0cf5836ptgd.cloudfront.net/public%2Firfan%40trolio.com%2F64b6738988f3e366d955cebd%2Fvideos%2FMXlcGUL5Ws%2Fanim-mercury.jpg"
                 applyTransformer={selected === randomIds.image2}
                 startAt={sequences[1].startAt}
                 endAt={sequences[1].endAt}
@@ -120,7 +120,7 @@ export const TimelineTest = (props: TimelineProps) => {
                   setSelected(randomIds.image3);
                 }}
                 uniqueId={randomIds.image3}
-                src="https://eyecastvideoeditorfiles.s3.ap-southeast-2.amazonaws.com/public%2Firfan%40trolio.com%2F64b6738988f3e366d955cebd%2Fvideos%2Fm-TrPlwQHj%2Fantoine-petit-screen-wip-02.jpg"
+                src="https://d1r0cf5836ptgd.cloudfront.net/public%2Firfan%40trolio.com%2F64b6738988f3e366d955cebd%2Fvideos%2Fm-TrPlwQHj%2Fantoine-petit-screen-wip-02.jpg"
                 applyTransformer={selected === randomIds.image3}
                 startAt={sequences[2].startAt}
                 endAt={sequences[2].endAt}

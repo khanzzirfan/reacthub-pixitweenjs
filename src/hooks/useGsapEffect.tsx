@@ -1,9 +1,14 @@
-import { useState, RefObject } from "react";
-import useDeepEffect from "./useDeepEffect";
+import { useCallback } from "react";
 import * as PIXI from "pixi.js";
 import gsap from "gsap";
 import CustomEase from "gsap/CustomEase";
 import { Animations } from "../types/Animations";
+import { PixiPlugin } from "gsap/PixiPlugin";
+
+// register Pixi Plugin
+gsap.registerPlugin(PixiPlugin);
+// give the plugin a reference to the PIXI object
+PixiPlugin.registerPIXI(PIXI);
 
 // register flip plugin
 gsap.registerPlugin(CustomEase);
@@ -19,15 +24,22 @@ gsap.registerEffect({
       .timeline()
       .fromTo(
         target,
-        { width: vars?.width * 0.9, height: vars?.height * 0.9 },
         {
-          width: vars?.width * 1.1,
-          height: vars?.height * 1.1,
+          pixi: {
+            scaleX: 0.9,
+            scaleY: 0.9,
+          },
+        },
+        {
+          pixi: {
+            scaleX: 1.2,
+            scaleY: 1.2,
+          },
           duration: 0.5,
           ease: "slow",
         }
       )
-      .to(target, { ...vars, duration: 0.5 });
+      .to(target, { pixi: { scaleX: 1, scaleY: 1, ...vars }, duration: 0.5 });
   },
 });
 
@@ -37,12 +49,12 @@ gsap.registerEffect({
   effect(target: PIXI.Container, vars: any) {
     return gsap
       .timeline()
-      .to(target, { duration: 0.1, x: "+=5" })
-      .to(target, { duration: 0.1, x: "-=10" })
-      .to(target, { duration: 0.1, x: "+=10" })
-      .to(target, { duration: 0.1, x: "-=10" })
-      .to(target, { duration: 0.1, x: "+=5" })
-      .to(target, { ...vars, duration: 0.5 });
+      .to(target, { duration: 0.1, pixi: { x: "+=5" } })
+      .to(target, { duration: 0.1, pixi: { x: "-=10" } })
+      .to(target, { duration: 0.1, pixi: { x: "+=10" } })
+      .to(target, { duration: 0.1, pixi: { x: "-=10" } })
+      .to(target, { duration: 0.1, pixi: { x: "+=5" } })
+      .to(target, { pixi: { ...vars }, duration: 0.5 });
   },
 });
 
@@ -52,9 +64,9 @@ gsap.registerEffect({
   effect(target: PIXI.Container, vars: any) {
     return gsap
       .timeline()
-      .to(target, { duration: 0.5, rotation: 1 })
-      .to(target, { duration: 0.5, rotation: -1 })
-      .to(target, { rotation: 0, ...vars, duration: 0.5 });
+      .to(target, { duration: 0.5, pixi: { rotation: 1 } })
+      .to(target, { duration: 0.5, pixi: { rotation: -1.5 } })
+      .to(target, { pixi: { rotation: 0, ...vars }, duration: 0.5 });
   },
 });
 
@@ -64,10 +76,13 @@ gsap.registerEffect({
   effect(target: PIXI.Container, vars: any) {
     return gsap
       .timeline()
-      .to(target, { duration: 0.3, width: vars.width * 0.5, rotation: -1 })
-      .to(target, { duration: 0.4, width: vars.width * 1.2, rotation: 1 })
-      .to(target, { duration: 0.3, width: vars.width, rotation: 0 })
-      .to(target, { rotation: 0, ...vars, duration: 0.5 });
+      .to(target, {
+        duration: 0.3,
+        pixi: { scaleX: 0.5, rotation: -1 },
+      })
+      .to(target, { duration: 0.4, pixi: { scaleX: 1.5, rotation: 1 } })
+      .to(target, { duration: 0.3, pixi: { scaleX: 1, rotation: 0 } })
+      .to(target, { pixi: { rotation: 0, ...vars }, duration: 0.5 });
   },
 });
 
@@ -79,21 +94,31 @@ gsap.registerEffect({
       .timeline()
       .to(target, {
         duration: 0.3,
-        width: vars.width * 0.5,
-        x: vars.x * -0.5,
+        pixi: {
+          scaleX: 0.5,
+          x: vars.x * -0.5,
+        },
       })
       .to(target, {
         duration: 0.3,
-        width: vars.width * 1.5,
-        x: vars.x * 1.5,
+        pixi: {
+          scaleX: 1.5,
+          x: vars.x * 1.5,
+        },
       })
       .to(target, {
         duration: 0.3,
-        width: vars.width * 0.5,
-        x: vars.x * -0.01,
+        pixi: {
+          scaleX: 0.5,
+          x: vars.x * -0.01,
+        },
       })
-      .to(target, { duration: 0.3, width: vars.width, x: vars.x })
-      .to(target, { rotation: 0, ...vars, duration: 0.5 });
+      .to(target, { duration: 0.3, pixi: { scaleX: 1, x: vars.x } })
+      .to(target, {
+        rotation: 0,
+        pixi: { ...vars, rotation: 0 },
+        duration: 0.5,
+      });
   },
 });
 
@@ -101,7 +126,7 @@ gsap.registerEffect({
 gsap.registerEffect({
   name: "NONE", // @ts-ignore
   effect(target: PIXI.Container, vars: any) {
-    return gsap.to(target, {
+    return gsap.timeline().to(target, {
       duration: 0,
     });
   },
@@ -128,13 +153,26 @@ gsap.registerEffect({
   name: "BOUNCE_IN",
   effect(target: PIXI.Container, vars: any) {
     // Apply the custom bounceIn animation with PixiJS-specific properties
-    return gsap.from(target, {
-      ...vars,
-      duration: 2,
-      width: vars?.width * 1.5,
-      height: vars?.height * 1.5,
-      ease: "bounce.out",
-    });
+    return gsap.timeline().fromTo(
+      target,
+      {
+        pixi: {
+          scaleX: 1.5,
+          scaleY: 1.5,
+        },
+      },
+      {
+        ...vars,
+        pixi: {
+          x: vars?.x,
+          y: vars?.y,
+          scaleX: 1,
+          scaleY: 1,
+        },
+        duration: 2,
+        ease: "bounce.out",
+      }
+    );
   },
 });
 
@@ -142,12 +180,16 @@ gsap.registerEffect({
 gsap.registerEffect({
   name: "BOUNCE_IN_DOWN",
   effect(target: PIXI.Container, vars: any) {
-    return gsap.from(target, {
-      ...vars,
+    return gsap.timeline().from(target, {
       duration: 2,
       ease: "bounce.out",
-      y: -1500,
-      alpha: 0,
+      immediateRender: true,
+      pixi: {
+        ...vars,
+        x: vars?.x,
+        y: -1500,
+        alpha: 0,
+      },
     });
   },
 });
@@ -156,12 +198,14 @@ gsap.registerEffect({
 gsap.registerEffect({
   name: "BOUNCE_IN_LEFT",
   effect(target: PIXI.Container, vars: any) {
-    return gsap.from(target, {
-      ...vars,
+    return gsap.timeline().from(target, {
       ease: "bounce.out",
-      x: -1500,
-      duration: 2,
-      alpha: 0,
+      pixi: {
+        ...vars,
+        x: -1500,
+        duration: 2,
+        alpha: 0,
+      },
     });
   },
 });
@@ -170,11 +214,13 @@ gsap.registerEffect({
 gsap.registerEffect({
   name: "BOUNCE_IN_RIGHT",
   effect(target: PIXI.Container, vars: any) {
-    return gsap.from(target, {
-      ...vars,
+    return gsap.timeline().from(target, {
       ease: "bounce.out",
-      x: 1500,
       duration: 2,
+      pixi: {
+        ...vars,
+        x: 1500,
+      },
     });
   },
 });
@@ -183,10 +229,12 @@ gsap.registerEffect({
 gsap.registerEffect({
   name: "BOUNCE_IN_UP",
   effect(target: PIXI.Container, vars: any) {
-    return gsap.from(target, {
-      ...vars,
+    return gsap.timeline().from(target, {
       ease: "bounce.out",
-      y: 1500,
+      pixi: {
+        ...vars,
+        y: 1500,
+      },
       duration: 2,
     });
   },
@@ -196,10 +244,12 @@ gsap.registerEffect({
 gsap.registerEffect({
   name: "BOUNCE_OUT",
   effect(target: PIXI.Container, vars: any) {
-    return gsap.from(target, {
+    return gsap.timeline().from(target, {
       ...vars,
       ease: "bounce.in",
-      y: 2000,
+      pixi: {
+        y: 2000,
+      },
       duration: 1.5,
     });
   },
@@ -208,8 +258,8 @@ gsap.registerEffect({
 /** GSAP Effect = FADE_IN */
 gsap.registerEffect({
   name: "FADE_IN",
-  effect(target: PIXI.Container, vars: any) {
-    return gsap.fromTo(
+  effect(target: PIXI.Container) {
+    return gsap.timeline().fromTo(
       target,
       {
         alpha: 0,
@@ -218,7 +268,6 @@ gsap.registerEffect({
         ease: "power4.in",
         alpha: 1,
         duration: 1,
-        ...vars,
       }
     );
   },
@@ -228,18 +277,22 @@ gsap.registerEffect({
 gsap.registerEffect({
   name: "FADE_IN_DOWN",
   effect(target: PIXI.Container, vars: any) {
-    return gsap.fromTo(
+    return gsap.timeline().fromTo(
       target,
       {
-        y: -1000,
-        alpha: 0,
+        pixi: {
+          y: -1000,
+          alpha: 0,
+        },
       },
       {
-        ease: "power4.in",
-        y: 0,
-        alpha: 1,
         duration: 1,
-        ...vars,
+        ease: "power4.in",
+        pixi: {
+          y: 0,
+          alpha: 1,
+          ...vars,
+        },
       }
     );
   },
@@ -249,18 +302,22 @@ gsap.registerEffect({
 gsap.registerEffect({
   name: "FADE_IN_LEFT",
   effect(target: PIXI.Container, vars: any) {
-    return gsap.fromTo(
+    return gsap.timeline().fromTo(
       target,
       {
-        x: -1000,
-        alpha: 0,
+        pixi: {
+          alpha: 0,
+          x: -1000,
+        },
       },
       {
         ease: "power4.in",
-        x: 0,
-        alpha: 1,
+        pixi: {
+          x: 0,
+          alpha: 1,
+          ...vars,
+        },
         duration: 1,
-        ...vars,
       }
     );
   },
@@ -273,15 +330,19 @@ gsap.registerEffect({
     return gsap.fromTo(
       target,
       {
-        x: 2000,
-        alpha: 0,
+        pixi: {
+          x: 2000,
+          alpha: 0,
+        },
       },
       {
-        ease: "power4.in",
-        x: 0,
-        alpha: 1,
         duration: 1,
-        ...vars,
+        ease: "power4.in",
+        pixi: {
+          x: 0,
+          alpha: 1,
+          ...vars,
+        },
       }
     );
   },
@@ -294,15 +355,19 @@ gsap.registerEffect({
     return gsap.fromTo(
       target,
       {
-        y: 2000,
-        alpha: 0,
+        pixi: {
+          y: 2000,
+          alpha: 0,
+        },
       },
       {
-        ease: "power4.in",
-        y: 0,
-        alpha: 1,
         duration: 0.8,
-        ...vars,
+        ease: "power4.in",
+        pixi: {
+          y: 0,
+          alpha: 1,
+          ...vars,
+        },
       }
     );
   },
@@ -318,20 +383,20 @@ gsap.registerEffect({
   },
 });
 
-export function useGsapEffect(
-  target: RefObject<PIXI.Container>,
-  effect: Animations | string,
-  vars: any
-): gsap.core.Tween {
-  const [animation, setAnimation] = useState<gsap.core.Tween>(
-    gsap.to(target, { duration: 0 })
+export function useGsapEffect(): { updateEffect: any } {
+  const updateEffect = useCallback(
+    (
+      target: PIXI.Container,
+      effect: Animations | string,
+      vars: any
+    ): gsap.core.Tween | gsap.core.Timeline => {
+      if (gsap.effects[effect] && target) {
+        return gsap.effects[effect](target, vars);
+      }
+      return gsap.effects["NONE"](target, vars);
+    },
+    []
   );
 
-  useDeepEffect(() => {
-    if (gsap.effects[effect] && target.current) {
-      setAnimation(gsap.effects[effect](target.current, vars));
-    }
-  }, [effect, target, vars]);
-
-  return animation;
+  return { updateEffect };
 }

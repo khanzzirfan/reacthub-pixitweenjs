@@ -2,6 +2,9 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { PixiTextSprite } from ".";
 import { AppStateContextProvider } from "../../utils/AppStateProvider";
 import { AppWrapper } from "../../utils/AppWrapper";
+import { PixiSequenceWrapper } from "../../components/PixiSequence/PixiSeqenceWrapper";
+import { PixiSequence } from "../../components/PixiSequence";
+import { Animations } from "../../types";
 
 // More on how to set up stories at: https://storybook.js.org/docs/react/writing-stories/introduction
 const meta = {
@@ -144,7 +147,11 @@ export const Normal: Story = {
 export const FadeIn: Story = {
   render: (args: any) => (
     <AppStateContextProvider {...args}>
-      <PixiTextSprite {...args} />
+      <PixiSequenceWrapper startAt={0} endAt={5}>
+        <PixiSequence startAt={args.startAt} endAt={args.endAt}>
+          <PixiTextSprite {...args} />
+        </PixiSequence>
+      </PixiSequenceWrapper>
     </AppStateContextProvider>
   ),
   args: {
@@ -235,6 +242,63 @@ export const Filters: Story = {
     },
     startAt: 0,
     endAt: 10,
+    visible: true,
+  },
+};
+
+// More on writing stories with args: https://storybook.js.org/docs/react/writing-stories/args
+export const Draggable: Story = {
+  render: (args: any) => (
+    <>
+      <AppStateContextProvider {...args}>
+        <PixiSequenceWrapper startAt={0} endAt={5}>
+          <PixiSequence startAt={args.startAt} endAt={args.endAt}>
+            <PixiTextSprite {...args} />
+          </PixiSequence>
+        </PixiSequenceWrapper>
+      </AppStateContextProvider>
+      <AppStateContextProvider {...args}>
+        <PixiTextSprite {...args} />
+      </AppStateContextProvider>
+    </>
+  ),
+  args: {
+    uniqueId: "TextSprite001", // uniqueId of the sprite
+    text: "Hello Welcome to PixiJS",
+    disabled: false,
+    applyTransformer: true,
+    transformation: {
+      x: 200,
+      y: 200,
+      width: 200,
+      height: 200,
+      anchor: 0.5,
+      rotation: 0,
+      alpha: 1,
+      scale: 1,
+      tint: 0xffffff,
+      blendMode: 0,
+      colorCorrection: {},
+      fill: "#00ff99",
+      fontSize: 20,
+      fontFamily: "Arial",
+      align: "center",
+      stroke: 0x000000,
+      strokeThickness: 0,
+      letterSpacing: 0,
+      lineHeight: 0,
+      dropShadow: false,
+      dropShadowColor: 0x000000,
+      dropShadowBlur: 0,
+      wordWrap: false,
+      wordWrapWidth: 100,
+      padding: 0,
+      textBaseline: "alphabetic",
+      trim: false,
+      animation: Animations.FADE_IN,
+    },
+    startAt: 0,
+    endAt: 5,
     visible: true,
   },
 };

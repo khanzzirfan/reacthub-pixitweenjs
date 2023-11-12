@@ -137,8 +137,8 @@ export const GifSequence: Story = {
 export const VideoSequence: Story = {
   render: (args: any) => {
     const initialProps = {
-      uniqueId: "oceanv1", // uniqueId of the sprite
-      src: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+      uniqueId: "biggerforblazers", // uniqueId of the sprite
+      src: "https://d1r0cf5836ptgd.cloudfront.net/public%2Firfan%40trolio.com%2F6472d56e805c3bffc3cded33%2Fvideos%2Fyd2M9NnQHL%2FForBiggerBlazes.mp4",
       transformation: {
         x: 290,
         y: 250,

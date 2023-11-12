@@ -356,7 +356,7 @@ const PixiGifSprite = React.forwardRef<
 export default PixiGifSprite;
 
 // @ts-ignore
-PixiGifSprite.whyDidYouRender = {
-  logOnDifferentValues: true,
-  customName: "PixiGifSprite",
-};
+// PixiGifSprite.whyDidYouRender = {
+//   logOnDifferentValues: true,
+//   customName: "PixiGifSprite",
+// };

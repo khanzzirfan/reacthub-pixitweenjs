@@ -94,7 +94,7 @@ export const Normal: Story = {
   ),
   args: {
     uniqueId: "oceanv1", // uniqueId of the sprite
-    src: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+    src: "https://d1r0cf5836ptgd.cloudfront.net/public%2Firfan%40trolio.com%2F6472d56e805c3bffc3cded33%2Fvideos%2Fyd2M9NnQHL%2FForBiggerBlazes.mp4",
     transformation: {
       x: 290,
       y: 250,
@@ -127,7 +127,7 @@ export const FadeIn: Story = {
   ),
   args: {
     uniqueId: "ForBiggerBlazes002", // uniqueId of the sprite
-    src: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+    src: "https://d1r0cf5836ptgd.cloudfront.net/public%2Firfan%40trolio.com%2F6472d56e805c3bffc3cded33%2Fvideos%2Fyd2M9NnQHL%2FForBiggerBlazes.mp4",
     transformation: {
       x: 100,
       y: 100,
@@ -161,7 +161,7 @@ export const Filters: Story = {
   ),
   args: {
     uniqueId: "videofiter002", // uniqueId of the sprite
-    src: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+    src: "https://d1r0cf5836ptgd.cloudfront.net/public%2Firfan%40trolio.com%2F6472d56e805c3bffc3cded33%2Fvideos%2Fyd2M9NnQHL%2FForBiggerBlazes.mp4",
     transformation: {
       x: 290,
       y: 250,
@@ -200,7 +200,7 @@ export const SplitPosition: Story = {
   ),
   args: {
     uniqueId: "videofiter002", // uniqueId of the sprite
-    src: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+    src: "https://d1r0cf5836ptgd.cloudfront.net/public%2Firfan%40trolio.com%2F6472d56e805c3bffc3cded33%2Fvideos%2Fyd2M9NnQHL%2FForBiggerBlazes.mp4",
     transformation: {
       x: 290,
       y: 250,
@@ -232,7 +232,7 @@ export const SplitStartPos: Story = {
   ),
   args: {
     uniqueId: "videofiter002", // uniqueId of the sprite
-    src: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+    src: "https://d1r0cf5836ptgd.cloudfront.net/public%2Firfan%40trolio.com%2F6472d56e805c3bffc3cded33%2Fvideos%2Fyd2M9NnQHL%2FForBiggerBlazes.mp4",
     transformation: {
       x: 290,
       y: 250,
@@ -264,7 +264,7 @@ export const VideoFps: Story = {
   ),
   args: {
     uniqueId: "videofiterfps002", // uniqueId of the sprite
-    src: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+    src: "https://d1r0cf5836ptgd.cloudfront.net/public%2Firfan%40trolio.com%2F6472d56e805c3bffc3cded33%2Fvideos%2Fyd2M9NnQHL%2FForBiggerBlazes.mp4",
     transformation: {
       x: 290,
       y: 250,

@@ -2,11 +2,12 @@ import * as React from "react";
 import { useRef, useState, useContext } from "react";
 import { Container, withFilters } from "@pixi/react";
 import * as PIXI from "pixi.js";
+import gsap from "gsap";
 import { Effects } from "../types/Effects";
-// import pixiTransfomer from "../utils/PixiTransformer";
 import PixiTransformer from "../components/PixiTransformer/PixiTransformer";
 import { PixiBaseSpriteProps, ForwardedRefResponse } from "../types/BaseProps";
 import { TransformationEnd } from "../types/transformation";
+import useDebounce from "../hooks/useDebounce";
 import {
   GsapPixieContext,
   Events,
@@ -33,6 +34,14 @@ interface AbstractContainerProps extends PixiBaseSpriteProps {
   isTextEditMode?: boolean;
 }
 
+interface AnimationProps {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  animation: Animations;
+}
+
 const AbstractContainer = React.forwardRef<
   ForwardedRefResponse | null,
   AbstractContainerProps
@@ -41,6 +50,10 @@ const AbstractContainer = React.forwardRef<
   const [isMounted, setIsMounted] = React.useState(false);
   const [isTransformerDragging, setIsTransformerDragging] = useState(false);
   const [isMouseOverTransformer, setIsMouseOverTransformer] = useState(false);
+  const [transforms, setTransforms] = useState<AnimationProps>(); // for transformer
+
+  // delay the transforms;
+  const debouncedTransforms = useDebounce(transforms, 300);
 
   //// Refs
   const containerRef = useRef<PIXI.Container>(null);
@@ -48,8 +61,9 @@ const AbstractContainer = React.forwardRef<
   const imgGroupRef = useRef<PIXI.Container>(null);
   const transformerRef = useRef<PIXI.Container>(null);
   const animTweenRef = useRef<gsap.core.Tween>(null);
+  const animContainerRef = useRef<PIXI.Container>(null);
 
-  //// Context
+  // //// Context
   const { tl } = useContext(GsapPixieContext);
 
   // use props with useMemo
@@ -80,22 +94,7 @@ const AbstractContainer = React.forwardRef<
     isTextEditMode,
   } = props;
 
-  const animTween = useGsapEffect(containerRef, animation, {
-    x,
-    y,
-    width,
-    height,
-  });
-  // log all props
-
-  /** dot config */
-  // const dotConfig = {
-  //   // scale: 1,
-  //   // angle: 5,
-  //   // distance: 5,
-  // };
-
-  /**Apply sharpness */
+  const anim = useGsapEffect();
 
   /** Adding custom event listners */
   /** Event Listeneres */
@@ -126,22 +125,61 @@ const AbstractContainer = React.forwardRef<
     }
   }, []);
 
+  React.useEffect(() => {
+    setTransforms({
+      x,
+      y,
+      width,
+      height,
+      animation,
+    });
+  }, [animation, x, y, width, height]);
+
   // setup animation to run at eeffect
   React.useEffect(() => {
-    if (tl.current) {
-      // recycle and remove old tweens
-      if (animTweenRef.current) tl.current.remove(animTweenRef.current);
-      tl.current.add(animTween, startAt);
-      //@ts-ignore
-      animTweenRef.current = animTween;
-    }
-    return () => {
-      if (tl.current) {
-        tl.current.remove(animTween);
-        animTween.progress(0).kill();
+    if (!parentNode.current) return;
+    const ctx = gsap.context(() => {
+      if (tl.current && debouncedTransforms) {
+        const { x, y, animation } = debouncedTransforms || {};
+        const currentProgress = tl.current.progress();
+        const animTween: gsap.core.Timeline = anim.updateEffect(
+          containerRef.current,
+          animation,
+          {
+            immediateRender: false,
+            x,
+            y,
+            overwrite: true,
+          }
+        );
+        if (animTweenRef.current) {
+          tl.current.remove(animTweenRef.current);
+          animTweenRef.current.progress(0).kill();
+        }
+        // check in place to run the transition anim only if the timeline already in progress
+        if (currentProgress > 0.1) {
+          animTween.eventCallback("onComplete", () => {
+            animTween.remove("onComplete");
+            tl.current.add(animTween, startAt);
+            //@ts-ignore
+            animTweenRef.current = animTween;
+          });
+          animTween.play();
+        } else {
+          animTween.progress(1);
+          tl.current.add(animTween, startAt);
+          //@ts-ignore
+          animTweenRef.current = animTween;
+        }
+      } else {
+        if (animTweenRef.current) animTweenRef.current.progress(0).kill();
       }
+    }, parentNode.current);
+    // cleanup
+    return () => {
+      ctx.revert();
     };
-  }, [startAt, , animTween]);
+  }, [startAt, debouncedTransforms]);
 
   const handleMouseOverTransformer = React.useCallback(() => {
     setIsMouseOverTransformer(true);
@@ -191,43 +229,45 @@ const AbstractContainer = React.forwardRef<
             pointerout: pointerout,
           })}
       >
-        {!isGif && (
-          <Filters
-            scale={1}
-            apply={({ matrix }: { matrix: any }) => {
-              if (effect === Effects.BlackAndWhite) {
-                matrix.desaturate();
-              } else if (effect === Effects.Sepia) {
-                matrix.sepia();
-              } else if (effect === Effects.RetroVintage) {
-                matrix.negative();
-              } else if (effect === Effects.NightVision) {
-                matrix.negative();
-              } else if (effect === Effects.Normal) {
-                matrix.reset();
-              }
-            }}
-            matrix={{
-              enabled: true,
-              // @ts-ignore
-              matrix: CYAN,
-            }}
-          >
-            <Container ref={imgGroupRef}>{props.children}</Container>
-          </Filters>
-        )}
-        {isGif && <Container ref={imgGroupRef}>{props.children}</Container>}
-        {!isEmpty(overlay) &&
-          overlay !== OverlayTypes.NONE &&
-          overlay !== OverlayTypes.NORMAL && (
-            <PixiOverlayTilingSprite
-              overlay={overlay!}
-              width={width}
-              height={height}
-              x={x}
-              y={y}
-            />
+        <Container ref={animContainerRef}>
+          {!isGif && (
+            <Filters
+              scale={1}
+              apply={({ matrix }: { matrix: any }) => {
+                if (effect === Effects.BlackAndWhite) {
+                  matrix.desaturate();
+                } else if (effect === Effects.Sepia) {
+                  matrix.sepia();
+                } else if (effect === Effects.RetroVintage) {
+                  matrix.negative();
+                } else if (effect === Effects.NightVision) {
+                  matrix.negative();
+                } else if (effect === Effects.Normal) {
+                  matrix.reset();
+                }
+              }}
+              matrix={{
+                enabled: true,
+                // @ts-ignore
+                matrix: CYAN,
+              }}
+            >
+              <Container ref={imgGroupRef}>{props.children}</Container>
+            </Filters>
           )}
+          {isGif && <Container ref={imgGroupRef}>{props.children}</Container>}
+          {!isEmpty(overlay) &&
+            overlay !== OverlayTypes.NONE &&
+            overlay !== OverlayTypes.NORMAL && (
+              <PixiOverlayTilingSprite
+                overlay={overlay!}
+                width={width}
+                height={height}
+                x={x}
+                y={y}
+              />
+            )}
+        </Container>
       </Container>
       {applyTransformer && visible && !isTextEditMode && (
         <PixiTransformer
@@ -249,7 +289,7 @@ const AbstractContainer = React.forwardRef<
 export default AbstractContainer;
 
 // @ts-ignore
-AbstractContainer.whyDidYouRender = {
-  logOnDifferentValues: true,
-  customName: "AbstractContainer",
-};
+// AbstractContainer.whyDidYouRender = {
+//   logOnDifferentValues: true,
+//   customName: "AbstractContainer",
+// };

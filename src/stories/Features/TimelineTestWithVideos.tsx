@@ -101,7 +101,7 @@ export const TimelineTestVideos = (props: TimelineProps) => {
                     setSelected(randomIds.image2);
                   }}
                   uniqueId={randomIds.image2}
-                  src="https://eyecastvideoeditorfiles.s3.ap-southeast-2.amazonaws.com/public%2Firfan%40trolio.com%2F64b6738988f3e366d955cebd%2Fvideos%2FMXlcGUL5Ws%2Fanim-mercury.jpg"
+                  src="https://d1r0cf5836ptgd.cloudfront.net/public%2Firfan%40trolio.com%2F64b6738988f3e366d955cebd%2Fvideos%2FMXlcGUL5Ws%2Fanim-mercury.jpg"
                   applyTransformer={selected === randomIds.image2}
                   startAt={sequences[1].startAt}
                   endAt={sequences[1].endAt}
@@ -124,7 +124,7 @@ export const TimelineTestVideos = (props: TimelineProps) => {
                   pointerdown={() => {
                     setSelected(randomIds.image3);
                   }}
-                  src="https://eyecastvideoeditorfiles.s3.ap-southeast-2.amazonaws.com/public%2Firfan%40trolio.com%2F6472d56e805c3bffc3cded33%2Fvideos%2FYra_kbKljX%2Fbig_buck_bunny_720p_1mb.mp4"
+                  src="https://d1r0cf5836ptgd.cloudfront.net/public%2Firfan%40trolio.com%2F6472d56e805c3bffc3cded33%2Fvideos%2FYra_kbKljX%2Fbig_buck_bunny_720p_1mb.mp4"
                   applyTransformer={selected === randomIds.image3}
                   startAt={sequences[2].startAt}
                   endAt={sequences[2].endAt}
@@ -173,7 +173,7 @@ export const TimelineTestVideos = (props: TimelineProps) => {
                   applyTransformer={selected === randomIds.image3}
                   startAt={sequences[4].startAt}
                   endAt={sequences[4].endAt}
-                  src="https://eyecastvideoeditorfiles.s3.ap-southeast-2.amazonaws.com/public%2Firfan%40trolio.com%2F6472d56e805c3bffc3cded33%2Fvideos%2FnnS18Ov5PM%2Fdwsample+mov+360p.mov"
+                  src="https://d1r0cf5836ptgd.cloudfront.net/public%2Firfan%40trolio.com%2F6472d56e805c3bffc3cded33%2Fvideos%2FnnS18Ov5PM%2Fdwsample+mov+360p.mov"
                   transformation={{
                     ...videoProps.transformation,
                     x: 450,
@@ -206,7 +206,7 @@ export const TimelineTestVideos = (props: TimelineProps) => {
                   pointerdown={() => {
                     setSelected(randomIds!?.image);
                   }}
-                  src="https://eyecastvideoeditorfiles.s3.ap-southeast-2.amazonaws.com/public%2Firfan%40trolio.com%2F64b6738988f3e366d955cebd%2Fvideos%2FMXlcGUL5Ws%2Fanim-mercury.jpg"
+                  src="https://d1r0cf5836ptgd.cloudfront.net/public%2Firfan%40trolio.com%2F64b6738988f3e366d955cebd%2Fvideos%2FMXlcGUL5Ws%2Fanim-mercury.jpg"
                   applyTransformer={selected === randomIds?.image}
                   uniqueId={randomIds?.image}
                   startAt={sequences[5].startAt}
@@ -215,7 +215,7 @@ export const TimelineTestVideos = (props: TimelineProps) => {
                     ...ImageProps.transformation,
                     x: 150,
                     y: 150,
-                  }}  
+                  }}
                 />
               </PixiSequence>
             </PixiSequenceWrapper>

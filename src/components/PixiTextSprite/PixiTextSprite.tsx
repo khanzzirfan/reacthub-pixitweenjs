@@ -105,7 +105,6 @@ const PixiTextSprite = React.forwardRef<
   //// State
   // State variables to track click events
   const doubleClickDelay = 300; // Adjust this as needed
-
   //// Refs
   const parentNode = useRef<PIXI.Container>(null);
   const lastClickTimeRef = useRef<number>(0);

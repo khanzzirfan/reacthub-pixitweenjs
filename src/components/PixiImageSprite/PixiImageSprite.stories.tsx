@@ -558,12 +558,12 @@ export const Animation: Story = {
     const args = {
       uniqueId: "surya002", // uniqueId of the sprite
       src: "https://assets.codepen.io/693612/surya.svg",
-      applyTransformer: false,
+      applyTransformer: true,
       startAt: 0,
       endAt: 5,
       transformation: {
-        x: 100,
-        y: 100,
+        x: 200,
+        y: 250,
         width: 150,
         height: 150,
         anchor: 0.5,
@@ -624,5 +624,52 @@ export const Animation: Story = {
     controls: {
       include: ["animation"],
     },
+  },
+};
+
+// More on writing stories with args: https://storybook.js.org/docs/react/writing-stories/args
+export const PointerAnimation: Story = {
+  render: (args: any) => (
+    <>
+      <AppStateContextProvider {...args}>
+        <PixiSequenceWrapper startAt={0} endAt={16}>
+          <PixiSequence startAt={args.startAt} endAt={args.endAt}>
+            <PixiImageSprite {...args} />
+          </PixiSequence>
+        </PixiSequenceWrapper>
+      </AppStateContextProvider>
+      <AppStateContextProvider {...args}>
+        <PixiImageSprite {...args} />
+      </AppStateContextProvider>
+    </>
+  ),
+  args: {
+    uniqueId: "surya001", // uniqueId of the sprite
+    src: "https://assets.codepen.io/693612/surya.svg",
+    applyTransformer: true,
+    startAt: 0,
+    endAt: 5,
+    transformation: {
+      x: 200,
+      y: 200,
+      width: 150,
+      height: 150,
+      anchor: 0.5,
+      rotation: 0,
+      alpha: 1,
+      scale: 1,
+      tint: 0xffffff,
+      blendMode: 0,
+      effect: Effects.None,
+      animation: Animations.NONE,
+      colorCorrection: {
+        enabled: false,
+        contrast: 1,
+        saturation: 1,
+        exposure: 1,
+        blurRadius: 0,
+      },
+    },
+    visible: true,
   },
 };

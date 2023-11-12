@@ -7,3 +7,6 @@ export * from "./types";
 
 // Events
 export * from "./events";
+
+// hooks
+export * from "./hooks";
