@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.107-alpha.91](https://github.com/khanzzirfan/reacthub-pixitweenjs/compare/v0.2.107-alpha.90...v0.2.107-alpha.91) (2023-11-16)
+
+
+### Bug Fixes
+
+* updated gsap sync for gifs to work with gsap scrubbing animation ([bb982b0](https://github.com/khanzzirfan/reacthub-pixitweenjs/commit/bb982b0e7b26f688c775f49d07afed70e5ea1fc3))
+
 ### [0.2.107-alpha.90](https://github.com/khanzzirfan/reacthub-pixitweenjs/compare/v0.2.107-alpha.89...v0.2.107-alpha.90) (2023-11-16)
 
 ### [0.2.107-alpha.89](https://github.com/khanzzirfan/reacthub-pixitweenjs/compare/v0.2.107-alpha.88...v0.2.107-alpha.89) (2023-11-15)
