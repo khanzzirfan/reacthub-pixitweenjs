@@ -3,6 +3,7 @@ import useDeepEffect from "./useDeepEffect";
 import { TransformationEnd } from "../types/transformation";
 import { GsapPixieContext } from "../providers/GsapPixieContextProvider";
 import gsap from "gsap";
+import "@pixi/gif";
 
 interface AppState {
   transformation: {

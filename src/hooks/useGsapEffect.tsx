@@ -187,7 +187,7 @@ gsap.registerEffect({
       pixi: {
         ...vars,
         x: vars?.x,
-        y: -1500,
+        y: -2500,
         alpha: 0,
       },
     });
@@ -200,10 +200,10 @@ gsap.registerEffect({
   effect(target: PIXI.Container, vars: any) {
     return gsap.timeline().from(target, {
       ease: "bounce.out",
+      duration: 2,
       pixi: {
         ...vars,
         x: -1500,
-        duration: 2,
         alpha: 0,
       },
     });
@@ -214,12 +214,13 @@ gsap.registerEffect({
 gsap.registerEffect({
   name: "BOUNCE_IN_RIGHT",
   effect(target: PIXI.Container, vars: any) {
+    const xPos = Math.max(1000, vars?.maxX + 500);
     return gsap.timeline().from(target, {
       ease: "bounce.out",
       duration: 2,
       pixi: {
         ...vars,
-        x: 1500,
+        x: xPos, // 1000 is the width of the container
       },
     });
   },
@@ -233,7 +234,7 @@ gsap.registerEffect({
       ease: "bounce.out",
       pixi: {
         ...vars,
-        y: 1500,
+        y: 2000,
       },
       duration: 2,
     });
@@ -281,7 +282,7 @@ gsap.registerEffect({
       target,
       {
         pixi: {
-          y: -1000,
+          y: -1500,
           alpha: 0,
         },
       },
@@ -307,7 +308,7 @@ gsap.registerEffect({
       {
         pixi: {
           alpha: 0,
-          x: -1000,
+          x: -2000,
         },
       },
       {

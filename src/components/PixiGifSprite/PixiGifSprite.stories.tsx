@@ -1,9 +1,12 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { PixiGifSprite } from ".";
+// import { PixiGifSprite } from ".";
+import PixiGifSprite from "./PixiGifGsapSync";
 import { AppStateContextProvider } from "../../utils/AppStateProvider";
 import { Effects } from "../../types/Effects";
 import { AppWrapper } from "../../utils/AppWrapper";
 import { Animations } from "../../types";
+import { PixiSequenceWrapper } from "../../components/PixiSequence/PixiSeqenceWrapper";
+import { PixiSequence } from "../../components/PixiSequence";
 
 // More on how to set up stories at: https://storybook.js.org/docs/react/writing-stories/introduction
 const meta = {
@@ -115,7 +118,21 @@ type Story = StoryObj<typeof meta>;
 export const Normal: Story = {
   render: (args: any) => (
     <AppStateContextProvider {...args}>
-      <PixiGifSprite {...args} />
+      <PixiSequenceWrapper startAt={0} endAt={16}>
+        <PixiSequence startAt={args.startAt} endAt={args.endAt}>
+          <PixiGifSprite {...args} />
+        </PixiSequence>
+        <PixiSequence startAt={3} endAt={5}>
+          <PixiGifSprite
+            {...args}
+            src="https://media.giphy.com/media/3o72F7YT6s0EMFI0Za/giphy.gif"
+            uniqueId="giftext002"
+            startAt={3}
+            endAt={5}
+            transformation={{ ...args.transformation, x: 400, y: 400 }}
+          />
+        </PixiSequence>
+      </PixiSequenceWrapper>
     </AppStateContextProvider>
   ),
   args: {

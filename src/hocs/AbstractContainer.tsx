@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useRef, useState, useContext } from "react";
-import { Container, withFilters } from "@pixi/react";
+import { Container, withFilters, useApp } from "@pixi/react";
 import * as PIXI from "pixi.js";
 import gsap from "gsap";
 import { Effects } from "../types/Effects";
@@ -40,6 +40,8 @@ interface AnimationProps {
   width: number;
   height: number;
   animation: Animations;
+  maxX: number;
+  maxY: number;
 }
 
 const AbstractContainer = React.forwardRef<
@@ -65,6 +67,9 @@ const AbstractContainer = React.forwardRef<
 
   // //// Context
   const { tl } = useContext(GsapPixieContext);
+  const app = useApp();
+  const maxX = app.screen.width;
+  const maxY = app.screen.height;
 
   // use props with useMemo
   const {
@@ -132,15 +137,17 @@ const AbstractContainer = React.forwardRef<
       width,
       height,
       animation,
+      maxX,
+      maxY,
     });
-  }, [animation, x, y, width, height]);
+  }, [animation, x, y, width, height, maxX, maxY]);
 
   // setup animation to run at eeffect
   React.useEffect(() => {
     if (!parentNode.current) return;
     const ctx = gsap.context(() => {
       if (tl.current && debouncedTransforms) {
-        const { x, y, animation } = debouncedTransforms || {};
+        const { x, y, animation, maxX, maxY } = debouncedTransforms || {};
         const currentProgress = tl.current.progress();
         const animTween: gsap.core.Timeline = anim.updateEffect(
           containerRef.current,
@@ -150,6 +157,8 @@ const AbstractContainer = React.forwardRef<
             x,
             y,
             overwrite: true,
+            maxX,
+            maxY,
           }
         );
         if (animTweenRef.current) {

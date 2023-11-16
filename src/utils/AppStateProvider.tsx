@@ -2,6 +2,7 @@ import * as React from "react";
 import useDeepEffect from "./useDeepEffect";
 import { TransformationEnd } from "../types/transformation";
 import { action } from "@storybook/addon-actions";
+import "@pixi/gif";
 
 interface AppState {
   transformation: {

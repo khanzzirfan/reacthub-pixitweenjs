@@ -187,6 +187,7 @@ const PixiVideoSprite = React.forwardRef<
     } else {
       videoStateRef.current.isDragging = false;
     }
+    videoStateRef.current.isMuted = mute;
   }, [mute, dragModeRef, pauseVideoDebounce, videoElement]);
 
   /** Gsap Start and Stop Events */
@@ -351,7 +352,18 @@ const PixiVideoSprite = React.forwardRef<
   React.useEffect(() => {
     if (videoElement.current) {
       videoElement.current.muted = mute;
+      videoStateRef.current.isMuted = mute;
     }
+    // sometimes the videoElement is not ready so we need to wait for it to be ready
+    const timeoutId = setTimeout(() => {
+      if (videoElement.current) {
+        videoElement.current.muted = mute;
+        videoStateRef.current.isMuted = mute;
+      }
+    }, 1500);
+    return () => {
+      clearTimeout(timeoutId);
+    };
   }, [mute]);
 
   // load // load meta // load seek through
@@ -361,6 +373,7 @@ const PixiVideoSprite = React.forwardRef<
     const onload = function () {
       if (videoElement.current) {
         videoElement.current.currentTime = minStartAt;
+        videoElement.current.muted = mute;
       }
     };
 
