@@ -32,3 +32,6 @@ dist
 .env.dev
 
 .npmrc
+
+## storybook build files
+storybook-static
