@@ -1,2 +1,2 @@
-export { default as PixiGifSprite } from "./PixiGifSprite";
-export * from "./PixiGifSprite";
+export { default as PixiGifSprite } from "./PixiGifGsapSync";
+export * from "./PixiGifGsapSync";

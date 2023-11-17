@@ -37,4 +37,4 @@ PixiTweenJs is designed to help you build animated time-controlled canvas elemen
 
 ## Usage
 
-Visit the [storybook](https://64b9d71094fa7aed0c7291cf-sinysbbbmx.chromatic.com/?path=/docs/components-imagesprite--docs)
+Visit the [storybook](https://64b9d71094fa7aed0c7291cf-vaocdrptkv.chromatic.com/)

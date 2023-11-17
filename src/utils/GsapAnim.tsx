@@ -26,13 +26,7 @@ interface Ease {
   };
 }
 
-export const getAnimByName = (
-  animate: string,
-  stageWidth?: number,
-  stageHeight?: number,
-  x?: number,
-  y?: number,
-): Ease => {
+export const getAnimByName = (animate: string): Ease => {
   let ease: Ease = {};
   switch (animate) {
     case "NONE":
@@ -69,7 +63,7 @@ export const getAnimByName = (
     case "BOUNCE_OUT_UP":
       break;
     case "FADE_IN":
-      ease.to = { ease: "power4.in", alpha: 1, duration: 0.5 };
+      ease.to = { ease: "power4.in", alpha: 1, duration: 1 };
       break;
     case "FADE_IN_DOWN":
       ease.fromTo = {

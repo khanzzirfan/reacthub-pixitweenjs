@@ -1,21 +1,29 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { PixiSvgPathSprite } from ".";
 import { AppStateContextProvider } from "../../utils/AppStateProvider";
+import { AppWrapper } from "../../utils/AppWrapper";
+import { Animations } from "../../types";
 
 // More on how to set up stories at: https://storybook.js.org/docs/react/writing-stories/introduction
 const meta = {
   title: "Components/SvgSprite",
   component: PixiSvgPathSprite,
-
+  decorators: [
+    (Story: any) => (
+      <div style={{ width: "100%", height: "100%" }}>
+        <AppWrapper>{Story({ appState: "x" })}</AppWrapper>
+      </div>
+    ),
+  ],
   tags: ["autodocs"],
   argTypes: {
     uniqueId: {
       control: "text",
       description: "uniqueId of the sprite",
     },
-    src: {
+    path: {
       control: "text",
-      description: "source of the image",
+      description: "source of the svg path",
     },
     transformation: {
       control: "object",
@@ -53,12 +61,7 @@ const meta = {
     applyTransformer: { control: "boolean", description: "applyTransformer" },
     startAt: { control: "number", description: "startAt" },
     endAt: { control: "number", description: "endAt" },
-    initialAlpha: {
-      control: "number",
-      min: 0,
-      max: 1,
-      description: "sprite initial alpha value (default  1)",
-    },
+    visible: { control: "boolean", description: "visible" },
     onAnchorTransformationEnd: {
       action: "onAnchorTransformationEnd",
       description:
@@ -67,6 +70,14 @@ const meta = {
     pointerdown: {
       action: "pointerdown",
       description: "pointerdown event",
+    },
+    pointerout: {
+      action: "pointerout",
+      description: "pointerout event",
+    },
+    pointerover: {
+      action: "pointerover",
+      description: "pointerover event",
     },
   },
 } satisfies Meta<typeof PixiSvgPathSprite>;
@@ -84,11 +95,14 @@ export const Normal: Story = {
   args: {
     uniqueId: "svg001", // uniqueId of the sprite
     path: "M 100 100 L 300 100 L 200 300 z",
+    applyTransformer: false,
+    startAt: 0,
+    endAt: 10,
     transformation: {
-      x: 100,
-      y: 100,
-      width: 150,
-      height: 150,
+      x: 200,
+      y: 200,
+      width: 200,
+      height: 200,
       anchor: 0.5,
       rotation: 0,
       alpha: 1,
@@ -98,10 +112,7 @@ export const Normal: Story = {
       colorCorrection: {},
       fill: "#FFC0CB",
     },
-    applyTransformer: false,
-    startAt: 0,
-    endAt: 10,
-    initialAlpha: 1,
+    visible: true,
   },
 };
 
@@ -114,24 +125,61 @@ export const FadeIn: Story = {
   args: {
     uniqueId: "surya002", // uniqueId of the sprite
     path: "M 100, 100 m -75, 0 a 75,75 0 1,0 150,0 a 75,75 0 1,0 -150,0",
+    applyTransformer: false,
+    startAt: 0,
+    endAt: 10,
     transformation: {
-      x: 100,
-      y: 100,
-      width: 150,
-      height: 150,
+      x: 200,
+      y: 200,
+      width: 200,
+      height: 200,
       anchor: 0.5,
       rotation: 0,
       alpha: 1,
       scale: 1,
       tint: 0xffffff,
       blendMode: 0,
-      animation: "FADE_IN",
+      animation: Animations.FADE_IN,
       colorCorrection: {},
       fill: "#fe2c54",
     },
+    visible: true,
+  },
+};
+
+// More on writing stories with args: https://storybook.js.org/docs/react/writing-stories/args
+export const Filters: Story = {
+  render: (args: any) => (
+    <AppStateContextProvider {...args}>
+      <PixiSvgPathSprite {...args} />
+    </AppStateContextProvider>
+  ),
+  args: {
+    uniqueId: "svgfilters001", // uniqueId of the sprite
+    path: "M 100 100 L 300 100 L 200 300 z",
     applyTransformer: false,
     startAt: 0,
     endAt: 10,
-    initialAlpha: 0,
+    transformation: {
+      x: 200,
+      y: 200,
+      width: 200,
+      height: 200,
+      anchor: 0.5,
+      rotation: 0,
+      alpha: 1,
+      scale: 1,
+      tint: 0xffffff,
+      blendMode: 0,
+      colorCorrection: {
+        enabled: true,
+        contrast: 1,
+        saturation: 2,
+        exposure: 1,
+        blurRadius: 3,
+      },
+      fill: "#FFC0CB",
+    },
+    visible: true,
   },
 };

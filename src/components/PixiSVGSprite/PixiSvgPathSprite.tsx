@@ -1,27 +1,28 @@
 import * as React from "react";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 // @ts-ignore
 import PropTypes from "prop-types";
-import { GsapPixieContext } from "../../providers/GsapPixieContextProvider";
-import { Sprite, Container, useApp, withFilters } from "@pixi/react";
-import { AdjustmentFilter } from "@pixi/filter-adjustment";
+import { Sprite, Container, useApp } from "@pixi/react";
 import * as PIXI from "pixi.js";
-import gsap from "gsap";
 import { SVG } from "pixi-svg";
-import PixiTransformer from "../../utils/PixiTransformer";
 // @ts-ignore
 import svgpath from "svgpath";
 // @ts-ignore
 import isEmpty from "lodash/isEmpty";
-import { getAnimByName } from "../../utils/GsapAnim";
-import { TransformationEnd } from "../../types/transformation";
+import {
+  PixiBaseSpriteProps,
+  ForwardedRefResponse,
+} from "../../types/BaseProps";
+import AbstractContainer from "../../hocs/AbstractContainer";
+import { Effects } from "../../types/Effects";
+import { withFiltersHook } from "../../hooks/withFiltersHook";
+import { Animations } from "../../types";
 
-type PixiSvgPathSpriteProps = {
+export interface PixiSvgPathSpriteProps extends PixiBaseSpriteProps {
   uniqueId: string;
   path: string;
   startAt: number;
   endAt: number;
-  initialAlpha: number;
   transformation: {
     x: number;
     y: number;
@@ -33,7 +34,8 @@ type PixiSvgPathSpriteProps = {
     scale?: number | [number, number];
     tint?: number;
     blendMode?: number;
-    animation?: string;
+    animation?: Animations;
+    hexColor?: string;
     fill?: string;
     fontWeight?: string;
     fontStyle?: string;
@@ -59,8 +61,10 @@ type PixiSvgPathSpriteProps = {
       blue?: number;
       alpha?: number;
       scaleInput?: number;
+      vignette?: number;
+      noise?: number;
     };
-    effect?: string;
+    effect?: Effects;
   };
   pointerdown?: () => void;
   pointerup?: () => void;
@@ -71,197 +75,68 @@ type PixiSvgPathSpriteProps = {
   mouseout?: () => void;
   applyTransformer?: boolean;
   onAnchorTransformationEnd?: (endData: any) => void;
-};
+}
 
-type EffectFunc = () => void;
-type Deps = ReadonlyArray<unknown>;
-
-const Filters = withFilters(Container, {
-  blur: PIXI.filters.BlurFilter,
-  adjust: AdjustmentFilter,
-  matrix: PIXI.filters.ColorMatrixFilter,
-});
-
-/** filter config */
-const config = {
-  dot: {
-    scale: 1,
-    angle: 5,
-  },
-  blur: {
-    blur: 0,
-    quality: 4,
-  },
-};
-
-/** CYAN Filters */
-const CYAN = [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0];
-
-const PixiSvgPathSprite: React.FC<PixiSvgPathSpriteProps> = (props) => {
+const PixiSvgPathSprite = React.forwardRef<
+  ForwardedRefResponse | null,
+  PixiSvgPathSpriteProps
+>((props, ref) => {
   //// State
-  const [isMounted, setIsMounted] = React.useState(false);
-  const [isTransformerDragging, setIsTransformerDragging] = useState(false);
-  const [isMouseOverTransformer, setIsMouseOverTransformer] = useState(false);
   const [texture, setTexture] = React.useState<any>(null);
 
-  console.log("allProps", props);
   //// Refs
   const imageRef = useRef<PIXI.Sprite>(null);
-  const containerRef = useRef<PIXI.Container>(null);
   const parentNode = useRef<PIXI.Container>(null);
   const imgGroupRef = useRef<PIXI.Container>(null);
-  const transformerRef = useRef<PIXI.Container>(null);
 
   //// Context
-  const { tl } = useContext(GsapPixieContext);
 
   /// 1001
   // console.log("contxt Values", tl);
   const {
-    uniqueId,
     path,
-    startAt,
-    endAt,
-    initialAlpha,
+    visible,
+    disabled,
     transformation: {
       x,
       y,
       width,
       height,
       anchor,
-      animation,
-      colorCorrection,
-      effect,
+      hexColor,
       fill,
-      fontWeight,
-      fontStyle,
       stroke = "none",
       strokeWidth = 0,
-      blurRadius = 0,
+      colorCorrection = {},
     },
     pointerdown,
     pointerup,
-    mousedown,
-    mouseup,
-    pointerover,
-    mouseover,
-    mouseout,
-    applyTransformer,
-    onAnchorTransformationEnd,
-    ...restProps
   } = props;
-
-  // color corrections
-  const {
-    enabled = false,
-    temperature = 1,
-    hue = 1,
-    contrast = 1,
-    saturation = 1,
-    exposure = 1,
-    reset,
-    sharpness = 1,
-    value = 0,
-    levels = 1,
-    luminance = 0,
-    enhance = 0,
-    red = 150,
-    green = 150,
-    blue = 150,
-    alpha = 1,
-    scaleInput = 1,
-  } = colorCorrection || {};
 
   const app = useApp();
 
-  /** adjustment filter */
-  const adjustments = {
-    brightness: exposure,
-    contrast,
-    saturation,
-    alpha,
-  };
+  // const fillColor = PIXI.utils.string2hex(fill || "#262730");
+  /// hooks
+  const {
+    temperatureFilter,
+    sharpnessFilter,
+    hueFilter,
+    blurFilter,
+    adjustmentFilter,
+    vignetteFilter,
+    noiseFilter,
+  } = withFiltersHook(colorCorrection);
 
-  const fillColor = PIXI.utils.string2hex(fill || "#262730");
-
-  /** handle on tranformer onchange */
-  const handleOnTransformChange = React.useCallback(() => {
-    setIsTransformerDragging(true);
-  }, []);
-
-  // transformer to handle sprite transformation
-  const handleOnTransformEnd = React.useCallback(
-    (endData: TransformationEnd) => {
-      console.log("changeEnd", endData);
-      if (onAnchorTransformationEnd) {
-        console.log("running onAnchorTransformationEnd");
-        onAnchorTransformationEnd(endData);
-      }
-    },
-    []
-  );
-
-  useEffect(() => {
-    let ctx = gsap.context(() => {});
-    if (containerRef.current && tl.current) {
-      const data = {
-        duration: Number(endAt) - Number(startAt),
-      };
-
-      const ease = getAnimByName(animation || "None");
-      ctx = gsap.context(() => {
-        if (!isEmpty(ease.from)) {
-          tl.current
-            .from(containerRef.current, { ...ease.from }, startAt)
-            .to(imgGroupRef.current, { alpha: 1, duration: 0.2 }, startAt)
-            .from(imgGroupRef.current, { ...data }, startAt)
-            .to(containerRef.current, { alpha: 0, duration: 0.2 }, endAt - 0.2);
-        } else if (!isEmpty(ease.to)) {
-          tl.current
-            .to(
-              containerRef.current,
-              { alpha: 1, duration: 0.2, ...ease.to },
-              startAt
-            )
-            .from(imgGroupRef.current, { ...data }, startAt)
-            .to(containerRef.current, { alpha: 0, duration: 0.2 }, endAt - 0.2);
-        } else if (!isEmpty(ease.fromTo)) {
-          tl.current
-            .fromTo(
-              containerRef.current,
-              ease.fromTo?.from,
-              ease.fromTo?.to,
-              startAt
-            )
-            .from(imgGroupRef.current, { ...data }, startAt)
-            .to(containerRef.current, { alpha: 0, duration: 0.2 }, endAt - 0.2);
-        } else {
-          tl.current
-            .to(containerRef.current, { alpha: 1, duration: 0.01 }, startAt)
-            .from(imgGroupRef.current, { ...data }, startAt)
-            .to(
-              containerRef.current,
-              { alpha: 0, duration: 0.1 },
-              Number(endAt) - Number(0.1)
-            );
-        }
-      });
-    }
-    return () => ctx.revert(); // cleanup!
-  }, [animation, startAt, endAt]);
-
-  React.useEffect(() => {
-    if (containerRef.current) {
-      setIsMounted(true);
-    }
-  }, []);
+  const { blurRadius = 0, vignette = 0, noise = 0 } = colorCorrection;
 
   React.useEffect(() => {
     const transformedPath = svgpath(path).scale(5).translate(0, 0).toString();
     // console.log('path', path);
     // console.log('transformedPath', transformedPath);
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}"> 
-        <path stroke="${stroke}" stroke-width="${strokeWidth}" fill="${fill}" d="${transformedPath}">
+        <path stroke="${stroke}" stroke-width="${strokeWidth}" fill="${
+      hexColor || fill
+    }" d="${transformedPath}">
         </path>
       </svg>`;
 
@@ -271,108 +146,46 @@ const PixiSvgPathSprite: React.FC<PixiSvgPathSpriteProps> = (props) => {
     return () => {
       // removeTransformer();
     };
-  }, [app, path, stroke, strokeWidth, fill]);
+  }, [app, path, stroke, strokeWidth, hexColor, fill]);
 
   return (
-    // @ts-ignore
-    <Container ref={parentNode}>
-      {/* @ts-ignore */}
-      <Container
-        ref={containerRef}
-        alpha={initialAlpha}
-        position={[x, y]}
-        pivot={[x, y]}
-        width={width}
-        height={height}
-      >
-        {colorCorrection && colorCorrection.enabled ? (
-          <Filters
-            scale={1}
-            blur={{ blur: blurRadius, quality: 4 }}
-            adjust={adjustments}
-            apply={({ matrix }: { matrix: any }) => {
-              if (effect === "BlackAndWhite") {
-                matrix.desaturate();
-              } else if (effect === "Sepia") {
-                matrix.sepia();
-              } else if (effect === "RetroVintage") {
-                matrix.negative();
-              } else if (effect === "NightVision") {
-                matrix.negative();
-              } else if (effect === "Normal") {
-                matrix.reset();
-              }
-            }}
-            matrix={{
-              enabled: true,
-              // @ts-ignore
-              matrix: CYAN,
-            }}
-          >
-            {/* @ts-ignore */}
-
-            <Container ref={imgGroupRef}>
-              {texture && (
-                <Sprite
-                  texture={texture}
-                  width={width}
-                  height={height}
-                  anchor={anchor}
-                  ref={imageRef}
-                  x={x}
-                  y={y}
-                  // @ts-ignore
-                  interactive={true}
-                  pointerdown={pointerdown}
-                  pointerup={pointerup}
-                  pointerover={pointerover}
-                  mousedown={mousedown}
-                  mouseup={mouseup}
-                  mouseover={mouseover}
-                  mouseout={mouseout}
-                />
-              )}
-            </Container>
-          </Filters>
-        ) : (
-          // @ts-ignore
-          <Container ref={imgGroupRef}>
-            {texture && (
-              <Sprite
-                texture={texture}
-                width={width}
-                height={height}
-                anchor={anchor}
-                ref={imageRef}
-                x={x}
-                y={y}
-                // @ts-ignore
-                interactive={true}
-                pointerdown={pointerdown}
-                pointerup={pointerup}
-                pointerover={pointerover}
-                mousedown={mousedown}
-                mouseup={mouseup}
-                mouseover={mouseover}
-                mouseout={mouseout}
-              />
-            )}
-          </Container>
-        )}
+    <AbstractContainer {...props} ref={ref}>
+      <Container ref={parentNode}>
+        <Container ref={imgGroupRef}>
+          {texture && (
+            <Sprite
+              texture={texture}
+              width={width}
+              height={height}
+              anchor={anchor}
+              ref={imageRef}
+              x={x}
+              y={y}
+              alpha={visible ? 1 : 0}
+              {...(!disabled &&
+                visible && {
+                  interactive: true,
+                  pointerdown: pointerdown,
+                  pointerup: pointerup,
+                })}
+              filters={[
+                temperatureFilter,
+                sharpnessFilter,
+                hueFilter,
+                adjustmentFilter,
+                // conditionally add blur filter
+                ...(blurRadius > 0 ? [blurFilter] : []),
+                // conditionally add vignette filter
+                ...(vignette > 0 ? [vignetteFilter] : []),
+                // conditionally add noise filter
+                ...(noise > 0 ? [noiseFilter] : []),
+              ]}
+            />
+          )}
+        </Container>
       </Container>
-      {applyTransformer && (
-        <PixiTransformer
-          pixiTransformerRef={transformerRef}
-          imageRef={containerRef}
-          isMounted={isMounted}
-          transformCommit={handleOnTransformEnd}
-          transformChange={handleOnTransformChange}
-          mouseoverEvent={setIsMouseOverTransformer}
-          uniqueId={uniqueId}
-        />
-      )}
-    </Container>
+    </AbstractContainer>
   );
-};
+});
 
 export default PixiSvgPathSprite;

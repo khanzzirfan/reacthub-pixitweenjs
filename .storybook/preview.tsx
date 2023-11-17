@@ -1,9 +1,15 @@
 import React from "react";
 import { AppWrapper } from "../src/utils/AppWrapper";
+import whyDidYouRender from "@welldone-software/why-did-you-render";
+
+whyDidYouRender(React, {
+  trackAllPureComponents: true,
+});
+
 /** @type { import('@storybook/react').Preview } */
 const preview = {
   parameters: {
-    actions: { argTypesRegex: "^on[A-Z].*" },
+    actions: { argTypesRegex: "^on.*" },
     controls: {
       matchers: {
         color: /(background|color)$/i,
@@ -12,9 +18,5 @@ const preview = {
     },
   },
 };
-
-export const decorators = [
-  (Story) => <AppWrapper>{Story({ appState: "x" })}</AppWrapper>,
-];
 
 export default preview;

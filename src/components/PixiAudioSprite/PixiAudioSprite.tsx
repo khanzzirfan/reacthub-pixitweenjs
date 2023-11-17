@@ -1,26 +1,29 @@
 import * as React from "react";
 import { useContext, useEffect, useRef } from "react";
-// @ts-ignore
-import PropTypes from "prop-types";
 import {
   GsapPixieContext,
   Events,
 } from "../../providers/GsapPixieContextProvider";
-import { Container, useApp } from "@pixi/react";
-import { useCustomEventListener } from "react-custom-events";
+import { Container } from "@pixi/react";
+import { useCustomEventListener } from "../../events";
 import gsap from "gsap";
-import { Sound } from "@pixi/sound";
 import * as PIXI from "pixi.js";
 // @ts-ignore
 import isEmpty from "lodash/isEmpty";
+// @ts-ignore
+import debounce from "lodash/debounce";
+import { Howl } from "howler";
 
 type PixiAudioSpriteProps = {
   uniqueId: string;
   src: string;
   startAt: number;
   endAt: number;
+  audioStartAt: number;
+  audioEndAt: number;
   mute: boolean;
   speed: number;
+  visible: boolean;
 };
 interface AudioState {
   isPlaying: boolean;
@@ -46,66 +49,87 @@ const PixiAudioSprite: React.FC<PixiAudioSpriteProps> = (props) => {
     isDragging: false,
   };
   //// State
-  const [isMounted, setIsMounted] = React.useState(false);
+  const [, setIsMounted] = React.useState(false);
 
-  const audioStateRef = useRef<AudioState>(initialState);
-
-  console.log("allProps", props);
   //// Refs
   const containerRef = useRef<PIXI.Container>(null);
-  const imgGroupRef = useRef<PIXI.Container>(null);
+  const audioStateRef = useRef<AudioState>(initialState);
+  const tweenRef = useRef<gsap.core.Tween>(null);
+  const audioContainerRef = React.useRef<Howl>(null);
 
   //// Context
-  //// Context
-  const { tl, playerTimeRef } = useContext(GsapPixieContext);
+  const { tl, dragModeRef } = useContext(GsapPixieContext);
 
   /// 1001
   // console.log("contxt Values", tl);
-  const { uniqueId, src, startAt, endAt, mute, speed, ...restProps } = props;
-
-  const app = useApp();
-  const audioContainerRef = React.useRef<Sound>(null);
+  const {
+    uniqueId,
+    src,
+    startAt,
+    endAt,
+    mute,
+    speed,
+    audioStartAt,
+    audioEndAt,
+    visible,
+  } = props;
 
   /** Adding custom event listners */
   /** Event Listeneres */
   useCustomEventListener(Events.PAUSE, () => {
-    console.log("pause event");
-    if (containerRef.current) {
+    if (containerRef.current && audioContainerRef.current) {
       // @ts-ignore
       audioContainerRef.current?.pause();
       audioStateRef.current.isPlaying = false;
     }
   });
 
-  const gsapOnStart = (startAt: number) => {
-    if (containerRef.current) {
-      console.log("audio gsapOnStart", startAt);
-      if (playerTimeRef.current >= startAt && playerTimeRef.current <= endAt) {
-        // @ts-ignore
-        audioContainerRef.current?.play({
-          volume: mute ? 0 : 1,
-          start: startAt,
-          end: endAt,
-          speed: speed || 1,
-        });
-        audioStateRef.current.isPlaying = true;
-        audioStateRef.current.completed = false;
-      }
+  useCustomEventListener(Events.COMPLETE, () => {
+    if (audioStartAt > 0 && audioContainerRef.current) {
+      audioContainerRef.current.seek(audioStartAt);
     }
-  };
+  });
 
-  const gsapOnPause = (startAt: number) => {
-    if (containerRef.current) {
-      console.log("audio gsapOnStart", startAt);
+  useCustomEventListener(Events.SCRUBBER_CLICKED, () => {
+    if (containerRef.current && audioContainerRef.current) {
       // @ts-ignore
       audioContainerRef.current?.pause();
       audioStateRef.current.isPlaying = false;
+    }
+  });
+
+  // /** stop video playing when gsapDragging is true */
+  React.useEffect(() => {
+    if (audioContainerRef.current) {
+      if (dragModeRef.current) {
+        audioContainerRef.current.pause();
+        audioStateRef.current.isPlaying = false;
+        audioStateRef.current.isDragging = true;
+      } else {
+        audioStateRef.current.isDragging = false;
+      }
+    }
+  }, [dragModeRef]);
+
+  const gsapOnStart = (startAt: number, endAt: number) => {
+    // console.log("gsap on start 0010", uniqueId, startAt, endAt);
+    // run the audio start as part of updater
+    if (
+      tl.current &&
+      tl.current.isActive() &&
+      tweenRef.current &&
+      tweenRef.current.isActive() &&
+      !dragModeRef.current &&
+      audioContainerRef.current
+    ) {
+      console.log("gsap on start 0020", uniqueId, startAt, endAt);
+      audioContainerRef.current.play();
+      audioStateRef.current.isPlaying = true;
     }
   };
 
   const gsapOnComplete = () => {
     if (containerRef.current) {
-      console.log("audio gsapOnStart", startAt);
       // @ts-ignore
       audioContainerRef.current?.stop();
       audioStateRef.current.isPlaying = false;
@@ -114,51 +138,72 @@ const PixiAudioSprite: React.FC<PixiAudioSpriteProps> = (props) => {
   };
 
   const gsapOnUpdate = (startAt: number) => {
-    if (
+    // @ts-ignore
+    const currentTweenTime = startAt + tweenRef.current?.time();
+    // console.log("current audio time", currentTweenTime, tl.current?.time());
+    if (audioContainerRef.current && dragModeRef.current) {
+      /// console.log("runing debounce updates", currentTweenTime);
+      audioContainerRef.current.seek(currentTweenTime);
+      audioContainerRef.current.pause();
+      audioStateRef.current.isPlaying = false;
+    } else if (
       containerRef.current &&
       !audioStateRef.current.isPlaying &&
-      !audioStateRef.current.completed
+      tl.current?.isActive() &&
+      audioContainerRef.current
     ) {
-      console.log("audio gsapOnUpdate", startAt);
-      // @ts-ignore
-      audioContainerRef.current?.refresh();
-      // @ts-ignore
-      audioContainerRef.current?.refreshPaused();
-
-      // @ts-ignore
-      audioContainerRef.current?.resume();
+      // console.log(
+      //   "running setUpdateTimer with currentTweenTime",
+      //   currentTweenTime,
+      //   uniqueId
+      // );
+      audioContainerRef.current.seek(currentTweenTime);
+      audioContainerRef.current.play();
       audioStateRef.current.isPlaying = true;
     }
   };
 
-  const onInterrupt = (startAt: number) => {};
+  const onInterrupt = () => {};
 
   useEffect(() => {
     let ctx = gsap.context(() => {});
     if (containerRef.current && tl.current) {
       const data = {
-        duration: Number(endAt) - Number(startAt),
+        duration: Number(audioEndAt) - Number(audioStartAt),
         onStart: gsapOnStart,
         onComplete: gsapOnComplete,
-        onStartParams: [startAt],
+        onStartParams: [audioStartAt, audioEndAt],
         onCompleteParams: [],
         onInterrupt: onInterrupt,
         onUpdate: gsapOnUpdate,
-        onUpdateParams: [],
+        onUpdateParams: [audioStartAt, audioEndAt],
       };
+      // gsap context for tl to revert timeline;
       ctx = gsap.context(() => {
+        // @ts-ignore
+        tweenRef.current = gsap.from(
+          containerRef.current,
+          // @ts-ignore
+          data,
+          audioStartAt
+        );
+
         tl.current
           .to(containerRef.current, { alpha: 1, duration: 0.01 }, startAt)
-          .from(imgGroupRef.current, { ...data }, startAt)
-          .to(
-            containerRef.current,
-            { alpha: 0, duration: 0.1 },
-            Number(endAt) - Number(0.1)
-          );
+          .to(containerRef.current, { alpha: 0, duration: 0.1 }, Number(endAt));
+
+        // add tween
+        tl.current.add(tweenRef.current, startAt);
       });
     }
-    return () => ctx.revert(); // cleanup!
-  }, [startAt, endAt]);
+    return () => {
+      if (tweenRef.current) {
+        tweenRef.current.kill();
+        gsap.killTweensOf(tweenRef.current);
+      }
+      ctx.revert(); // cleanup!
+    };
+  }, [startAt, endAt, audioStartAt, audioEndAt]);
 
   React.useEffect(() => {
     if (containerRef.current) {
@@ -167,41 +212,80 @@ const PixiAudioSprite: React.FC<PixiAudioSpriteProps> = (props) => {
   }, []);
 
   React.useEffect(() => {
-    if (containerRef.current && audioContainerRef.current) {
-      console.log("soundref", audioContainerRef.current);
-      // @ts-ignore
-      audioStateRef.current.mute = mute;
-      audioStateRef.current.speed = speed;
-      console.log("containerAudio", audioContainerRef.current.volume);
-      audioContainerRef.current.volume = mute ? 0 : 1;
-    }
-  }, [mute, speed]);
-
-  const onSoundLoaded = React.useCallback(
-    (err: any, sound: Sound | undefined) => {
-      //@ts-ignore
-      audioContainerRef.current = sound;
-      audioStateRef.current.loaded = true;
-      // const instance = sound.play();
-    },
-    []
-  );
-
-  React.useEffect(() => {
     if (!isEmpty(src)) {
-      // @pixi/sound package usage
-      //@ts-ignore
-      audioContainerRef.current = Sound.from({
-        url: src,
-        preload: true,
-        singleInstance: true,
-        loaded: onSoundLoaded,
+      // console.log("running audio sprite useEffect 4001", uniqueId, src);
+      // @ts-ignore
+      audioContainerRef.current = new Howl({
+        src: [src],
+        // sprite: {
+        //   [uniqueId]: [audioStartAt * 1000, (audioEndAt - audioStartAt) * 1000],
+        // },
+        autoplay: false,
+        loop: false,
+        rate: speed || 1,
+        volume: !mute && visible ? 1 : 0,
+        onload: () => {
+          console.log("loaded audio sprite" + uniqueId);
+          audioStateRef.current.loaded = true;
+          if (audioContainerRef.current) {
+            if (audioStartAt > 0) {
+              audioContainerRef.current.seek(audioStartAt);
+            }
+            audioContainerRef.current.volume(!mute && visible ? 1 : 0);
+            audioContainerRef.current.rate(speed || 1);
+
+            // pause
+            audioContainerRef.current.pause();
+            audioStateRef.current.isPlaying = false;
+            audioStateRef.current.completed = false;
+          }
+        },
+        onend: () => {
+          console.log("end of playing audio sprite" + uniqueId);
+          audioStateRef.current.isPlaying = false;
+          audioStateRef.current.completed = true;
+        },
+        onplay: () => {
+          console.log("play of playing audio sprite" + uniqueId);
+          audioStateRef.current.isPlaying = true;
+        },
+        onpause: () => {
+          console.log("pause of playing audio sprite" + uniqueId);
+          audioStateRef.current.isPlaying = false;
+        },
+        onstop: () => {
+          console.log("stop of playing audio sprite" + uniqueId);
+          audioStateRef.current.isPlaying = false;
+        },
       });
     }
     return () => {
       // app.loader.reset();
+      // reset the audio container ref
+      if (audioContainerRef.current) {
+        audioContainerRef.current.unload();
+      }
     };
-  }, [uniqueId, src, onSoundLoaded]);
+  }, [
+    uniqueId,
+    src,
+    startAt,
+    endAt,
+    audioStartAt,
+    audioEndAt,
+    mute,
+    visible,
+    speed,
+  ]);
+
+  React.useEffect(() => {
+    if (audioContainerRef.current) {
+      console.log("running updateEffect 2002", uniqueId, audioEndAt);
+      audioContainerRef.current.volume(!mute && visible ? 1 : 0);
+      audioContainerRef.current.rate(speed || 1);
+      audioStateRef.current.isPlaying = true;
+    }
+  }, [mute, visible, speed]);
 
   return (
     // @ts-ignore

@@ -1,3 +1,12 @@
-export * from "./components/PixiImageSprite";
+export * from "./components";
 // Path: src\index.js
 export * from "./providers";
+
+// types
+export * from "./types";
+
+// Events
+export * from "./events";
+
+// hooks
+export * from "./hooks";

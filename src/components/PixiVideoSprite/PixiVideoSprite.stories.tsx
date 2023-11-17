@@ -1,12 +1,20 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { PixiVideoSprite } from ".";
 import { AppStateContextProvider } from "../../utils/AppStateProvider";
+import { AppWrapper } from "../../utils/AppWrapper";
+import { Animations } from "../../types";
 
 // More on how to set up stories at: https://storybook.js.org/docs/react/writing-stories/introduction
 const meta = {
   title: "Components/VideoSprite",
   component: PixiVideoSprite,
-
+  decorators: [
+    (Story: any) => (
+      <div style={{ width: "100%", height: "100%" }}>
+        <AppWrapper>{Story({ appState: "x" })}</AppWrapper>
+      </div>
+    ),
+  ],
   tags: ["autodocs"],
   argTypes: {
     uniqueId: {
@@ -57,12 +65,7 @@ const meta = {
     frameEndAt: { control: "number", description: "frameEndAt" },
     mute: { control: "boolean", description: "mute" },
     locked: { control: "boolean", description: "locked" },
-    initialAlpha: {
-      control: "number",
-      min: 0,
-      max: 1,
-      description: "sprite initial alpha value (default  1)",
-    },
+    visible: { control: "boolean", description: "visible" },
     onAnchorTransformationEnd: {
       action: "onAnchorTransformationEnd",
       description:
@@ -71,6 +74,10 @@ const meta = {
     pointerdown: {
       action: "pointerdown",
       description: "pointerdown event",
+    },
+    fps: {
+      control: "number",
+      description: "fps of the video",
     },
   },
 } satisfies Meta<typeof PixiVideoSprite>;
@@ -87,7 +94,7 @@ export const Normal: Story = {
   ),
   args: {
     uniqueId: "oceanv1", // uniqueId of the sprite
-    src: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+    src: "https://d1r0cf5836ptgd.cloudfront.net/public%2Firfan%40trolio.com%2F6472d56e805c3bffc3cded33%2Fvideos%2Fyd2M9NnQHL%2FForBiggerBlazes.mp4",
     transformation: {
       x: 290,
       y: 250,
@@ -102,11 +109,11 @@ export const Normal: Story = {
       colorCorrection: {},
     },
     applyTransformer: false,
-    startAt: 0,
-    endAt: 10,
+    startAt: 3,
+    endAt: 7,
     frameStartAt: 0,
     frameEndAt: 10,
-    initialAlpha: 1,
+    visible: true,
     mute: false,
     locked: false,
   },
@@ -120,7 +127,7 @@ export const FadeIn: Story = {
   ),
   args: {
     uniqueId: "ForBiggerBlazes002", // uniqueId of the sprite
-    src: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+    src: "https://d1r0cf5836ptgd.cloudfront.net/public%2Firfan%40trolio.com%2F6472d56e805c3bffc3cded33%2Fvideos%2Fyd2M9NnQHL%2FForBiggerBlazes.mp4",
     transformation: {
       x: 100,
       y: 100,
@@ -132,7 +139,7 @@ export const FadeIn: Story = {
       scale: 1,
       tint: 0xffffff,
       blendMode: 0,
-      animation: "FADE_IN",
+      animation: Animations.FADE_IN,
       colorCorrection: {},
     },
     applyTransformer: false,
@@ -140,8 +147,144 @@ export const FadeIn: Story = {
     endAt: 10,
     frameStartAt: 0,
     frameEndAt: 10,
-    initialAlpha: 0,
+    visible: true,
     mute: false,
     locked: false,
+  },
+};
+
+export const Filters: Story = {
+  render: (args: any) => (
+    <AppStateContextProvider {...args}>
+      <PixiVideoSprite {...args} />
+    </AppStateContextProvider>
+  ),
+  args: {
+    uniqueId: "videofiter002", // uniqueId of the sprite
+    src: "https://d1r0cf5836ptgd.cloudfront.net/public%2Firfan%40trolio.com%2F6472d56e805c3bffc3cded33%2Fvideos%2Fyd2M9NnQHL%2FForBiggerBlazes.mp4",
+    transformation: {
+      x: 290,
+      y: 250,
+      width: 550,
+      height: 400,
+      anchor: 0.5,
+      rotation: 0,
+      alpha: 1,
+      scale: 1,
+      tint: 0xffffff,
+      blendMode: 0,
+      colorCorrection: {
+        enabled: true,
+        contrast: 2,
+        saturation: 2,
+        exposure: 2,
+        blurRadius: 1,
+      },
+    },
+    applyTransformer: false,
+    startAt: 0,
+    endAt: 10,
+    frameStartAt: 0,
+    frameEndAt: 10,
+    visible: true,
+    mute: false,
+    locked: false,
+  },
+};
+
+export const SplitPosition: Story = {
+  render: (args: any) => (
+    <AppStateContextProvider {...args}>
+      <PixiVideoSprite {...args} />
+    </AppStateContextProvider>
+  ),
+  args: {
+    uniqueId: "videofiter002", // uniqueId of the sprite
+    src: "https://d1r0cf5836ptgd.cloudfront.net/public%2Firfan%40trolio.com%2F6472d56e805c3bffc3cded33%2Fvideos%2Fyd2M9NnQHL%2FForBiggerBlazes.mp4",
+    transformation: {
+      x: 290,
+      y: 250,
+      width: 550,
+      height: 400,
+      anchor: 0.5,
+      rotation: 0,
+      alpha: 1,
+      scale: 1,
+      tint: 0xffffff,
+      blendMode: 0,
+    },
+    applyTransformer: false,
+    startAt: 0,
+    endAt: 10,
+    frameStartAt: 5,
+    frameEndAt: 10,
+    visible: true,
+    mute: false,
+    locked: false,
+  },
+};
+
+export const SplitStartPos: Story = {
+  render: (args: any) => (
+    <AppStateContextProvider {...args}>
+      <PixiVideoSprite {...args} />
+    </AppStateContextProvider>
+  ),
+  args: {
+    uniqueId: "videofiter002", // uniqueId of the sprite
+    src: "https://d1r0cf5836ptgd.cloudfront.net/public%2Firfan%40trolio.com%2F6472d56e805c3bffc3cded33%2Fvideos%2Fyd2M9NnQHL%2FForBiggerBlazes.mp4",
+    transformation: {
+      x: 290,
+      y: 250,
+      width: 550,
+      height: 400,
+      anchor: 0.5,
+      rotation: 0,
+      alpha: 1,
+      scale: 1,
+      tint: 0xffffff,
+      blendMode: 0,
+    },
+    applyTransformer: false,
+    startAt: 5,
+    endAt: 10,
+    frameStartAt: 0,
+    frameEndAt: 10,
+    visible: true,
+    mute: false,
+    locked: false,
+  },
+};
+
+export const VideoFps: Story = {
+  render: (args: any) => (
+    <AppStateContextProvider {...args}>
+      <PixiVideoSprite {...args} />
+    </AppStateContextProvider>
+  ),
+  args: {
+    uniqueId: "videofiterfps002", // uniqueId of the sprite
+    src: "https://d1r0cf5836ptgd.cloudfront.net/public%2Firfan%40trolio.com%2F6472d56e805c3bffc3cded33%2Fvideos%2Fyd2M9NnQHL%2FForBiggerBlazes.mp4",
+    transformation: {
+      x: 290,
+      y: 250,
+      width: 550,
+      height: 400,
+      anchor: 0.5,
+      rotation: 0,
+      alpha: 1,
+      scale: 1,
+      tint: 0xffffff,
+      blendMode: 0,
+    },
+    applyTransformer: false,
+    startAt: 0,
+    endAt: 15,
+    frameStartAt: 0,
+    frameEndAt: 15,
+    visible: true,
+    mute: false,
+    locked: false,
+    fps: 30,
   },
 };

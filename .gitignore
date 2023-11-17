@@ -30,3 +30,5 @@ dist
 .env
 .env.local
 .env.dev
+
+.npmrc

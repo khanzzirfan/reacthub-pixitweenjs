@@ -18,9 +18,16 @@ export const AppWrapper: React.FC<AppProps> = ({
   const backgroundColorx = PIXI.utils.string2hex(backgroundColor || "#2D2E3C");
   const width = 600;
   const height = 500;
+  const quillEditorRef = React.useRef<HTMLDivElement>(null);
+
+  console.log("app wrapper updates with wrt timeline changes");
+
   /// color: 0x1099bb,
   return (
     <div className="App">
+      <div id="note-editor" ref={quillEditorRef}></div>
+      <div id="toolbar"></div>
+      <div id="lottieroot"></div>
       <GsapPixieContextProvider>
         <ChakraProvider>
           <Flex flexDir={"column"}>
