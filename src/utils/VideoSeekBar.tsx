@@ -104,16 +104,26 @@ export const VideoSeekBar: React.FC = () => {
     timeline.current && timeline.current.revert();
   };
 
+  const handleOnSeekZero = () => {
+    emitCustomEvent(Events.SCRUBBER_PAUSE);
+    emitCustomEvent(Events.SCRUBBER_SEEK, 0);
+    /// setSliderValue(0);
+    playerTimeRef.current = 0;
+    timeline.current && timeline.current.time(0);
+    timeline.current && timeline.current.revert();
+  };
+
   /** Create Draggable for the Gsap Player */
 
   return (
     <Flex flexDir={"column"}>
-      <Box>
+      <Box display={"flex"} gap={1}>
         <Button onClick={handleRestart}>Play</Button>
         <Button onClick={handlePause}>Pause</Button>
         <Button onClick={handlePlay}>Resume</Button>
         <Button onClick={handleSeekTest}>Seek (4:00)</Button>
         <Button onClick={handleOnBackward}>Reset</Button>
+        <Button onClick={handleOnSeekZero}>Zero</Button>
       </Box>
       <Flex px={1} mt={2}>
         <Slider
