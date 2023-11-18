@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.107-alpha.98](https://github.com/khanzzirfan/reacthub-pixitweenjs/compare/v0.2.107-alpha.97...v0.2.107-alpha.98) (2023-11-18)
+
+
+### Bug Fixes
+
+* updated sequence player with the start and end sequence correctly ([e1a35ae](https://github.com/khanzzirfan/reacthub-pixitweenjs/commit/e1a35ae8908621363b06b8550d2058e46e217dc5))
+* updated video seeking gsaap and pixi syncing correctly ([ac4d5a6](https://github.com/khanzzirfan/reacthub-pixitweenjs/commit/ac4d5a619748075ef4f0b0014b54b444c9853c4a))
+
 ### [0.2.107-alpha.97](https://github.com/khanzzirfan/reacthub-pixitweenjs/compare/v0.2.107-alpha.96...v0.2.107-alpha.97) (2023-11-17)
 
 ### [0.2.107-alpha.96](https://github.com/khanzzirfan/reacthub-pixitweenjs/compare/v0.2.107-alpha.95...v0.2.107-alpha.96) (2023-11-17)
