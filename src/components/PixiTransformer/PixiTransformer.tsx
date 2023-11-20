@@ -1,5 +1,7 @@
 import * as PIXI from "pixi.js";
 import * as React from "react";
+import { useApp } from "@pixi/react";
+
 // @ts-ignore
 import { Transformer } from "reacthub-react-bindings";
 import { emitCustomEvent } from "../../events";
@@ -43,6 +45,16 @@ const PixiTransformer = ({
   const transformerState = React.useRef<PixiTransformerState>({
     isDragging: false,
   });
+
+  const app = useApp();
+  const maxX = app.screen.width;
+  const maxY = app.screen.height;
+
+  const handlerThickness = React.useMemo(() => {
+    // handle thickness based the screen width and height
+    const thicknessFactor = Math.min(maxX, maxY) / 800;
+    return 1.5 * thicknessFactor < 2 ? 2 : 1.5 * thicknessFactor;
+  }, [maxX, maxY]);
 
   // State variables to track click events
   const doubleClickDelay = 300; // Adjust this as needed
@@ -174,7 +186,7 @@ const PixiTransformer = ({
       boxRotationEnabled={true}
       centeredScaling={true}
       boxScalingEnabled={true}
-      wireframeStyle={{ thickness: 2, color: anchorFill }}
+      wireframeStyle={{ thickness: handlerThickness, color: anchorFill }}
       lockAspectRatio={true}
       scaleEnabled={true}
       handleStyle={{

@@ -177,6 +177,7 @@ const PixiAudioSprite: React.FC<PixiAudioSpriteProps> = (props) => {
         onInterrupt: onInterrupt,
         onUpdate: gsapOnUpdate,
         onUpdateParams: [audioStartAt, audioEndAt],
+        id: uniqueId,
       };
       // gsap context for tl to revert timeline;
       ctx = gsap.context(() => {
@@ -203,7 +204,7 @@ const PixiAudioSprite: React.FC<PixiAudioSpriteProps> = (props) => {
       }
       ctx.revert(); // cleanup!
     };
-  }, [startAt, endAt, audioStartAt, audioEndAt]);
+  }, [startAt, endAt, audioStartAt, audioEndAt, uniqueId]);
 
   React.useEffect(() => {
     if (containerRef.current) {

@@ -16,8 +16,8 @@ export const AppWrapper: React.FC<AppProps> = ({
   backgroundColor,
 }) => {
   const backgroundColorx = PIXI.utils.string2hex(backgroundColor || "#2D2E3C");
-  const width = 600;
-  const height = 500;
+  const width = 1080;
+  const height = 2500;
   const quillEditorRef = React.useRef<HTMLDivElement>(null);
 
   console.log("app wrapper updates with wrt timeline changes");
