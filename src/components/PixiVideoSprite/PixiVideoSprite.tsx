@@ -38,6 +38,7 @@ export interface PixiVideoSpriteProps extends PixiBaseSpriteProps {
   mouseout?: () => void;
   applyTransformer?: boolean;
   onAnchorTransformationEnd?: (endData: any) => void;
+  fps?: number;
 }
 
 interface VideoState {

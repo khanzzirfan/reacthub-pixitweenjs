@@ -6,8 +6,7 @@ export interface PixiBaseSpriteProps {
   children?: React.ReactNode;
   uniqueId: string;
   src?: string;
-  path?: string;
-  text?: string;
+  
   startAt: number;
   endAt: number;
   visible: boolean;
@@ -64,7 +63,6 @@ export interface PixiBaseSpriteProps {
   mouseout?: () => void;
   applyTransformer?: boolean;
   onAnchorTransformationEnd?: (endData: any) => void;
-  fps?: number;
 }
 
 export interface ForwardedRefResponse {
