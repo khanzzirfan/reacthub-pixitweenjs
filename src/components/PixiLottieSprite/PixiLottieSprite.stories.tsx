@@ -1,16 +1,15 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import PixiGifSprite from "./PixiGifGsapSync";
+import PixiLottieSprite from "./PixiLottieSprite";
 import { AppStateContextProvider } from "../../utils/AppStateProvider";
-import { Effects } from "../../types/Effects";
 import { AppWrapper } from "../../utils/AppWrapper";
-import { Animations } from "../../types";
 import { PixiSequenceWrapper } from "../../components/PixiSequence/PixiSeqenceWrapper";
 import { PixiSequence } from "../../components/PixiSequence";
-
+import { Effects } from "../../types/Effects";
+import { Animations } from "../../types";
 // More on how to set up stories at: https://storybook.js.org/docs/react/writing-stories/introduction
 const meta = {
-  title: "Components/GifSprite",
-  component: PixiGifSprite,
+  title: "Components/LottieSprite",
+  component: PixiLottieSprite,
   decorators: [
     (Story: any) => (
       <div style={{ width: "100%", height: "100%" }}>
@@ -108,7 +107,7 @@ const meta = {
       description: "pointerout event",
     },
   },
-} satisfies Meta<typeof PixiGifSprite>;
+} satisfies Meta<typeof PixiLottieSprite>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -119,19 +118,19 @@ export const Normal: Story = {
     <AppStateContextProvider {...args}>
       <PixiSequenceWrapper startAt={0} endAt={16}>
         <PixiSequence startAt={args.startAt} endAt={args.endAt}>
-          <PixiGifSprite {...args} />
+          <PixiLottieSprite {...args} />
         </PixiSequence>
       </PixiSequenceWrapper>
     </AppStateContextProvider>
   ),
   args: {
-    uniqueId: "suryaGify001", // uniqueId of the sprite
-    src: "https://media.giphy.com/media/5VKbvrjxpVJCM/giphy.gif",
+    uniqueId: "lottie001", // uniqueId of the sprite
+    src: "https://assets1.lottiefiles.com/packages/lf20_RkWAMt.json",
     locked: false,
     loop: false,
     applyTransformer: false,
     startAt: 0,
-    endAt: 5,
+    endAt: 3,
     frameStartAt: 0,
     frameEndAt: 3,
     transformation: {
@@ -151,34 +150,25 @@ export const Normal: Story = {
   },
 };
 
-export const Multiple: Story = {
+// More on writing stories with args: https://storybook.js.org/docs/react/writing-stories/args
+export const Filter: Story = {
   render: (args: any) => (
     <AppStateContextProvider {...args}>
       <PixiSequenceWrapper startAt={0} endAt={16}>
         <PixiSequence startAt={args.startAt} endAt={args.endAt}>
-          <PixiGifSprite {...args} />
-        </PixiSequence>
-        <PixiSequence startAt={3} endAt={5}>
-          <PixiGifSprite
-            {...args}
-            src="https://media.giphy.com/media/3o72F7YT6s0EMFI0Za/giphy.gif"
-            uniqueId="giftext002"
-            startAt={3}
-            endAt={5}
-            transformation={{ ...args.transformation, x: 400, y: 400 }}
-          />
+          <PixiLottieSprite {...args} />
         </PixiSequence>
       </PixiSequenceWrapper>
     </AppStateContextProvider>
   ),
   args: {
-    uniqueId: "suryaGify001", // uniqueId of the sprite
-    src: "https://media.giphy.com/media/5VKbvrjxpVJCM/giphy.gif",
+    uniqueId: "lottie-car-drive", // uniqueId of the sprite
+    src: "https://lottie.host/272b60dd-462d-42a3-8ed6-fec4143633d6/X4FxBascRI.json",
     locked: false,
-    loop: false,
+    loop: true,
     applyTransformer: false,
     startAt: 0,
-    endAt: 5,
+    endAt: 3,
     frameStartAt: 0,
     frameEndAt: 3,
     transformation: {
@@ -192,28 +182,35 @@ export const Multiple: Story = {
       scale: 1,
       tint: 0xffffff,
       blendMode: 0,
+      effect: Effects.Sepia,
+      animation: Animations.NONE,
       colorCorrection: {},
     },
     visible: true,
   },
 };
 
+// More on writing stories with args: https://storybook.js.org/docs/react/writing-stories/args
 export const FadeIn: Story = {
   render: (args: any) => (
     <AppStateContextProvider {...args}>
-      <PixiGifSprite {...args} />
+      <PixiSequenceWrapper startAt={0} endAt={16}>
+        <PixiSequence startAt={args.startAt} endAt={args.endAt}>
+          <PixiLottieSprite {...args} />
+        </PixiSequence>
+      </PixiSequenceWrapper>
     </AppStateContextProvider>
   ),
   args: {
-    uniqueId: "suryaGifyFadeIn001", // uniqueId of the sprite
-    src: "https://media.giphy.com/media/5VKbvrjxpVJCM/giphy.gif",
+    uniqueId: "lottie-car-drive", // uniqueId of the sprite
+    src: "https://lottie.host/272b60dd-462d-42a3-8ed6-fec4143633d6/X4FxBascRI.json",
     locked: false,
-    loop: false,
+    loop: true,
     applyTransformer: false,
     startAt: 0,
-    endAt: 2.5,
+    endAt: 3,
     frameStartAt: 0,
-    frameEndAt: 2.5,
+    frameEndAt: 3,
     transformation: {
       x: 200,
       y: 200,
@@ -227,146 +224,6 @@ export const FadeIn: Story = {
       blendMode: 0,
       effect: Effects.None,
       animation: Animations.FADE_IN,
-      colorCorrection: {},
-    },
-    visible: true,
-  },
-};
-
-export const Filters: Story = {
-  render: (args: any) => (
-    <AppStateContextProvider {...args}>
-      <PixiGifSprite {...args} />
-    </AppStateContextProvider>
-  ),
-  args: {
-    uniqueId: "suryaGify001", // uniqueId of the sprite
-    src: "https://media.giphy.com/media/5VKbvrjxpVJCM/giphy.gif",
-    locked: false,
-    loop: false,
-    applyTransformer: false,
-    startAt: 0,
-    endAt: 4,
-    frameStartAt: 0,
-    frameEndAt: 4,
-    transformation: {
-      x: 200,
-      y: 200,
-      width: 200,
-      height: 200,
-      anchor: 0.5,
-      rotation: 0,
-      alpha: 1,
-      scale: 1,
-      tint: 0xffffff,
-      blendMode: 0,
-      colorCorrection: {
-        enabled: true,
-        contrast: 2,
-        saturation: 2,
-        exposure: 2,
-        blurRadius: 1,
-      },
-    },
-    visible: true,
-  },
-};
-
-// More on writing stories with args: https://storybook.js.org/docs/react/writing-stories/args
-export const SplitPosition: Story = {
-  render: (args: any) => (
-    <AppStateContextProvider {...args}>
-      <PixiGifSprite {...args} />
-    </AppStateContextProvider>
-  ),
-  args: {
-    uniqueId: "suryaGify001", // uniqueId of the sprite
-    src: "https://media.giphy.com/media/5VKbvrjxpVJCM/giphy.gif",
-    locked: false,
-    loop: false,
-    applyTransformer: false,
-    startAt: 0,
-    endAt: 3,
-    frameStartAt: 0,
-    frameEndAt: 3,
-    transformation: {
-      x: 200,
-      y: 200,
-      width: 200,
-      height: 200,
-      anchor: 0.5,
-      rotation: 0,
-      alpha: 1,
-      scale: 1,
-      tint: 0xffffff,
-      blendMode: 0,
-      colorCorrection: {},
-    },
-    visible: true,
-  },
-};
-
-export const SplitStartPos: Story = {
-  render: (args: any) => (
-    <AppStateContextProvider {...args}>
-      <PixiGifSprite {...args} />
-    </AppStateContextProvider>
-  ),
-  args: {
-    uniqueId: "suryaGify001", // uniqueId of the sprite
-    src: "https://media.giphy.com/media/5VKbvrjxpVJCM/giphy.gif",
-    locked: false,
-    loop: false,
-    applyTransformer: false,
-    startAt: 5,
-    endAt: 8,
-    frameStartAt: 0,
-    frameEndAt: 3,
-    transformation: {
-      x: 200,
-      y: 200,
-      width: 200,
-      height: 200,
-      anchor: 0.5,
-      rotation: 0,
-      alpha: 1,
-      scale: 1,
-      tint: 0xffffff,
-      blendMode: 0,
-      colorCorrection: {},
-    },
-    visible: true,
-  },
-};
-
-// More on writing stories with args: https://storybook.js.org/docs/react/writing-stories/args
-export const StipopGif: Story = {
-  render: (args: any) => (
-    <AppStateContextProvider {...args}>
-      <PixiGifSprite {...args} />
-    </AppStateContextProvider>
-  ),
-  args: {
-    uniqueId: "1692003433901_qmnl9aqqmm", // uniqueId of the sprite
-    src: "https://img.stipop.io/2023/8/14/1692003433901_qmnl9aqqmm.gif",
-    locked: false,
-    loop: false,
-    applyTransformer: false,
-    startAt: 0,
-    endAt: 3,
-    frameStartAt: 0,
-    frameEndAt: 3,
-    transformation: {
-      x: 200,
-      y: 200,
-      width: 200,
-      height: 200,
-      anchor: 0.5,
-      rotation: 0,
-      alpha: 1,
-      scale: 1,
-      tint: 0xffffff,
-      blendMode: 0,
       colorCorrection: {},
     },
     visible: true,

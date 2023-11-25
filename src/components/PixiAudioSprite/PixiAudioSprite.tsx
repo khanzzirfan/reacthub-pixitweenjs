@@ -24,6 +24,7 @@ type PixiAudioSpriteProps = {
   mute: boolean;
   speed: number;
   visible: boolean;
+  waveform?: boolean;
 };
 interface AudioState {
   isPlaying: boolean;
@@ -56,6 +57,7 @@ const PixiAudioSprite: React.FC<PixiAudioSpriteProps> = (props) => {
   const audioStateRef = useRef<AudioState>(initialState);
   const tweenRef = useRef<gsap.core.Tween>(null);
   const audioContainerRef = React.useRef<Howl>(null);
+  /// const audioSpriteBaseTextureRef = React.useRef<PIXI.BaseTexture>(null);
 
   //// Context
   const { tl, dragModeRef } = useContext(GsapPixieContext);
@@ -72,6 +74,7 @@ const PixiAudioSprite: React.FC<PixiAudioSpriteProps> = (props) => {
     audioStartAt,
     audioEndAt,
     visible,
+    /// waveform = false,
   } = props;
 
   /** Adding custom event listners */
