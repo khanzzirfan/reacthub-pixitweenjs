@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.107-alpha.102](https://github.com/khanzzirfan/reacthub-pixitweenjs/compare/v0.2.107-alpha.101...v0.2.107-alpha.102) (2023-11-26)
+
+
+### Features
+
+* lottie-web introduction ([cb40dcf](https://github.com/khanzzirfan/reacthub-pixitweenjs/commit/cb40dcfa66b53d3a9dd3133749e0d316be1f6742))
+
 ### [0.2.107-alpha.101](https://github.com/khanzzirfan/reacthub-pixitweenjs/compare/v0.2.107-alpha.100...v0.2.107-alpha.101) (2023-11-25)
 
 
