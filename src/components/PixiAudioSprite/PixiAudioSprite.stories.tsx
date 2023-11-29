@@ -57,7 +57,7 @@ export const Normal: Story = {
   ),
   args: {
     uniqueId: "audio001", // uniqueId of the sprite
-    src: "https://eyecastvideoeditorfiles.s3.ap-southeast-2.amazonaws.com/public%2Firfan%40trolio.com%2F6472d56e805c3bffc3cded33%2Fvideos%2F8Qq3DKrGnQ%2Fpiano2-CoolEdit.mp3",
+    src: "https://d1r0cf5836ptgd.cloudfront.net/public%2Firfan%40trolio.com%2F6556e2bc65dffe866558cf47%2Fvideos%2Fz8AyBilLvx%2Fpenguins-audio_1-8.MP3",
     startAt: 0,
     endAt: 5,
     audioStartAt: 0,

@@ -253,7 +253,7 @@ const PixiLottieSprite = React.forwardRef<
       }
       // kill tween before adding it.
       ctx = gsap.context(() => {
-        const wrap = gsap.utils.wrap(0, lottieDuration);
+        const wrap = gsap.utils.wrap(startAt, lottieDuration);
         tweenRef.current = gsap.timeline({}).to(
           containerRef.current,
           {

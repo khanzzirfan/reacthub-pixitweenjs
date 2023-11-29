@@ -112,6 +112,7 @@
     "react-dom": "^18.2.0",
     "react-fast-compare": "^3.2.0",
     "reacthub-react-bindings": "latest",
+    "siriwave": "^2.4.0",
     "standard-version": "^9.5.0",
     "storybook": "^7.1.0",
     "storybook-react-context": "^0.6.0",
