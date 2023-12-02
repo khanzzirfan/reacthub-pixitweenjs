@@ -4,7 +4,7 @@ import {
   GsapPixieContext,
   Events,
 } from "../../providers/GsapPixieContextProvider";
-import { Container } from "@pixi/react";
+import { Container, Sprite } from "@pixi/react";
 import { useCustomEventListener } from "../../events";
 import gsap from "gsap";
 import * as PIXI from "pixi.js";
@@ -13,6 +13,7 @@ import isEmpty from "lodash/isEmpty";
 // @ts-ignore
 import debounce from "lodash/debounce";
 import { Howl } from "howler";
+import { isRemoteAsset } from "../../utils/isRemoteAsset";
 
 type PixiAudioSpriteProps = {
   uniqueId: string;
@@ -25,6 +26,8 @@ type PixiAudioSpriteProps = {
   speed: number;
   visible: boolean;
   waveform?: boolean;
+  width?: number;
+  height?: number;
 };
 interface AudioState {
   isPlaying: boolean;
@@ -51,13 +54,24 @@ const PixiAudioSprite: React.FC<PixiAudioSpriteProps> = (props) => {
   };
   //// State
   const [, setIsMounted] = React.useState(false);
+  // state
+  const [blobUrl, setBlobUrl] = React.useState<string>("");
+  // @ts-ignore
+  const [metadata, setMetadata] = React.useState<any>({}); // audio metadata
+  const [isLoaded, setIsLoaded] = React.useState(false);
 
   //// Refs
   const containerRef = useRef<PIXI.Container>(null);
   const audioStateRef = useRef<AudioState>(initialState);
   const tweenRef = useRef<gsap.core.Tween>(null);
   const audioContainerRef = React.useRef<Howl>(null);
-  /// const audioSpriteBaseTextureRef = React.useRef<PIXI.BaseTexture>(null);
+  const analyserRef = useRef<AnalyserNode>();
+  const canvasRef = React.useRef<HTMLCanvasElement>();
+  const audioSourceRef = useRef<MediaElementAudioSourceNode>();
+  const gainNodeRef = useRef<GainNode>();
+  const bodyRef = useRef<HTMLElement>(document.body);
+  const imageRef = useRef<PIXI.Sprite>(null);
+  const videoTextureRef = React.useRef<PIXI.Texture<PIXI.Resource>>();
 
   //// Context
   const { tl, dragModeRef } = useContext(GsapPixieContext);
@@ -73,9 +87,30 @@ const PixiAudioSprite: React.FC<PixiAudioSpriteProps> = (props) => {
     speed,
     audioStartAt,
     audioEndAt,
-    visible,
-    /// waveform = false,
+    visible = false,
+    waveform = false,
+    width = 300,
+    height = 300,
   } = props;
+
+  React.useLayoutEffect(() => {
+    canvasRef.current = document.createElement("canvas");
+    canvasRef.current.setAttribute("id", `${uniqueId}audioContainer`);
+    // set width and height;
+    canvasRef.current.setAttribute("width", `300`);
+    canvasRef.current.setAttribute("height", `300`);
+    const body = bodyRef.current;
+    // Append the new child to the body
+    body.appendChild(canvasRef.current);
+
+    // Cleanup: Remove the new child when the component is unmounted
+    return () => {
+      if (canvasRef.current) {
+        body.removeChild(canvasRef.current);
+        canvasRef.current = undefined;
+      }
+    };
+  }, []);
 
   /** Adding custom event listners */
   /** Event Listeneres */
@@ -101,6 +136,101 @@ const PixiAudioSprite: React.FC<PixiAudioSpriteProps> = (props) => {
     }
   });
 
+  const drawCanvas = React.useCallback(() => {
+    if (analyserRef.current && canvasRef.current) {
+      const canvas = canvasRef.current;
+      const ctx = canvas.getContext("2d")!;
+      const WIDTH = canvas.width;
+      const HEIGHT = canvas.height;
+      const analyser = analyserRef.current;
+      const bufferLength = analyser.frequencyBinCount;
+      const dataArray = new Uint8Array(bufferLength);
+      const barWidth = (WIDTH / bufferLength) * 2.5;
+      let x = 0;
+
+      analyser.getByteFrequencyData(dataArray);
+
+      ctx.fillStyle = "#000";
+      ctx.fillRect(0, 0, WIDTH, HEIGHT);
+
+      for (let i = 0; i < bufferLength; i++) {
+        const barHeight = dataArray[i];
+
+        const r = barHeight + 25 * (i / bufferLength);
+        const g = 250 * (i / bufferLength);
+        const b = 50;
+
+        ctx.fillStyle = "rgb(" + r + "," + g + "," + b + ")";
+        ctx.fillRect(x, HEIGHT - barHeight, barWidth, barHeight);
+        // console.log("fillRect", x, HEIGHT, barWidth, barHeight);
+
+        x += barWidth + 1;
+      }
+    }
+  }, []);
+
+  React.useEffect(() => {
+    const fetchWithCorsCatch = async (src: string) => {
+      try {
+        const response = await fetch(src, {
+          mode: "cors",
+          referrerPolicy: "no-referrer-when-downgrade",
+        });
+        return response;
+      } catch (err) {
+        const error = err as Error;
+        if (
+          // Chrome
+          error.message.includes("Failed to fetch") ||
+          // Safari
+          error.message.includes("Load failed") ||
+          // Firefox
+          error.message.includes(
+            "NetworkError when attempting to fetch resource"
+          )
+        ) {
+          throw new TypeError(
+            `Failed to read from ${src}: ${error.message}. Does the resource support CORS?`
+          );
+        }
+        throw err;
+      }
+    };
+
+    const loadAsync = async () => {
+      if (!isEmpty(src)) {
+        // Fetch and decode the audio file
+        const response = await fetchWithCorsCatch(src);
+        const arrayBuffer = await response.arrayBuffer();
+        // create URL.createObjectURL from the arrayBuffer;
+        const blob = new Blob([arrayBuffer]);
+        const url = URL.createObjectURL(blob);
+        // check howler ctx exists and use it to decode audio buffer channel data
+        if (Howler.ctx) {
+          const wave = await Howler.ctx.decodeAudioData(arrayBuffer);
+          const channelWaveforms = new Array(wave.numberOfChannels)
+            .fill(true)
+            .map((_, channel) => {
+              return wave.getChannelData(channel);
+            });
+
+          const metadata = {
+            channelWaveforms,
+            sampleRate: Howler.ctx.sampleRate,
+            durationInSeconds: wave.duration,
+            numberOfChannels: wave.numberOfChannels,
+            resultId: String(Math.random()),
+            isRemote: isRemoteAsset(src),
+          };
+          setMetadata(metadata);
+        }
+        setBlobUrl(url);
+      }
+    };
+
+    loadAsync();
+  }, [src]);
+
   // /** stop video playing when gsapDragging is true */
   React.useEffect(() => {
     if (audioContainerRef.current) {
@@ -115,7 +245,6 @@ const PixiAudioSprite: React.FC<PixiAudioSpriteProps> = (props) => {
   }, [dragModeRef]);
 
   const gsapOnStart = (startAt: number, endAt: number) => {
-    // console.log("gsap on start 0010", uniqueId, startAt, endAt);
     // run the audio start as part of updater
     if (
       tl.current &&
@@ -164,6 +293,10 @@ const PixiAudioSprite: React.FC<PixiAudioSpriteProps> = (props) => {
       audioContainerRef.current.play();
       audioStateRef.current.isPlaying = true;
     }
+
+    // draw audio sprites waves
+    drawCanvas();
+    if (videoTextureRef.current) videoTextureRef.current.update();
   };
 
   const onInterrupt = () => {};
@@ -216,20 +349,25 @@ const PixiAudioSprite: React.FC<PixiAudioSpriteProps> = (props) => {
   }, []);
 
   React.useEffect(() => {
-    if (!isEmpty(src)) {
-      // console.log("running audio sprite useEffect 4001", uniqueId, src);
+    if (videoTextureRef.current) videoTextureRef.current.update();
+    return () => {};
+  }, [isLoaded]);
+
+  React.useEffect(() => {
+    if (!isEmpty(blobUrl)) {
       // @ts-ignore
       audioContainerRef.current = new Howl({
-        src: [src],
+        src: [blobUrl],
         // sprite: {
         //   [uniqueId]: [audioStartAt * 1000, (audioEndAt - audioStartAt) * 1000],
         // },
+        format: ["mp3"], // Specify the audio format(s) you're using
+        html5: true, // Use HTML5 audio
         autoplay: false,
         loop: false,
         rate: speed || 1,
         volume: !mute && visible ? 1 : 0,
         onload: () => {
-          console.log("loaded audio sprite" + uniqueId);
           audioStateRef.current.loaded = true;
           if (audioContainerRef.current) {
             if (audioStartAt > 0) {
@@ -242,6 +380,33 @@ const PixiAudioSprite: React.FC<PixiAudioSpriteProps> = (props) => {
             audioContainerRef.current.pause();
             audioStateRef.current.isPlaying = false;
             audioStateRef.current.completed = false;
+            if (!analyserRef.current && waveform) {
+              // Take 2
+              /////// Create an AnalyserNode and connect it to the Howler.js audio node
+              const analyser = Howler.ctx.createAnalyser();
+              analyser.fftSize = 256;
+              const gainNode = Howler.ctx.createGain();
+              gainNode.gain.value = 1; // Adjust the gain as needed
+              // Connect the Howler.js audio node to the AnalyserNode and GainNode
+              const audioSource = Howler.ctx.createMediaElementSource(
+                // @ts-ignore
+                audioContainerRef.current._sounds[0]._node
+              );
+              audioSource.connect(analyser);
+              analyser.connect(gainNode);
+              gainNode.connect(Howler.ctx.destination);
+              // Store references
+              analyserRef.current = analyser;
+              audioSourceRef.current = audioSource;
+              gainNodeRef.current = gainNode;
+
+              if (canvasRef.current) {
+                canvasRef.current.setAttribute("style", "display:none");
+                const texture = PIXI.Texture.from(canvasRef.current);
+                videoTextureRef.current = texture;
+              }
+              setIsLoaded(true);
+            }
           }
         },
         onend: () => {
@@ -269,6 +434,11 @@ const PixiAudioSprite: React.FC<PixiAudioSpriteProps> = (props) => {
       if (audioContainerRef.current) {
         audioContainerRef.current.unload();
       }
+
+      // delete the blocl url on onumount
+      if (!isEmpty(blobUrl)) {
+        URL.revokeObjectURL(blobUrl);
+      }
     };
   }, [
     uniqueId,
@@ -280,6 +450,8 @@ const PixiAudioSprite: React.FC<PixiAudioSpriteProps> = (props) => {
     mute,
     visible,
     speed,
+    blobUrl,
+    waveform,
   ]);
 
   React.useEffect(() => {
@@ -293,7 +465,20 @@ const PixiAudioSprite: React.FC<PixiAudioSpriteProps> = (props) => {
 
   return (
     // @ts-ignore
-    <Container ref={containerRef}></Container>
+    <Container ref={containerRef}>
+      {waveform && isLoaded && videoTextureRef.current && (
+        <Sprite
+          texture={videoTextureRef.current}
+          width={width || 300}
+          height={height || 300}
+          anchor={0.5}
+          x={0}
+          y={0}
+          ref={imageRef}
+          alpha={visible ? 1 : 0}
+        />
+      )}
+    </Container>
   );
 };
 

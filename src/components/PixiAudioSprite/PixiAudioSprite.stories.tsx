@@ -69,6 +69,27 @@ export const Normal: Story = {
 };
 
 // More on writing stories with args: https://storybook.js.org/docs/react/writing-stories/args
+export const Visualization: Story = {
+  render: (args: any) => (
+    <AppStateContextProvider {...args}>
+      <PixiAudioSprite {...args} />
+    </AppStateContextProvider>
+  ),
+  args: {
+    uniqueId: "audio001", // uniqueId of the sprite
+    src: "https://d1r0cf5836ptgd.cloudfront.net/public%2Firfan%40trolio.com%2F6556e2bc65dffe866558cf47%2Fvideos%2Fz8AyBilLvx%2Fpenguins-audio_1-8.MP3",
+    startAt: 0,
+    endAt: 5,
+    audioStartAt: 0,
+    audioEndAt: 5,
+    mute: false,
+    speed: 1,
+    visible: true,
+    waveform: true,
+  },
+};
+
+// More on writing stories with args: https://storybook.js.org/docs/react/writing-stories/args
 export const Speech: Story = {
   render: (args: any) => (
     <AppStateContextProvider {...args}>
@@ -88,7 +109,7 @@ export const Speech: Story = {
   },
 };
 
-export const Customized: Story = {
+export const Muted: Story = {
   render: (args: any) => (
     <AppStateContextProvider {...args}>
       <PixiAudioSprite {...args} />
