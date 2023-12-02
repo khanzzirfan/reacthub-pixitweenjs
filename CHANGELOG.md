@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.107-alpha.105](https://github.com/khanzzirfan/reacthub-pixitweenjs/compare/v0.2.107-alpha.104...v0.2.107-alpha.105) (2023-12-02)
+
+
+### Features
+
+* audio visualizer implemented ([b327cfb](https://github.com/khanzzirfan/reacthub-pixitweenjs/commit/b327cfb946fb6171daf9d8cac23441e4b26d93a4))
+
 ### [0.2.107-alpha.104](https://github.com/khanzzirfan/reacthub-pixitweenjs/compare/v0.2.107-alpha.103...v0.2.107-alpha.104) (2023-12-02)
 
 
