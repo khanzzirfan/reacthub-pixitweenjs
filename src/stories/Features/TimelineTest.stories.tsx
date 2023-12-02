@@ -4,7 +4,6 @@ import { TimelineTestVideos } from "./TimelineTestWithVideos";
 import { TimelineWithGif } from "./TimelineWithGif";
 import { TimelineAnimationTest } from "./TimelineAnimations";
 import { TimelineTestAudios } from "./TimelineTestAudios";
-import TestAudioFiles from "./TestHowlerAudioFiles";
 
 // More on how to set up stories at: https://storybook.js.org/docs/react/writing-stories/introduction
 const meta = {
@@ -104,26 +103,6 @@ export const VideoTest: Story = {
 
 export const AudioTest: Story = {
   render: (args: any) => <TimelineTestAudios {...args} />,
-  args: {
-    sequences: [
-      {
-        startAt: 0,
-        endAt: 5,
-      },
-      {
-        startAt: 4,
-        endAt: 9,
-      },
-      {
-        startAt: 6,
-        endAt: 20,
-      },
-    ],
-  },
-};
-
-export const HowlerAudioTest: Story = {
-  render: (args: any) => <TestAudioFiles {...args} />,
   args: {
     sequences: [
       {

@@ -2,6 +2,8 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { PixiSvgPathSprite } from ".";
 import { AppStateContextProvider } from "../../utils/AppStateProvider";
 import { AppWrapper } from "../../utils/AppWrapper";
+import { PixiSequenceWrapper } from "../../components/PixiSequence/PixiSeqenceWrapper";
+import { PixiSequence } from "../../components/PixiSequence";
 import { Animations } from "../../types";
 
 // More on how to set up stories at: https://storybook.js.org/docs/react/writing-stories/introduction
@@ -89,7 +91,11 @@ type Story = StoryObj<typeof meta>;
 export const Normal: Story = {
   render: (args: any) => (
     <AppStateContextProvider {...args}>
-      <PixiSvgPathSprite {...args} />
+      <PixiSequenceWrapper startAt={0} endAt={16}>
+        <PixiSequence startAt={args.startAt} endAt={args.endAt}>
+          <PixiSvgPathSprite {...args} />
+        </PixiSequence>
+      </PixiSequenceWrapper>
     </AppStateContextProvider>
   ),
   args: {
@@ -119,7 +125,11 @@ export const Normal: Story = {
 export const FadeIn: Story = {
   render: (args: any) => (
     <AppStateContextProvider {...args}>
-      <PixiSvgPathSprite {...args} />
+      <PixiSequenceWrapper startAt={0} endAt={16}>
+        <PixiSequence startAt={args.startAt} endAt={args.endAt}>
+          <PixiSvgPathSprite {...args} />
+        </PixiSequence>
+      </PixiSequenceWrapper>
     </AppStateContextProvider>
   ),
   args: {
@@ -151,7 +161,11 @@ export const FadeIn: Story = {
 export const Filters: Story = {
   render: (args: any) => (
     <AppStateContextProvider {...args}>
-      <PixiSvgPathSprite {...args} />
+      <PixiSequenceWrapper startAt={0} endAt={16}>
+        <PixiSequence startAt={args.startAt} endAt={args.endAt}>
+          <PixiSvgPathSprite {...args} />
+        </PixiSequence>
+      </PixiSequenceWrapper>
     </AppStateContextProvider>
   ),
   args: {

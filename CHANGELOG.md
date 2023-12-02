@@ -2,6 +2,35 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.107-alpha.103](https://github.com/khanzzirfan/reacthub-pixitweenjs/compare/v0.2.107-alpha.102...v0.2.107-alpha.103) (2023-11-26)
+
+### [0.2.107-alpha.102](https://github.com/khanzzirfan/reacthub-pixitweenjs/compare/v0.2.107-alpha.101...v0.2.107-alpha.102) (2023-11-26)
+
+
+### Features
+
+* lottie-web introduction ([cb40dcf](https://github.com/khanzzirfan/reacthub-pixitweenjs/commit/cb40dcfa66b53d3a9dd3133749e0d316be1f6742))
+
+### [0.2.107-alpha.101](https://github.com/khanzzirfan/reacthub-pixitweenjs/compare/v0.2.107-alpha.100...v0.2.107-alpha.101) (2023-11-25)
+
+
+### Bug Fixes
+
+* updated id of the tween ([4b76098](https://github.com/khanzzirfan/reacthub-pixitweenjs/commit/4b760985c72477162bac5af67e80f9bfd80be191))
+* updated storybook documentation ([2107046](https://github.com/khanzzirfan/reacthub-pixitweenjs/commit/21070460a41e5521ae9be20b7b937a1d700c687e))
+
+### [0.2.107-alpha.100](https://github.com/khanzzirfan/reacthub-pixitweenjs/compare/v0.2.107-alpha.99...v0.2.107-alpha.100) (2023-11-20)
+
+### [0.2.107-alpha.99](https://github.com/khanzzirfan/reacthub-pixitweenjs/compare/v0.2.107-alpha.98...v0.2.107-alpha.99) (2023-11-18)
+
+### [0.2.107-alpha.98](https://github.com/khanzzirfan/reacthub-pixitweenjs/compare/v0.2.107-alpha.97...v0.2.107-alpha.98) (2023-11-18)
+
+
+### Bug Fixes
+
+* updated sequence player with the start and end sequence correctly ([e1a35ae](https://github.com/khanzzirfan/reacthub-pixitweenjs/commit/e1a35ae8908621363b06b8550d2058e46e217dc5))
+* updated video seeking gsaap and pixi syncing correctly ([ac4d5a6](https://github.com/khanzzirfan/reacthub-pixitweenjs/commit/ac4d5a619748075ef4f0b0014b54b444c9853c4a))
+
 ### [0.2.107-alpha.97](https://github.com/khanzzirfan/reacthub-pixitweenjs/compare/v0.2.107-alpha.96...v0.2.107-alpha.97) (2023-11-17)
 
 ### [0.2.107-alpha.96](https://github.com/khanzzirfan/reacthub-pixitweenjs/compare/v0.2.107-alpha.95...v0.2.107-alpha.96) (2023-11-17)

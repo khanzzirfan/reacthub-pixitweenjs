@@ -16,7 +16,7 @@ export const AppWrapper: React.FC<AppProps> = ({
   backgroundColor,
 }) => {
   const backgroundColorx = PIXI.utils.string2hex(backgroundColor || "#2D2E3C");
-  const width = 600;
+  const width = 800;
   const height = 500;
   const quillEditorRef = React.useRef<HTMLDivElement>(null);
 

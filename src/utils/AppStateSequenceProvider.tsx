@@ -3,6 +3,7 @@ import useDeepEffect from "./useDeepEffect";
 import { TransformationEnd } from "../types/transformation";
 import { GsapPixieContext } from "../providers/GsapPixieContextProvider";
 import gsap from "gsap";
+import { action } from "@storybook/addon-actions";
 import "@pixi/gif";
 
 interface AppState {
@@ -20,7 +21,6 @@ export const AppStateSequenceProvider: React.FC<
 > = ({ children, ...props }) => {
   console.log("AppStateContextProvider", props);
   const [mouseOverSprite, setMouseOverSprite] = React.useState<boolean>(false);
-
   const appStateRef = React.useRef<AppState>(props);
 
   //// Context
@@ -44,6 +44,7 @@ export const AppStateSequenceProvider: React.FC<
   const onAnchorTransformationEnd = React.useCallback(
     (data: TransformationEnd) => {
       console.log("onAnchorTransformationEnd", data);
+      action("onAnchorTransformationEnd")();
       const { transformation } = data;
       const newAppState = {
         ...appStateRef.current,
@@ -60,20 +61,26 @@ export const AppStateSequenceProvider: React.FC<
 
   const onMouseOverSprite = React.useCallback(() => {
     setMouseOverSprite(true);
+    action("onMouseOverSprite")();
   }, []);
 
   const onMouseOutSprite = React.useCallback(() => {
     setMouseOverSprite(false);
+    action("onMouseOutSprite")();
   }, []);
 
-  const onClickSprite = React.useCallback(() => {}, []);
+  const onClickSprite = React.useCallback(() => {
+    action("onClickSprite")();
+  }, []);
 
   const onTextUpdate = React.useCallback((data: any) => {
     console.log("onTextUpdate", data);
+    action("onTextUpdate")();
   }, []);
 
   const onExitQuillEditor = React.useCallback(() => {
     console.log("onExitQuillEditor");
+    action("onExitQuillEditor")();
   }, []);
 
   return (

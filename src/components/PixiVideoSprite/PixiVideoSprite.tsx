@@ -38,6 +38,7 @@ export interface PixiVideoSpriteProps extends PixiBaseSpriteProps {
   mouseout?: () => void;
   applyTransformer?: boolean;
   onAnchorTransformationEnd?: (endData: any) => void;
+  fps?: number;
 }
 
 interface VideoState {
@@ -71,9 +72,8 @@ const PixiVideoSprite = React.forwardRef<
   PixiVideoSpriteProps
 >((props, ref) => {
   //// State
-  const [updater, setUpdater] = React.useState<number>(0);
-  const [videoTexture, setVideoTexture] =
-    React.useState<PIXI.Texture<PIXI.Resource>>();
+  const [videoLoaded, setVideoLoaded] = React.useState<boolean>(false);
+  const videoTextureRef = React.useRef<PIXI.Texture<PIXI.Resource>>();
 
   //// Refs
   const imageRef = useRef<PIXI.Sprite>(null);
@@ -156,40 +156,6 @@ const PixiVideoSprite = React.forwardRef<
     }
   });
 
-  /** Debounce pause video */
-  const pauseVideoDebounce = React.useCallback(
-    debounce(() => {
-      if (videoElement.current) {
-        const vid = videoElement.current;
-        const isVidPlaying =
-          vid.currentTime > 0 &&
-          !vid.paused &&
-          !vid.ended &&
-          vid.readyState > vid.HAVE_CURRENT_DATA;
-        if (isVidPlaying) videoElement.current.pause();
-        videoStateRef.current.isPlaying = false;
-      }
-    }, 400),
-    [videoElement]
-  );
-
-  // /** stop video playing when gsapDragging is true */
-  React.useEffect(() => {
-    if (videoElement.current && !isRemotion) {
-      if (dragModeRef.current) {
-        pauseVideoDebounce();
-        videoStateRef.current.isPlaying = false;
-        videoStateRef.current.isDragging = true;
-      } else {
-        videoStateRef.current.isDragging = false;
-      }
-      videoElement.current.muted = mute;
-    } else {
-      videoStateRef.current.isDragging = false;
-    }
-    videoStateRef.current.isMuted = mute;
-  }, [mute, dragModeRef, pauseVideoDebounce, videoElement]);
-
   /** Gsap Start and Stop Events */
   const gsapOnStart = (frameStartAt: number) => {
     if (videoElement.current) {
@@ -212,7 +178,6 @@ const PixiVideoSprite = React.forwardRef<
         ) {
           if (!isVidPlaying) videoElement.current.play();
           videoStateRef.current.isPlaying = true;
-          setUpdater((prev) => prev + 1);
         }
       }
       videoStateRef.current.progress = 0;
@@ -263,17 +228,10 @@ const PixiVideoSprite = React.forwardRef<
         !vid.ended &&
         vid.readyState > vid.HAVE_CURRENT_DATA;
 
-      if (dragModeRef.current) {
+      if (dragModeRef.current && videoTextureRef.current) {
         /// console.log("is videoStateRef.current.isDragging state in drag mode");
         videoElement.current.currentTime = currentTweenTime;
-        setTimeout(() => {
-          if (videoElement.current) {
-            videoElement.current.play().then(() => {
-              videoStateRef.current.isPlaying = false;
-              if (videoElement.current) videoElement.current.pause();
-            });
-          }
-        }, 100);
+        videoTextureRef.current.update();
         videoStateRef.current.isPlaying = false;
       } else if (
         (isVidPlaying !== videoStateRef.current.isPlaying || !isVidPlaying) &&
@@ -294,8 +252,6 @@ const PixiVideoSprite = React.forwardRef<
         videoStateRef.current.progress < 0.99
       ) {
         videoElement.current.currentTime = currentTweenTime;
-        // if (!isVidPlaying) videoElement.current.play();
-        // videoStateRef.current.isPlaying = true;
       }
     }
   };
@@ -304,7 +260,7 @@ const PixiVideoSprite = React.forwardRef<
     let ctx = gsap.context(() => {});
     if (containerRef.current && tl.current) {
       const data = {
-        duration: Number(frameEndAt) - Number(frameStartAt),
+        duration: Number(endAt) - Number(startAt),
         onStart: gsapOnStart,
         onComplete: gsapOnComplete,
         onStartParams: [frameStartAt, frameEndAt],
@@ -329,9 +285,14 @@ const PixiVideoSprite = React.forwardRef<
         },
       };
 
+      if (tweenRef.current) {
+        tweenRef.current.kill();
+        tl.current.remove(tweenRef.current);
+      }
+
       // kill tween before adding it.
       ctx = gsap.context(() => {
-        tweenRef.current = gsap.from(
+        tweenRef.current = gsap.to(
           containerRef.current,
           // @ts-ignore
           data,
@@ -347,7 +308,7 @@ const PixiVideoSprite = React.forwardRef<
       }
       ctx.revert(); // cleanup!
     };
-  }, [animation, startAt, endAt, frameStartAt, frameEndAt]);
+  }, [animation, startAt, endAt, frameStartAt, frameEndAt, uniqueId]);
 
   React.useEffect(() => {
     if (videoElement.current) {
@@ -370,6 +331,7 @@ const PixiVideoSprite = React.forwardRef<
   React.useEffect(() => {
     const minStartAt =
       Math.round((Number(frameStartAt) + Number.EPSILON) * 100) / 100;
+
     const onload = function () {
       if (videoElement.current) {
         videoElement.current.currentTime = minStartAt;
@@ -378,29 +340,11 @@ const PixiVideoSprite = React.forwardRef<
     };
 
     const onEnd = function () {
-      //dispatchState({ isPlaying: false });
-      if (videoElement.current) {
-        const vid = videoElement.current;
-        const isVidPlaying =
-          vid.currentTime > 0 &&
-          !vid.paused &&
-          !vid.ended &&
-          vid.readyState > vid.HAVE_CURRENT_DATA;
-
-        if (isVidPlaying) {
-          videoElement.current.pause();
-        }
-      }
       videoStateRef.current.isWaiting = false;
       videoStateRef.current.isStalled = false;
     };
 
     const onLoadStart = function () {
-      //dispatchState({ isWaiting: true, isStalled: false });
-      if (videoElement.current) {
-        videoElement.current.pause();
-      }
-
       videoStateRef.current.isWaiting = true;
       videoStateRef.current.isStalled = false;
     };
@@ -412,8 +356,6 @@ const PixiVideoSprite = React.forwardRef<
     };
 
     const onStalled = function () {
-      //dispatchState({ isStalled: true });
-      //setVideoState({ isWaiting: false, isStalled: true });
       videoStateRef.current.isWaiting = false;
       videoStateRef.current.isStalled = true;
     };
@@ -436,7 +378,8 @@ const PixiVideoSprite = React.forwardRef<
     }).then((texture) => {
       if (!texture) return;
       // texture.baseTexture.resource.source.currentSrc = urlWithTimestamp;
-      setVideoTexture(texture);
+      videoTextureRef.current = texture;
+      setVideoLoaded(true);
 
       // @ts-ignore
       videoElement.current = texture.baseTexture.resource.source;
@@ -477,7 +420,12 @@ const PixiVideoSprite = React.forwardRef<
   React.useEffect(() => {
     /// run the timeout for checking it all below logic
     const timeoutId = setTimeout(() => {
-      if (videoTexture && tweenRef.current && tl.current) {
+      if (
+        videoLoaded &&
+        videoTextureRef.current &&
+        tweenRef.current &&
+        tl.current
+      ) {
         const tweenCurrentProgress = tweenRef.current.progress();
         if (
           tweenCurrentProgress < 0.1 &&
@@ -485,54 +433,15 @@ const PixiVideoSprite = React.forwardRef<
           !tweenRef.current.isActive() &&
           !isRemotion
         ) {
-          videoElement.current.play().then(() => {
-            videoStateRef.current.isPlaying = false;
-            if (videoElement.current) videoElement.current.pause();
-          });
+          videoElement.current.currentTime = frameStartAt;
+          videoTextureRef.current.update();
         }
       }
     }, 30);
     return () => {
       clearTimeout(timeoutId);
     };
-  }, [videoTexture]);
-
-  /** ON start use effect to check if the timeline is really in progress else stop playing */
-  React.useEffect(() => {
-    // inactivate if timeline is inactive
-    if (tl.current && !tl.current.isActive() && !isRemotion) {
-      videoStateRef.current.isPlaying = false;
-      if (videoElement.current) videoElement.current.pause();
-    }
-
-    const timeoutId = setTimeout(() => {
-      if (videoTexture && tl.current && updater > 0 && !isRemotion) {
-        if (!tl.current.isActive()) {
-          videoStateRef.current.isPlaying = false;
-          if (videoElement.current) videoElement.current.pause();
-        }
-        const vid = videoElement.current;
-        if (
-          vid &&
-          tl.current.isActive() &&
-          tweenRef.current &&
-          tweenRef.current.isActive()
-        ) {
-          const isVidPlaying =
-            vid.currentTime > 0 &&
-            !vid.paused &&
-            !vid.ended &&
-            vid.readyState > vid.HAVE_CURRENT_DATA;
-          if (!isVidPlaying) videoElement.current.play();
-          videoStateRef.current.isPlaying = true;
-        }
-        /// videoStateRef.current.progress = tweenRef.current.progress();
-      }
-    }, 10);
-    return () => {
-      clearTimeout(timeoutId);
-    };
-  }, [updater, videoTexture]);
+  }, [videoLoaded]);
 
   return (
     <AbstractContainer
@@ -545,9 +454,9 @@ const PixiVideoSprite = React.forwardRef<
     >
       {/* @ts-ignore */}
       <Container ref={containerRef}>
-        {videoTexture && (
+        {videoTextureRef.current && (
           <Sprite
-            texture={videoTexture}
+            texture={videoTextureRef.current}
             width={width}
             height={height}
             anchor={0.5}

@@ -24,6 +24,7 @@ type PixiAudioSpriteProps = {
   mute: boolean;
   speed: number;
   visible: boolean;
+  waveform?: boolean;
 };
 interface AudioState {
   isPlaying: boolean;
@@ -56,6 +57,7 @@ const PixiAudioSprite: React.FC<PixiAudioSpriteProps> = (props) => {
   const audioStateRef = useRef<AudioState>(initialState);
   const tweenRef = useRef<gsap.core.Tween>(null);
   const audioContainerRef = React.useRef<Howl>(null);
+  /// const audioSpriteBaseTextureRef = React.useRef<PIXI.BaseTexture>(null);
 
   //// Context
   const { tl, dragModeRef } = useContext(GsapPixieContext);
@@ -72,6 +74,7 @@ const PixiAudioSprite: React.FC<PixiAudioSpriteProps> = (props) => {
     audioStartAt,
     audioEndAt,
     visible,
+    /// waveform = false,
   } = props;
 
   /** Adding custom event listners */
@@ -177,6 +180,7 @@ const PixiAudioSprite: React.FC<PixiAudioSpriteProps> = (props) => {
         onInterrupt: onInterrupt,
         onUpdate: gsapOnUpdate,
         onUpdateParams: [audioStartAt, audioEndAt],
+        id: uniqueId,
       };
       // gsap context for tl to revert timeline;
       ctx = gsap.context(() => {
@@ -203,7 +207,7 @@ const PixiAudioSprite: React.FC<PixiAudioSpriteProps> = (props) => {
       }
       ctx.revert(); // cleanup!
     };
-  }, [startAt, endAt, audioStartAt, audioEndAt]);
+  }, [startAt, endAt, audioStartAt, audioEndAt, uniqueId]);
 
   React.useEffect(() => {
     if (containerRef.current) {
