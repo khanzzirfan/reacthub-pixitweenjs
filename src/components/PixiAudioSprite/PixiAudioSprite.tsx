@@ -8,14 +8,21 @@ import { Container, Sprite } from "@pixi/react";
 import { useCustomEventListener } from "../../events";
 import gsap from "gsap";
 import * as PIXI from "pixi.js";
+import AbstractContainer from "../../hocs/AbstractContainer";
+
 // @ts-ignore
 import isEmpty from "lodash/isEmpty";
 // @ts-ignore
 import debounce from "lodash/debounce";
 import { Howl } from "howler";
 import { isRemoteAsset } from "../../utils/isRemoteAsset";
+import {
+  PixiBaseSpriteProps,
+  ForwardedRefResponse,
+} from "../../types/BaseProps";
+import { Waveforms } from "../../hocs/OverlayTilingSprite";
 
-type PixiAudioSpriteProps = {
+export interface PixiAudioSpriteProps extends PixiBaseSpriteProps {
   uniqueId: string;
   src: string;
   startAt: number;
@@ -25,10 +32,7 @@ type PixiAudioSpriteProps = {
   mute: boolean;
   speed: number;
   visible: boolean;
-  waveform?: boolean;
-  width?: number;
-  height?: number;
-};
+}
 interface AudioState {
   isPlaying: boolean;
   progress: number;
@@ -41,7 +45,10 @@ interface AudioState {
   completed?: boolean;
 }
 
-const PixiAudioSprite: React.FC<PixiAudioSpriteProps> = (props) => {
+const PixiAudioSprite = React.forwardRef<
+  ForwardedRefResponse | null,
+  PixiAudioSpriteProps
+>((props, ref) => {
   const initialState: AudioState = {
     isPlaying: false,
     progress: 0,
@@ -88,29 +95,35 @@ const PixiAudioSprite: React.FC<PixiAudioSpriteProps> = (props) => {
     audioStartAt,
     audioEndAt,
     visible = false,
-    waveform = false,
-    width = 300,
-    height = 300,
+    transformation,
   } = props;
 
-  React.useLayoutEffect(() => {
-    canvasRef.current = document.createElement("canvas");
-    canvasRef.current.setAttribute("id", `${uniqueId}audioContainer`);
-    // set width and height;
-    canvasRef.current.setAttribute("width", `300`);
-    canvasRef.current.setAttribute("height", `300`);
-    const body = bodyRef.current;
-    // Append the new child to the body
-    body.appendChild(canvasRef.current);
+  const {
+    width = 0,
+    height = 0,
+    x = 0,
+    y = 0,
+    waveform = Waveforms.NONE,
+  } = transformation || {};
 
+  React.useLayoutEffect(() => {
+    if (waveform !== Waveforms.NONE) {
+      canvasRef.current = document.createElement("canvas");
+      canvasRef.current.setAttribute("id", `${uniqueId}audioContainer`);
+      // set width and height;
+      canvasRef.current.setAttribute("width", `300`);
+      canvasRef.current.setAttribute("height", `300`);
+      // Append the new child to the body
+      bodyRef.current.appendChild(canvasRef.current);
+    }
     // Cleanup: Remove the new child when the component is unmounted
     return () => {
-      if (canvasRef.current) {
-        body.removeChild(canvasRef.current);
+      if (canvasRef.current && bodyRef.current) {
+        bodyRef.current.removeChild(canvasRef.current);
         canvasRef.current = undefined;
       }
     };
-  }, []);
+  }, [waveform]);
 
   /** Adding custom event listners */
   /** Event Listeneres */
@@ -229,7 +242,18 @@ const PixiAudioSprite: React.FC<PixiAudioSpriteProps> = (props) => {
     };
 
     loadAsync();
-  }, [src]);
+  }, [
+    uniqueId,
+    src,
+    startAt,
+    endAt,
+    audioStartAt,
+    audioEndAt,
+    mute,
+    visible,
+    speed,
+    src,
+  ]);
 
   // /** stop video playing when gsapDragging is true */
   React.useEffect(() => {
@@ -346,6 +370,10 @@ const PixiAudioSprite: React.FC<PixiAudioSpriteProps> = (props) => {
     if (containerRef.current) {
       setIsMounted(true);
     }
+    return () => {
+      console.log("unmounting audio sprite", uniqueId);
+      console.log("audioContainerRef.current", audioContainerRef.current);
+    };
   }, []);
 
   React.useEffect(() => {
@@ -366,7 +394,7 @@ const PixiAudioSprite: React.FC<PixiAudioSpriteProps> = (props) => {
         autoplay: false,
         loop: false,
         rate: speed || 1,
-        volume: !mute && visible ? 1 : 0,
+        /// volume: !mute && visible ? 1 : 0,
         onload: () => {
           audioStateRef.current.loaded = true;
           if (audioContainerRef.current) {
@@ -380,13 +408,13 @@ const PixiAudioSprite: React.FC<PixiAudioSpriteProps> = (props) => {
             audioContainerRef.current.pause();
             audioStateRef.current.isPlaying = false;
             audioStateRef.current.completed = false;
-            if (!analyserRef.current && waveform) {
+            if (!analyserRef.current && waveform !== Waveforms.NONE) {
               // Take 2
               /////// Create an AnalyserNode and connect it to the Howler.js audio node
               const analyser = Howler.ctx.createAnalyser();
               analyser.fftSize = 256;
               const gainNode = Howler.ctx.createGain();
-              gainNode.gain.value = 1; // Adjust the gain as needed
+              // gainNode.gain.value = 1; // Adjust the gain as needed
               // Connect the Howler.js audio node to the AnalyserNode and GainNode
               const audioSource = Howler.ctx.createMediaElementSource(
                 // @ts-ignore
@@ -427,6 +455,11 @@ const PixiAudioSprite: React.FC<PixiAudioSpriteProps> = (props) => {
           audioStateRef.current.isPlaying = false;
         },
       });
+
+      // resume howler ctx
+      Howler.ctx.resume().then(() => {
+        console.log("audio ctx resumed");
+      });
     }
     return () => {
       // app.loader.reset();
@@ -435,10 +468,19 @@ const PixiAudioSprite: React.FC<PixiAudioSpriteProps> = (props) => {
         audioContainerRef.current.unload();
       }
 
+      // disconnect analyser
+      // if (analyserRef.current) {
+      //   if (audioSourceRef.current)
+      //     audioSourceRef.current.disconnect(analyserRef.current);
+      // }
+
       // delete the blocl url on onumount
       if (!isEmpty(blobUrl)) {
         URL.revokeObjectURL(blobUrl);
       }
+
+      // unload the audio container ref
+      /// Howler.unload();
     };
   }, [
     uniqueId,
@@ -466,20 +508,27 @@ const PixiAudioSprite: React.FC<PixiAudioSpriteProps> = (props) => {
   return (
     // @ts-ignore
     <Container ref={containerRef}>
-      {waveform && isLoaded && videoTextureRef.current && (
-        <Sprite
-          texture={videoTextureRef.current}
-          width={width || 300}
-          height={height || 300}
-          anchor={0.5}
-          x={0}
-          y={0}
-          ref={imageRef}
-          alpha={visible ? 1 : 0}
-        />
+      {waveform !== Waveforms.NONE && isLoaded && videoTextureRef.current && (
+        <AbstractContainer
+          {...props}
+          ref={ref}
+          ignoreTlForVideo={true}
+          isGif={true}
+        >
+          <Sprite
+            texture={videoTextureRef.current}
+            width={width || 300}
+            height={height || 300}
+            anchor={0.5}
+            x={x}
+            y={y}
+            ref={imageRef}
+            alpha={visible ? 1 : 0}
+          />
+        </AbstractContainer>
       )}
     </Container>
   );
-};
+});
 
 export default PixiAudioSprite;

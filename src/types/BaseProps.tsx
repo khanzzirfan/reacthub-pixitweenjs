@@ -1,12 +1,12 @@
 import { Effects } from "./Effects";
-import { OverlayTypes } from "../hocs/OverlayTilingSprite";
+import { OverlayTypes, Waveforms } from "../hocs/OverlayTilingSprite";
 import { Animations } from "./Animations";
 
 export interface PixiBaseSpriteProps {
   children?: React.ReactNode;
   uniqueId: string;
   src?: string;
-  
+
   startAt: number;
   endAt: number;
   visible: boolean;
@@ -52,6 +52,7 @@ export interface PixiBaseSpriteProps {
     };
     effect?: Effects;
     overlay?: OverlayTypes;
+    waveform?: Waveforms;
   };
   pointerdown?: () => void;
   pointerup?: () => void;

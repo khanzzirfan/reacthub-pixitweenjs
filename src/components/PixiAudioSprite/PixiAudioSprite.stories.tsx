@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { PixiAudioSprite } from ".";
 import { AppStateContextProvider } from "../../utils/AppStateProvider";
 import { AppWrapper } from "../../utils/AppWrapper";
+import { Waveforms } from "../../hocs/OverlayTilingSprite";
 
 // More on how to set up stories at: https://storybook.js.org/docs/react/writing-stories/introduction
 const meta = {
@@ -65,6 +66,16 @@ export const Normal: Story = {
     mute: false,
     speed: 1,
     visible: true,
+    transformation: {
+      x: 0,
+      y: 0,
+      width: 0,
+      height: 0,
+      rotation: 0,
+      scale: 1,
+      alpha: 1,
+      anchor: 0.5,
+    },
   },
 };
 
@@ -85,7 +96,17 @@ export const Visualization: Story = {
     mute: false,
     speed: 1,
     visible: true,
-    waveform: true,
+    transformation: {
+      x: 0,
+      y: 0,
+      width: 0,
+      height: 0,
+      rotation: 0,
+      scale: 1,
+      alpha: 1,
+      anchor: 0.5,
+      waveform: Waveforms.EQUALIZER,
+    },
   },
 };
 
@@ -106,6 +127,16 @@ export const Speech: Story = {
     mute: false,
     speed: 1,
     visible: true,
+    transformation: {
+      x: 0,
+      y: 0,
+      width: 0,
+      height: 0,
+      rotation: 0,
+      scale: 1,
+      alpha: 1,
+      anchor: 0.5,
+    },
   },
 };
 
@@ -125,6 +156,16 @@ export const Muted: Story = {
     mute: true,
     speed: 1,
     visible: true,
+    transformation: {
+      x: 0,
+      y: 0,
+      width: 0,
+      height: 0,
+      rotation: 0,
+      scale: 1,
+      alpha: 1,
+      anchor: 0.5,
+    },
   },
 };
 
@@ -145,5 +186,15 @@ export const SplitPosition: Story = {
     mute: false,
     speed: 1,
     visible: true,
+    transformation: {
+      x: 0,
+      y: 0,
+      width: 0,
+      height: 0,
+      rotation: 0,
+      scale: 1,
+      alpha: 1,
+      anchor: 0.5,
+    },
   },
 };
