@@ -1,5 +1,5 @@
-import { Effects } from "./Effects";
-import { OverlayTypes, Waveforms } from "../hocs/OverlayTilingSprite";
+import { Effects, Waveforms } from "./Effects";
+import { OverlayTypes } from "../hocs/OverlayTilingSprite";
 import { Animations } from "./Animations";
 
 export interface PixiBaseSpriteProps {

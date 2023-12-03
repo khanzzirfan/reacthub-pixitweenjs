@@ -9,12 +9,6 @@ export enum OverlayTypes {
   BRICKS = "bricks",
 }
 
-export enum Waveforms {
-  NONE = "none",
-  EQUALIZER = "equalizer",
-  SIRIWAVE = "siriwave",
-}
-
 export interface Overlay {
   src: string;
   blendmode: "ADD" | "MULTIPLY";

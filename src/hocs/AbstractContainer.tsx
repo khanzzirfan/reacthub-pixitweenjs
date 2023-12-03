@@ -49,6 +49,7 @@ const initalTransforms = {
   y: 0,
   width: 0,
   height: 0,
+  anchor: 0.5,
   animation: Animations.NONE,
   maxX: 0,
   maxY: 0,
