@@ -38,3 +38,27 @@ PixiTweenJs is designed to help you build animated time-controlled canvas elemen
 ## Usage
 
 Visit the [storybook](https://64b9d71094fa7aed0c7291cf-bpnkkrlkgw.chromatic.com)
+
+## Documentation
+
+## License
+
+This library is licensed under the MIT License. See the LICENSE.md file for details.
+
+Note: This library comes with restrictions. You are not allowed to copy, modify, or sell this library or any derivative work on behalf of the original author. Usage is permitted only under the terms specified in the license.
+
+For example:
+
+- Allowed: Use in personal and non-commercial projects.
+- Not Allowed: Copying, modification, or commercial use without explicit permission.
+
+## Contributing
+
+Want to contribute to pixitweenjs? Our [contributing guide](Contribution.md) has you covered.
+
+## See also
+
+[editly](https://github.com/mifi/editly) - Declarative video API I also created earlier
+[remotion](https://github.com/remotion-dev/remotion) - Great inspiration
+
+Made with ❤️ in 🇦🇺
