@@ -29,6 +29,10 @@ npm install
     "pixi-filters": "5.1.1",
     "pixi-svg": "3.2.0",
     "pixi.js": "6.5.9",
+    "gsap": "3.11.5",
+    "howler": "^2.2.3",
+    "lottie-web": "^5.10.2",
+    "react-custom-events": "^1.1.1",
 ```
 
 ## Description
