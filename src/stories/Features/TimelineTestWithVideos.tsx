@@ -15,12 +15,30 @@ import { ChakraProvider } from "@chakra-ui/react";
 import PixiStage from "../../utils/PixiStage";
 import * as PIXI from "pixi.js";
 import { PixiSequenceWrapper } from "../../components/PixiSequence/PixiSeqenceWrapper";
+import { Animations } from "../../types";
+import { Effects } from "../../types/Effects";
+import { OverlayTypes } from "../../hocs/OverlayTilingSprite";
 
 export enum SpriteType {
   Image = "Image",
   Gif = "Gif",
   Video = "Video",
 }
+
+const initalTransforms = {
+  x: 0,
+  y: 0,
+  width: 0,
+  height: 0,
+  animation: Animations.NONE,
+  maxX: 0,
+  maxY: 0,
+  scale: 1,
+  rotation: 0,
+  effect: Effects.Normal,
+  overlay: OverlayTypes.NONE,
+  anchor: 0.5,
+};
 
 const randomIds = {
   image: "image-" + Math.random().toString(36).substr(2, 9),
@@ -195,6 +213,7 @@ export const TimelineTestVideos = (props: TimelineProps) => {
                   audioStartAt={0}
                   audioEndAt={5}
                   visible={true}
+                  transformation={initalTransforms}
                 />
               </PixiSequence>
               <PixiSequence

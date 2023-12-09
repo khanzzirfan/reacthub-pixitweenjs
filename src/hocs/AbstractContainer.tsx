@@ -44,6 +44,21 @@ interface AnimationProps {
   maxY: number;
 }
 
+const initalTransforms = {
+  x: 0,
+  y: 0,
+  width: 0,
+  height: 0,
+  anchor: 0.5,
+  animation: Animations.NONE,
+  maxX: 0,
+  maxY: 0,
+  scale: 1,
+  rotation: 0,
+  effect: Effects.Normal,
+  overlay: OverlayTypes.NONE,
+};
+
 const AbstractContainer = React.forwardRef<
   ForwardedRefResponse | null,
   AbstractContainerProps
@@ -76,17 +91,7 @@ const AbstractContainer = React.forwardRef<
     uniqueId,
     visible,
     startAt,
-    transformation: {
-      x,
-      y,
-      width,
-      height,
-      scale = [1, 1],
-      rotation = 0,
-      effect,
-      overlay,
-      animation = Animations.NONE,
-    },
+    transformation = initalTransforms,
     applyTransformer,
     disabled,
     pointerdown,
@@ -98,6 +103,18 @@ const AbstractContainer = React.forwardRef<
     onDoubleClick,
     isTextEditMode,
   } = props;
+
+  const {
+    x = 0,
+    y = 0,
+    width,
+    height,
+    scale = [1, 1],
+    rotation = 0,
+    effect,
+    overlay,
+    animation = Animations.NONE,
+  } = transformation;
 
   const anim = useGsapEffect();
 

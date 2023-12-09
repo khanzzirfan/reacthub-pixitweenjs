@@ -11,12 +11,29 @@ import { PixiSequenceWrapper } from "../../components/PixiSequence/PixiSeqenceWr
 /// import pixi stage
 import PixiStage from "../../utils/PixiStage";
 import * as PIXI from "pixi.js";
+import { Animations } from "../../types";
+import { Effects } from "../../types/Effects";
+import { OverlayTypes } from "../../hocs/OverlayTilingSprite";
 
 export enum SpriteType {
   Image = "Image",
   Gif = "Gif",
   Video = "Video",
 }
+const initalTransforms = {
+  x: 0,
+  y: 0,
+  width: 0,
+  height: 0,
+  animation: Animations.NONE,
+  maxX: 0,
+  maxY: 0,
+  scale: 1,
+  rotation: 0,
+  effect: Effects.Normal,
+  overlay: OverlayTypes.NONE,
+  anchor: 0.5,
+};
 
 const randomIds = {
   image: "image-" + Math.random().toString(36).substr(2, 9),
@@ -101,6 +118,7 @@ export const TimelineTestAudios = (props: TimelineProps) => {
                   audioEndAt={10}
                   visible={true}
                   src="https://d1r0cf5836ptgd.cloudfront.net/public%2Firfan%40trolio.com%2F6472d56e805c3bffc3cded33%2Fvideos%2F7M7ixuYvwQ%2Fsingle-speaker-speech-audio.mp3"
+                  transformation={initalTransforms}
                 />
               </PixiSequence>
 
@@ -117,6 +135,7 @@ export const TimelineTestAudios = (props: TimelineProps) => {
                   audioStartAt={0}
                   audioEndAt={5}
                   visible={true}
+                  transformation={initalTransforms}
                 />
               </PixiSequence>
               <PixiSequence
@@ -133,6 +152,7 @@ export const TimelineTestAudios = (props: TimelineProps) => {
                   audioEndAt={9.482438}
                   src="https://d1r0cf5836ptgd.cloudfront.net/public%2Firfan%40trolio.com%2F6472d56e805c3bffc3cded33%2Fvideos%2Ftik4DkVw_V%2Fpenguins-audio_1-8.MP3"
                   visible={true}
+                  transformation={initalTransforms}
                 />
               </PixiSequence>
             </PixiSequenceWrapper>

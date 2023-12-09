@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { PixiAudioSprite } from ".";
 import { AppStateContextProvider } from "../../utils/AppStateProvider";
 import { AppWrapper } from "../../utils/AppWrapper";
+import { Waveforms } from "../../types/Effects";
 
 // More on how to set up stories at: https://storybook.js.org/docs/react/writing-stories/introduction
 const meta = {
@@ -42,6 +43,30 @@ const meta = {
       control: "boolean",
       description: "element to be visible on pixi stage and interactive",
     },
+    transformation: {
+      control: "object",
+      description: "transformation of the sprite",
+      x: { control: "number", description: "x position of the sprite" },
+      y: { control: "number", description: "y position of the sprite" },
+      width: { control: "number", description: "width of the sprite" },
+      height: { control: "number", description: "height of the sprite" },
+      anchor: { control: "number", description: "anchor of the sprite" },
+      rotation: { control: "number", description: "rotation of the sprite" },
+      alpha: {
+        control: "number",
+        min: 0,
+        max: 1,
+        description: "alpha of the sprite",
+      },
+      scale: { control: "number", description: "scale of the sprite" },
+      tint: { control: "number", description: "tint of the sprite" },
+      blendMode: { control: "number", description: "blendMode of the sprite" },
+      waveform: {
+        type: "string",
+        options: Object.values(Waveforms),
+        description: "Waveforms effects of the sprite",
+      },
+    },
   },
 } satisfies Meta<typeof PixiAudioSprite>;
 
@@ -65,6 +90,86 @@ export const Normal: Story = {
     mute: false,
     speed: 1,
     visible: true,
+    transformation: {
+      x: 0,
+      y: 0,
+      width: 0,
+      height: 0,
+      rotation: 0,
+      scale: 1,
+      alpha: 1,
+      anchor: 0.5,
+    },
+  },
+};
+
+// More on writing stories with args: https://storybook.js.org/docs/react/writing-stories/args
+export const Visualization: Story = {
+  render: (args: any) => {
+    const initialState = {
+      uniqueId: "audio001", // uniqueId of the sprite
+      src: "https://d1r0cf5836ptgd.cloudfront.net/public%2Firfan%40trolio.com%2F6556e2bc65dffe866558cf47%2Fvideos%2Fz8AyBilLvx%2Fpenguins-audio_1-8.MP3",
+      startAt: 0,
+      endAt: 5,
+      audioStartAt: 0,
+      audioEndAt: 5,
+      mute: false,
+      speed: 1,
+      visible: true,
+      transformation: {
+        x: 100,
+        y: 100,
+        width: 300,
+        height: 300,
+        rotation: 0,
+        scale: 1,
+        alpha: 1,
+        anchor: 0.5,
+        waveform: args.waveform || Waveforms.EQUALIZER,
+      },
+    };
+
+    return (
+      <AppStateContextProvider {...initialState}>
+        <PixiAudioSprite {...initialState} />
+      </AppStateContextProvider>
+    );
+  },
+  args: {
+    uniqueId: "audio001", // uniqueId of the sprite
+    src: "https://d1r0cf5836ptgd.cloudfront.net/public%2Firfan%40trolio.com%2F6556e2bc65dffe866558cf47%2Fvideos%2Fz8AyBilLvx%2Fpenguins-audio_1-8.MP3",
+    startAt: 0,
+    endAt: 5,
+    audioStartAt: 0,
+    audioEndAt: 5,
+    mute: false,
+    speed: 1,
+    visible: true,
+    transformation: {
+      x: 100,
+      y: 100,
+      width: 300,
+      height: 300,
+      rotation: 0,
+      scale: 1,
+      alpha: 1,
+      anchor: 0.5,
+      waveform: Waveforms.EQUALIZER,
+    },
+  },
+  argTypes: {
+    // @ts-ignore
+    waveform: {
+      control: "select",
+      options: Object.values(Waveforms),
+      description:
+        "Waveforms effects of the sprite. it is enum type supplied as prop to the transformation property in the props.",
+    },
+  },
+  parameters: {
+    controls: {
+      include: ["waveform"],
+    },
   },
 };
 
@@ -85,10 +190,20 @@ export const Speech: Story = {
     mute: false,
     speed: 1,
     visible: true,
+    transformation: {
+      x: 0,
+      y: 0,
+      width: 0,
+      height: 0,
+      rotation: 0,
+      scale: 1,
+      alpha: 1,
+      anchor: 0.5,
+    },
   },
 };
 
-export const Customized: Story = {
+export const Muted: Story = {
   render: (args: any) => (
     <AppStateContextProvider {...args}>
       <PixiAudioSprite {...args} />
@@ -104,6 +219,16 @@ export const Customized: Story = {
     mute: true,
     speed: 1,
     visible: true,
+    transformation: {
+      x: 0,
+      y: 0,
+      width: 0,
+      height: 0,
+      rotation: 0,
+      scale: 1,
+      alpha: 1,
+      anchor: 0.5,
+    },
   },
 };
 
@@ -124,5 +249,15 @@ export const SplitPosition: Story = {
     mute: false,
     speed: 1,
     visible: true,
+    transformation: {
+      x: 0,
+      y: 0,
+      width: 0,
+      height: 0,
+      rotation: 0,
+      scale: 1,
+      alpha: 1,
+      anchor: 0.5,
+    },
   },
 };
