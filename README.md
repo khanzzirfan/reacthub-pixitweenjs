@@ -58,7 +58,7 @@ Want to contribute to pixitweenjs? Our [contributing guide](Contribution.md) has
 
 ## See also
 
-[editly](https://github.com/mifi/editly) - Declarative video API I also created earlier
-[remotion](https://github.com/remotion-dev/remotion) - Great inspiration
+- [editly](https://github.com/mifi/editly) - Declarative video API I also created earlier
+- [remotion](https://github.com/remotion-dev/remotion) - Great inspiration
 
 Made with ❤️ in 🇦🇺
