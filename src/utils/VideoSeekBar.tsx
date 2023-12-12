@@ -137,7 +137,7 @@ export const VideoSeekBar: React.FC = () => {
         </Slider>
       </Flex>
       <Flex flexDir={"row"}>
-        <Text px={2}>Gsap-CurrentTime:</Text>
+        <Text px={2}>Time:</Text>
         <Text ml={2} width={10}>
           {Math.round((time + Number.EPSILON) * 100) / 100}
         </Text>

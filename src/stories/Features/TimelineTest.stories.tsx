@@ -7,7 +7,7 @@ import { TimelineTestAudios } from "./TimelineTestAudios";
 
 // More on how to set up stories at: https://storybook.js.org/docs/react/writing-stories/introduction
 const meta = {
-  title: "Features/TimelineTest",
+  title: "Features/Timelines",
   component: TimelineTest,
 
   tags: ["autodocs"],
@@ -73,16 +73,19 @@ export const VideoTest: Story = {
         // image sprite
         startAt: 3,
         endAt: 8,
+        // ... other props
       },
       {
         // image sprite
         startAt: 0,
-        endAt: 6,
+        endAt: 3,
+        // ... other props
       },
       {
         // video sprite
-        startAt: 2,
+        startAt: 1,
         endAt: 7,
+        // ... other props
       },
       {
         // video sprite
@@ -92,10 +95,13 @@ export const VideoTest: Story = {
       {
         startAt: 8,
         endAt: 19,
+        // ... other props
       },
       {
-        startAt: 21,
-        endAt: 25,
+        // audio sprite
+        startAt: 15,
+        endAt: 19,
+        // ... other props
       },
     ],
   },

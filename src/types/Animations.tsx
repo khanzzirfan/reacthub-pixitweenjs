@@ -60,6 +60,7 @@ export enum Animations {
   CIRCULAR = "CIRCULAR",
   EXPO = "EXPO",
   SINE = "SINE",
+  SPIN = "SPIN",
   // Custom
 }
 

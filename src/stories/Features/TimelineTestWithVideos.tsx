@@ -16,7 +16,7 @@ import PixiStage from "../../utils/PixiStage";
 import * as PIXI from "pixi.js";
 import { PixiSequenceWrapper } from "../../components/PixiSequence/PixiSeqenceWrapper";
 import { Animations } from "../../types";
-import { Effects } from "../../types/Effects";
+import { Effects, Waveforms } from "../../types/Effects";
 import { OverlayTypes } from "../../hocs/OverlayTilingSprite";
 
 export enum SpriteType {
@@ -104,8 +104,11 @@ export const TimelineTestVideos = (props: TimelineProps) => {
                   endAt={sequences[0].endAt}
                   transformation={{
                     ...ImageProps.transformation,
-                    x: 150,
-                    y: 150,
+                    x: 380,
+                    y: 350,
+                    width: 100,
+                    height: 100,
+                    animation: Animations.BOUNCE_IN_RIGHT,
                   }}
                 />
               </PixiSequence>
@@ -119,7 +122,7 @@ export const TimelineTestVideos = (props: TimelineProps) => {
                     setSelected(randomIds.image2);
                   }}
                   uniqueId={randomIds.image2}
-                  src="https://d1r0cf5836ptgd.cloudfront.net/public%2Firfan%40trolio.com%2F64b6738988f3e366d955cebd%2Fvideos%2FMXlcGUL5Ws%2Fanim-mercury.jpg"
+                  src="https://assets.codepen.io/693612/surya.svg"
                   applyTransformer={selected === randomIds.image2}
                   startAt={sequences[1].startAt}
                   endAt={sequences[1].endAt}
@@ -127,8 +130,60 @@ export const TimelineTestVideos = (props: TimelineProps) => {
                     ...ImageProps.transformation,
                     x: 500,
                     y: 200,
-                    width: 100,
-                    height: 100,
+                    width: 150,
+                    height: 140,
+                    animation: Animations.SHAKE,
+                  }}
+                />
+
+                <PixiImageSprite
+                  {...ImageProps}
+                  uniqueId={"10101010"}
+                  src="https://assets.codepen.io/693612/surya.svg"
+                  applyTransformer={selected === randomIds.image2}
+                  startAt={sequences[1].startAt}
+                  endAt={sequences[1].endAt}
+                  transformation={{
+                    ...ImageProps.transformation,
+                    x: 100,
+                    y: 200,
+                    width: 150,
+                    height: 140,
+                    animation: Animations.SPIN,
+                  }}
+                />
+
+                <PixiImageSprite
+                  {...ImageProps}
+                  uniqueId={"ld87jud"}
+                  src="https://assets.codepen.io/693612/surya.svg"
+                  applyTransformer={selected === randomIds.image2}
+                  startAt={sequences[1].startAt}
+                  endAt={sequences[1].endAt}
+                  transformation={{
+                    ...ImageProps.transformation,
+                    x: 300,
+                    y: 200,
+                    width: 150,
+                    height: 140,
+                    animation: Animations.BOUNCE_IN_DOWN,
+                  }}
+                />
+
+                <PixiImageSprite
+                  {...ImageProps}
+                  uniqueId={"djd798jffdj"}
+                  src="https://assets.codepen.io/693612/surya.svg"
+                  applyTransformer={selected === randomIds.image2}
+                  startAt={sequences[1].startAt}
+                  endAt={sequences[1].endAt}
+                  transformation={{
+                    ...ImageProps.transformation,
+                    x: 300,
+                    y: 400,
+                    width: 150,
+                    height: 140,
+                    animation: Animations.BOUNCE_IN_UP,
                   }}
                 />
               </PixiSequence>
@@ -142,7 +197,7 @@ export const TimelineTestVideos = (props: TimelineProps) => {
                   pointerdown={() => {
                     setSelected(randomIds.image3);
                   }}
-                  src="https://d1r0cf5836ptgd.cloudfront.net/public%2Firfan%40trolio.com%2F6472d56e805c3bffc3cded33%2Fvideos%2FYra_kbKljX%2Fbig_buck_bunny_720p_1mb.mp4"
+                  src="https://d1r0cf5836ptgd.cloudfront.net/public%2Firfan%40trolio.com%2F6472d56e805c3bffc3cded33%2Fvideos%2Fwk9I4g8iJK%2FTransformers_+Rise+of+the+BeastsOfficial.mp4"
                   applyTransformer={selected === randomIds.image3}
                   startAt={sequences[2].startAt}
                   endAt={sequences[2].endAt}
@@ -150,8 +205,8 @@ export const TimelineTestVideos = (props: TimelineProps) => {
                     ...videoProps.transformation,
                     x: 100,
                     y: 350,
-                    width: 250,
-                    height: 240,
+                    width: 200,
+                    height: 200,
                   }}
                 />
               </PixiSequence>
@@ -173,14 +228,14 @@ export const TimelineTestVideos = (props: TimelineProps) => {
                     ...videoProps.transformation,
                     x: 100,
                     y: 100,
-                    width: 300,
+                    width: 350,
                     height: 300,
                   }}
                 />
               </PixiSequence>
               <PixiSequence
-                startAt={sequences[3].startAt}
-                endAt={sequences[3].endAt}
+                startAt={sequences[4].startAt}
+                endAt={sequences[4].endAt}
                 uniqueId="video-1"
               >
                 <PixiVideoSprite
@@ -191,13 +246,15 @@ export const TimelineTestVideos = (props: TimelineProps) => {
                   applyTransformer={selected === randomIds.image3}
                   startAt={sequences[4].startAt}
                   endAt={sequences[4].endAt}
-                  src="https://d1r0cf5836ptgd.cloudfront.net/public%2Firfan%40trolio.com%2F6472d56e805c3bffc3cded33%2Fvideos%2FnnS18Ov5PM%2Fdwsample+mov+360p.mov"
+                  frameStartAt={5}
+                  frameEndAt={12}
+                  src="https://d1r0cf5836ptgd.cloudfront.net/public%2Firfan%40trolio.com%2F6472d56e805c3bffc3cded33%2Fvideos%2Fwk9I4g8iJK%2FTransformers_+Rise+of+the+BeastsOfficial.mp4"
                   transformation={{
                     ...videoProps.transformation,
                     x: 450,
                     y: 100,
-                    width: 250,
-                    height: 250,
+                    width: 450,
+                    height: 300,
                   }}
                 />
               </PixiSequence>
@@ -213,7 +270,18 @@ export const TimelineTestVideos = (props: TimelineProps) => {
                   audioStartAt={0}
                   audioEndAt={5}
                   visible={true}
-                  transformation={initalTransforms}
+                  transformation={{
+                    ...initalTransforms,
+                    x: 430,
+                    y: 100,
+                    width: 300,
+                    height: 300,
+                    rotation: 0,
+                    scale: 1,
+                    alpha: 1,
+                    anchor: 0.5,
+                    waveform: Waveforms.LED,
+                  }}
                 />
               </PixiSequence>
               <PixiSequence
@@ -225,7 +293,7 @@ export const TimelineTestVideos = (props: TimelineProps) => {
                   pointerdown={() => {
                     setSelected(randomIds!?.image);
                   }}
-                  src="https://d1r0cf5836ptgd.cloudfront.net/public%2Firfan%40trolio.com%2F64b6738988f3e366d955cebd%2Fvideos%2FMXlcGUL5Ws%2Fanim-mercury.jpg"
+                  src="https://assets.codepen.io/693612/surya.svg"
                   applyTransformer={selected === randomIds?.image}
                   uniqueId={randomIds?.image}
                   startAt={sequences[5].startAt}
@@ -234,6 +302,7 @@ export const TimelineTestVideos = (props: TimelineProps) => {
                     ...ImageProps.transformation,
                     x: 150,
                     y: 150,
+                    animation: Animations.PULSE,
                   }}
                 />
               </PixiSequence>

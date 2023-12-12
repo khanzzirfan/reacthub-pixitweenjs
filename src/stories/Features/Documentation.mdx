@@ -1,0 +1,97 @@
+import { Meta } from "@storybook/blocks";
+
+<Meta title="Features/Documentation" />
+
+# Setting up a timeline using PixiJS Sprites and Sequences
+
+A common way is to setup each PixiJs sprites as child component of a `PixiSequence` component. This way PixiSequence can take care of mounting and unmouting component at a given start and end times.
+
+<br />
+
+## Example
+
+```
+export const Timeline = (props: TimelineProps) => {
+    // ... state/effects/refs/ etc
+    const { sequences } = props;
+    return (
+        <GsapPixieContextProvider>
+            <ChakraProvider>
+                <Flex flexDir={"column"}>
+                    {/* PixiJS Stage */}
+                    <PixiStage
+                        width={width}
+                        height={height}
+                        options={{ backgroundColor: backgroundColorx, resolution: 2 }}
+                    >
+                        {/* PixiJS Sequence Wrapper for total duration of timeline in seconds */}
+                        <PixiSequenceWrapper startAt={0} endAt={25}>
+                            {/* PixiJS Sequence 1 */}
+                            <PixiSequence startAt={sequences[0].startAt} endAt={sequences[0].endAt}>
+                            {/* PixiJS Image Sprite 1 */}
+                            <PixiImageSprite
+                                // ...props
+                            />
+                            </PixiSequence>
+                            {/* Other PixiJS Sequences and Sprites */}
+                        </PixiSequenceWrapper>
+                    </PixiStage>
+
+                    {/* Video Seek Bar Component */}
+                    <Box mt={5} w={700}>
+                    <VideoSeekBar />
+                    </Box>
+                </Flex>
+            </ChakraProvider>
+        </GsapPixieContextProvider>
+    );
+};
+
+```
+
+## The Fundamentals
+
+### GsapPixieContextProvider
+
+The `<GsapPixieContextProvider />` component serves as a context provider for integrating the GSAP (GreenSock Animation Platform) library with PixiJS within a React application. By wrapping components in this context provider, it establishes a shared context for animation control, enabling seamless coordination between GSAP and PixiJS functionalities. This integration is essential for managing and synchronizing complex animations, timelines, and sequences involving PixiJS elements, providing a unified and efficient solution for animation development in a React environment.
+
+### PixiStage
+
+The PixiStage component is a key element in PixiJS, a powerful 2D rendering library for the web. The Stage should be defined at the root leven of the canvas component to render all the pixijs sprites.
+
+### PixiSequenceWrapper
+
+The PixiSequenceWrapper component is a custom wrapper designed to facilitate the organization and management of sequences of PixiJS elements
+
+- Sequence Organization:
+  The primary purpose of PixiSequenceWrapper is to organize and group PixiJS elements into sequences, allowing for a structured representation of animations over time.
+- Timeline Control:
+  It serves as a container for sequences, defining a specific duration or timeframe during which the encapsulated PixiJS elements will be animated. The startAt and endAt props determine the timeline range for the sequences within the wrapper.
+
+### PixiSequence
+
+The PixiSequence component plays a crucial role in orchestrating and defining individual sequences of PixiJS elements within the context of a timeline. Here are key points summarizing its usage:
+
+- Temporal Definition:
+
+PixiSequence delineates a specific sequence of PixiJS elements, specifying the time range during which these elements will be animated. The startAt and endAt props set the temporal boundaries for the sequence.
+
+- Integration with PixiSequenceWrapper:
+
+Typically nested within a PixiSequenceWrapper, the PixiSequence component benefits from the wrapper's temporal context and organizational structure. It operates within the timeline defined by its parent wrapper.
+
+- Child of PixiStage:
+
+In the provided code, PixiSequence is a child of the PixiSequenceWrapper, which, in turn, is nested within the PixiStage. This hierarchy ensures proper coordination within the PixiJS rendering environment.
+
+- Container for PixiJS Elements:
+
+The PixiSequence encapsulates PixiJS sprites (e.g., PixiImageSprite, PixiVideoSprite, PixiAudioSprite) or other display objects. These elements are then animated within the specified temporal range.
+
+- Modular Animation Workflow:
+
+By encapsulating individual sequences, the component supports a modular and organized animation workflow. Developers can structure animations into distinct sequences, promoting clarity and maintainability.
+
+- Event Handling:
+
+The component allows for the definition of event handlers, such as pointerdown in the provided code. This enables interactive behavior, triggering actions when a user interacts with the PixiJS elements within the sequence.
