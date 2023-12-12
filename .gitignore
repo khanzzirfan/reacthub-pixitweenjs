@@ -35,3 +35,5 @@ dist
 
 ## storybook build files
 storybook-static
+# Local Netlify folder
+.netlify
