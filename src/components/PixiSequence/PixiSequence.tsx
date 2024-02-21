@@ -42,11 +42,18 @@ export const PixiSequence = (props: PixiSequenceProps) => {
         dataTweenRef.current = gsap
           .timeline()
           .set(containerRef.current, { alpha: initialAlpha })
-          .to(containerRef.current, {
-            pixi: {
-              alpha: 1,
-              eventMode: "static",
+          .set(
+            containerRef.current,
+            {
+              pixi: {
+                alpha: 1,
+                eventMode: "static",
+              },
             },
+            0.01
+          )
+          .to(containerRef.current, {
+            pixi: {},
             duration: Number(endAt) - Number(startAt),
           })
           .set(containerRef.current, { alpha: 0, eventMode: "none" });
